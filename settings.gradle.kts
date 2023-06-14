@@ -1,0 +1,1 @@
+rootProject.name = "com.cosmos.stealth-api"
