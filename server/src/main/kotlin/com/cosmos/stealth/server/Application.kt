@@ -1,6 +1,6 @@
-package com.cosmos.stealth
+package com.cosmos.stealth.server
 
-import com.cosmos.stealth.plugins.configureRouting
+import com.cosmos.stealth.server.plugins.configureRouting
 import io.ktor.server.application.Application
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty

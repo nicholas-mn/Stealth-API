@@ -1,1 +1,3 @@
-rootProject.name = "com.cosmos.stealth-api"
+rootProject.name = "stealth-api"
+
+include(":server")

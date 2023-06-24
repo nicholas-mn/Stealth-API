@@ -1,4 +1,4 @@
-package com.cosmos.stealth.plugins
+package com.cosmos.stealth.server.plugins
 
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
