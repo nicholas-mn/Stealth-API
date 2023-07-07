@@ -9,7 +9,7 @@ import com.squareup.moshi.JsonClass
  *
  * Values: community,user,feedable
  */
-
+@Suppress("EnumNaming")
 @JsonClass(generateAdapter = false)
 enum class SearchType(val value: String) {
 

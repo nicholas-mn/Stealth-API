@@ -9,7 +9,7 @@ import com.squareup.moshi.JsonClass
  *
  * Values: reddit,teddit,lemmy
  */
-
+@Suppress("EnumNaming")
 @JsonClass(generateAdapter = false)
 enum class ServiceName(val value: String) {
 

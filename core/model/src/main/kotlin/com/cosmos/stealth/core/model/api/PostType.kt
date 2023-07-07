@@ -8,7 +8,7 @@ import com.squareup.moshi.JsonClass
  *
  * Values: text,image,video,link
  */
-
+@Suppress("EnumNaming")
 @JsonClass(generateAdapter = false)
 enum class PostType(val value: String) {
 

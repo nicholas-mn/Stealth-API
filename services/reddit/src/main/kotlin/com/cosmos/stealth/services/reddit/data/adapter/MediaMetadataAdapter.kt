@@ -46,11 +46,13 @@ class MediaMetadataAdapter(
             annotations: MutableSet<out Annotation>,
             moshi: Moshi
         ): JsonAdapter<*>? {
-            if (annotations.isNotEmpty()) return null
-            if (Types.getRawType(type) == MediaMetadata::class.java) {
-                return MediaMetadataAdapter(moshi)
+            return when {
+                annotations.isNotEmpty() -> null
+
+                Types.getRawType(type) == MediaMetadata::class.java -> MediaMetadataAdapter(moshi)
+
+                else -> null
             }
-            return null
         }
     }
 }

@@ -10,6 +10,7 @@ import com.squareup.moshi.JsonClass
  * @param text 
  * @param url 
  */
+@Suppress("EnumNaming")
 @JsonClass(generateAdapter = true)
 data class FlairData (
     @Json(name = "type")

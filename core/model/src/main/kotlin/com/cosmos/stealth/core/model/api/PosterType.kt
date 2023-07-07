@@ -9,7 +9,7 @@ import com.squareup.moshi.JsonClass
  *
  * Values: regular,moderator,admin
  */
-
+@Suppress("EnumNaming")
 @JsonClass(generateAdapter = false)
 enum class PosterType(val value: String) {
 

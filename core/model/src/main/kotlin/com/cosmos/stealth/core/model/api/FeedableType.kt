@@ -9,7 +9,7 @@ import com.squareup.moshi.JsonClass
  *
  * Values: post,comment
  */
-
+@Suppress("EnumNaming")
 @JsonClass(generateAdapter = false)
 enum class FeedableType(val value: String) {
 

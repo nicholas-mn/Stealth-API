@@ -9,7 +9,7 @@ import com.squareup.moshi.JsonClass
  *
  * Values: best,new,top
  */
-
+@Suppress("EnumNaming")
 @JsonClass(generateAdapter = false)
 enum class Sort(val value: String) {
 

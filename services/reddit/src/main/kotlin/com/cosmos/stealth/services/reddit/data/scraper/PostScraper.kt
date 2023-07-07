@@ -82,7 +82,6 @@ class PostScraper(
         val crosspostTitle = attr(Selector.Attr.CROSSPOST_ROOT_TITLE)
         val crosspostAuthor = attr(Selector.Attr.CROSSPOST_ROOT_AUTHOR)
         val crosspostSubredditPrefixed = attr(Selector.Attr.CROSSPOST_ROOT_SUBREDDIT_PREFIXED)
-        // val crosspostTime = attr(Selector.Attr.CROSSPOST_ROOT_TIME) // TODO: format = 1 year ago
 
         val crosspost = crosspostAuthor
             .takeIf { it.isNotBlank() }

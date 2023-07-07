@@ -8,7 +8,7 @@ import com.squareup.moshi.JsonClass
  *
  * Values: user
  */
-
+@Suppress("EnumNaming")
 @JsonClass(generateAdapter = false)
 enum class UserType(val value: String) {
 

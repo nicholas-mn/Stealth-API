@@ -38,6 +38,7 @@ data class MoreChild (
     val data: MoreData
 ) : Child(ChildType.more)
 
+@Suppress("EnumNaming")
 enum class ChildType {
     @Json(name = "t1")
     t1,

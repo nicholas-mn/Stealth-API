@@ -5,6 +5,7 @@ import com.cosmos.stealth.services.reddit.data.adapter.Replies
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
+@Suppress("LongParameterList")
 @JsonClass(generateAdapter = true)
 class CommentData(
     @Json(name = "total_awards_received")
