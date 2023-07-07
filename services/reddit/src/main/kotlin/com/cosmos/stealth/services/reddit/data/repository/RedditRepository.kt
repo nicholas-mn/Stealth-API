@@ -33,7 +33,7 @@ class RedditRepository(
     override suspend fun getSubreddit(request: Request, subreddit: String, sorting: Sorting, after: String?): Feed {
         val response = safeApiCall {
             getSource(request.service.instance)
-                .getSubreddit(subreddit, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+                .getSubreddit(subreddit, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
         }
 
         return getSubreddit(response, request)
