@@ -9,7 +9,6 @@ import com.cosmos.stealth.services.reddit.data.model.Child
 import com.cosmos.stealth.services.reddit.data.model.Listing
 import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.TimeSorting
-import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi
 import com.cosmos.stealth.services.teddit.data.model.TedditUser
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -26,25 +25,25 @@ class DataTedditApi(private val client: HttpClient, private val urlSubstitutor: 
         after: String?,
         host: String?
     ): Listing {
-        val endpoint = RedditApi::getSubreddit.getEndpoint()
+        val endpoint = TedditApi::getSubreddit.getEndpoint()
 
-        val subredditParam = RedditApi::getSubreddit.getPathParameter(0) to subreddit
-        val sortParam = RedditApi::getSubreddit.getPathParameter(1) to sort.type
+        val subredditParam = TedditApi::getSubreddit.getPathParameter(0) to subreddit
+        val sortParam = TedditApi::getSubreddit.getPathParameter(1) to sort.type
 
         val url = urlSubstitutor.buildUrl(instance, endpoint, subredditParam, sortParam)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(RedditApi::getSubreddit.getQueryParameter(0), timeSorting?.type)
-            parameter(RedditApi::getSubreddit.getQueryParameter(1), after)
+            parameter(TedditApi::getSubreddit.getQueryParameter(0), timeSorting?.type)
+            parameter(TedditApi::getSubreddit.getQueryParameter(1), after)
         }.body()
     }
 
     override suspend fun getSubredditInfo(instance: String, subreddit: String, host: String?): Child {
-        val endpoint = RedditApi::getSubredditInfo.getEndpoint()
+        val endpoint = TedditApi::getSubredditInfo.getEndpoint()
 
-        val subredditParam = RedditApi::getSubredditInfo.getPathParameter(0) to subreddit
+        val subredditParam = TedditApi::getSubredditInfo.getPathParameter(0) to subreddit
 
         val url = urlSubstitutor.buildUrl(instance, endpoint, subredditParam)
 
@@ -62,19 +61,19 @@ class DataTedditApi(private val client: HttpClient, private val urlSubstitutor: 
         after: String?,
         host: String?
     ): Listing {
-        val endpoint = RedditApi::searchInSubreddit.getEndpoint()
+        val endpoint = TedditApi::searchInSubreddit.getEndpoint()
 
-        val subredditParam = RedditApi::searchInSubreddit.getPathParameter(0) to subreddit
-        val queryParam = RedditApi::searchInSubreddit.getPathParameter(1) to query
+        val subredditParam = TedditApi::searchInSubreddit.getPathParameter(0) to subreddit
+        val queryParam = TedditApi::searchInSubreddit.getPathParameter(1) to query
 
         val url = urlSubstitutor.buildUrl(instance, endpoint, subredditParam, queryParam)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(RedditApi::searchInSubreddit.getQueryParameter(0), sort?.type)
-            parameter(RedditApi::searchInSubreddit.getQueryParameter(1), timeSorting?.type)
-            parameter(RedditApi::searchInSubreddit.getQueryParameter(2), after)
+            parameter(TedditApi::searchInSubreddit.getQueryParameter(0), sort?.type)
+            parameter(TedditApi::searchInSubreddit.getQueryParameter(1), timeSorting?.type)
+            parameter(TedditApi::searchInSubreddit.getQueryParameter(2), after)
         }.body()
     }
 
@@ -85,17 +84,17 @@ class DataTedditApi(private val client: HttpClient, private val urlSubstitutor: 
         sort: Sort,
         host: String?
     ): List<Listing> {
-        val endpoint = RedditApi::getPost.getEndpoint()
+        val endpoint = TedditApi::getPost.getEndpoint()
 
-        val permalinkParam = RedditApi::getPost.getPathParameter(0) to permalink
+        val permalinkParam = TedditApi::getPost.getPathParameter(0) to permalink
 
         val url = urlSubstitutor.buildUrl(instance, endpoint, permalinkParam)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(RedditApi::getPost.getQueryParameter(0), limit)
-            parameter(RedditApi::getPost.getQueryParameter(1), sort.type)
+            parameter(TedditApi::getPost.getQueryParameter(0), limit)
+            parameter(TedditApi::getPost.getQueryParameter(1), sort.type)
         }.body()
     }
 
@@ -107,18 +106,18 @@ class DataTedditApi(private val client: HttpClient, private val urlSubstitutor: 
         after: String?,
         host: String?
     ): TedditUser {
-        val endpoint = RedditApi::getUserPosts.getEndpoint()
+        val endpoint = TedditApi::getUserPosts.getEndpoint()
 
-        val userParam = RedditApi::getUserPosts.getPathParameter(0) to user
+        val userParam = TedditApi::getUserPosts.getPathParameter(0) to user
 
         val url = urlSubstitutor.buildUrl(instance, endpoint, userParam)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(RedditApi::getUserPosts.getQueryParameter(0), sort.type)
-            parameter(RedditApi::getUserPosts.getQueryParameter(1), timeSorting?.type)
-            parameter(RedditApi::getUserPosts.getQueryParameter(2), after)
+            parameter(TedditApi::getUserPosts.getQueryParameter(0), sort.type)
+            parameter(TedditApi::getUserPosts.getQueryParameter(1), timeSorting?.type)
+            parameter(TedditApi::getUserPosts.getQueryParameter(2), after)
         }.body()
     }
 
@@ -130,18 +129,18 @@ class DataTedditApi(private val client: HttpClient, private val urlSubstitutor: 
         after: String?,
         host: String?
     ): TedditUser {
-        val endpoint = RedditApi::getUserComments.getEndpoint()
+        val endpoint = TedditApi::getUserComments.getEndpoint()
 
-        val userParam = RedditApi::getUserComments.getPathParameter(0) to user
+        val userParam = TedditApi::getUserComments.getPathParameter(0) to user
 
         val url = urlSubstitutor.buildUrl(instance, endpoint, userParam)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(RedditApi::getUserComments.getQueryParameter(0), sort.type)
-            parameter(RedditApi::getUserComments.getQueryParameter(1), timeSorting?.type)
-            parameter(RedditApi::getUserComments.getQueryParameter(2), after)
+            parameter(TedditApi::getUserComments.getQueryParameter(0), sort.type)
+            parameter(TedditApi::getUserComments.getQueryParameter(1), timeSorting?.type)
+            parameter(TedditApi::getUserComments.getQueryParameter(2), after)
         }.body()
     }
 
@@ -154,17 +153,17 @@ class DataTedditApi(private val client: HttpClient, private val urlSubstitutor: 
         after: String?,
         host: String?
     ): Listing {
-        val endpoint = RedditApi::searchSubreddit.getEndpoint()
+        val endpoint = TedditApi::searchSubreddit.getEndpoint()
 
         val url = urlSubstitutor.buildUrl(instance, endpoint)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(RedditApi::searchSubreddit.getQueryParameter(0), query)
-            parameter(RedditApi::searchSubreddit.getQueryParameter(1), sort?.type)
-            parameter(RedditApi::searchSubreddit.getQueryParameter(2), timeSorting?.type)
-            parameter(RedditApi::searchSubreddit.getQueryParameter(3), after)
+            parameter(TedditApi::searchSubreddit.getQueryParameter(0), query)
+            parameter(TedditApi::searchSubreddit.getQueryParameter(1), sort?.type)
+            parameter(TedditApi::searchSubreddit.getQueryParameter(2), timeSorting?.type)
+            parameter(TedditApi::searchSubreddit.getQueryParameter(3), after)
         }.body()
     }
 }
