@@ -12,7 +12,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class UrlSubstitutorTest {
@@ -63,9 +62,22 @@ class UrlSubstitutorTest {
 
         assertEquals("https://teddit.net/r/privacy/hot", url1)
         assertEquals("https://teddit.net/r/privacy/hot", url2)
-        assertFailsWith(IllegalStateException::class) {
-            urlSubstitutor.buildUrl("invalidurl.com", endpoint, subredditParam, sortParam)
-        }
+    }
+
+    @Test
+    fun testBuildWholeUrlWithQuery() = runTest {
+        val baseUrl = "https://teddit.net"
+        val baseHttpUrl = baseUrl.toHttpUrl()
+        val endpoint = "/r/{subreddit}/{sort}?api"
+
+        val subredditParam = "subreddit" to "privacy"
+        val sortParam = "sort" to "hot"
+
+        val url1 = urlSubstitutor.buildUrl(baseUrl, endpoint, subredditParam, sortParam)
+        val url2 = urlSubstitutor.buildUrl(baseHttpUrl, endpoint, subredditParam, sortParam)
+
+        assertEquals("https://teddit.net/r/privacy/hot?api", url1)
+        assertEquals("https://teddit.net/r/privacy/hot?api", url2)
     }
 
     @Test
@@ -79,9 +91,6 @@ class UrlSubstitutorTest {
 
         assertEquals("https://teddit.net/subreddits/search", url1)
         assertEquals("https://teddit.net/subreddits/search", url2)
-        assertFailsWith(IllegalStateException::class) {
-            urlSubstitutor.buildUrl("invalidurl.com", endpoint)
-        }
     }
 
     @After

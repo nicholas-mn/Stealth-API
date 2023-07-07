@@ -3,14 +3,13 @@ package com.cosmos.stealth.core.network.util
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.apache.commons.text.StringSubstitutor
 
 class UrlSubstitutor(private val defaultDispatcher: CoroutineDispatcher) {
 
     suspend fun buildUrl(baseUrl: String, path: String, vararg params: Pair<String, String>): String =
         withContext(defaultDispatcher) {
-            val baseHttpUrl = baseUrl.toHttpUrlOrNull() ?: error("$baseUrl is not a valid URL")
+            val baseHttpUrl = LinkValidator(baseUrl).validUrl ?: error("$baseUrl is not a valid URL")
             buildUrl(baseHttpUrl, path, *params)
         }
 
@@ -18,10 +17,9 @@ class UrlSubstitutor(private val defaultDispatcher: CoroutineDispatcher) {
         withContext(defaultDispatcher) {
             val encodedPath = buildUrl(path, *params)
 
-            baseUrl.newBuilder()
-                .encodedPath(encodedPath)
-                .build()
-                .toString()
+            // Build the URL manually to avoid query parameter encoding
+            // HttpUrl adds a trailing slash at the end of the URL, so it needs to be removed before appending our path
+            baseUrl.toString().dropLast(1).plus(encodedPath)
         }
 
     suspend fun buildUrl(path: String, vararg params: Pair<String, String>): String =
