@@ -8,7 +8,7 @@ typealias RedditSort = com.cosmos.stealth.services.reddit.data.model.Sort
 
 val Sort.redditSort: Sorting
     get() = when (this) {
-        Sort.best -> Sorting(RedditSort.BEST)
+        Sort.best -> Sorting(RedditSort.HOT)
         Sort.new -> Sorting(RedditSort.NEW)
         Sort.top -> Sorting(RedditSort.TOP, TimeSorting.ALL)
     }
