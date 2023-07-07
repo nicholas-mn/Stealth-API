@@ -1,4 +1,4 @@
-package com.cosmos.stealth.services.reddit.data.repository
+package com.cosmos.stealth.services.teddit.data.repository
 
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.Feed
@@ -7,7 +7,6 @@ import com.cosmos.stealth.core.model.api.Post
 import com.cosmos.stealth.core.model.api.SearchResults
 import com.cosmos.stealth.core.model.api.UserInfo
 import com.cosmos.stealth.core.model.data.Request
-import com.cosmos.stealth.core.network.util.LinkValidator
 import com.cosmos.stealth.core.network.util.Resource
 import com.cosmos.stealth.services.reddit.data.mapper.CommentMapper
 import com.cosmos.stealth.services.reddit.data.mapper.CommunityMapper
@@ -15,14 +14,13 @@ import com.cosmos.stealth.services.reddit.data.mapper.PostMapper
 import com.cosmos.stealth.services.reddit.data.mapper.UserMapper
 import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.Sorting
-import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi
+import com.cosmos.stealth.services.reddit.data.repository.Repository
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi
 import kotlinx.coroutines.CoroutineDispatcher
-import okhttp3.HttpUrl.Companion.toHttpUrl
 
-@Suppress("TooManyFunctions", "LongParameterList")
-class RedditRepository(
-    private val dataRedditApi: RedditApi,
-    private val scrapRedditApi: RedditApi,
+@Suppress("TooManyFunctions")
+class TedditRepository(
+    private val tedditApi: TedditApi,
     postMapper: PostMapper,
     communityMapper: CommunityMapper,
     userMapper: UserMapper,
@@ -32,8 +30,14 @@ class RedditRepository(
 
     override suspend fun getSubreddit(request: Request, subreddit: String, sorting: Sorting, after: String?): Feed {
         val response = safeApiCall {
-            getSource(request.service.instance)
-                .getSubreddit(subreddit, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+            tedditApi.getSubreddit(
+                request.getInstance(),
+                subreddit,
+                sorting.generalSorting,
+                sorting.timeSorting,
+                after,
+                request.info.host
+            )
         }
 
         return getSubreddit(response, request)
@@ -41,7 +45,7 @@ class RedditRepository(
 
     override suspend fun getSubredditInfo(request: Request, subreddit: String): Resource<CommunityInfo> {
         return getSubredditInfo(request) {
-            getSource(request.service.instance).getSubredditInfo(subreddit, request.info.host)
+            tedditApi.getSubredditInfo(request.getInstance(), subreddit, request.info.host)
         }
     }
 
@@ -53,22 +57,21 @@ class RedditRepository(
         after: String?
     ): Resource<SearchResults> {
         return searchInSubreddit(request) {
-            getSource(request.service.instance)
-                .searchInSubreddit(
-                    subreddit,
-                    query,
-                    sorting.generalSorting,
-                    sorting.timeSorting,
-                    after,
-                    request.info.host
-                )
+            tedditApi.searchInSubreddit(
+                request.getInstance(),
+                subreddit,
+                query,
+                sorting.generalSorting,
+                sorting.timeSorting,
+                after,
+                request.info.host
+            )
         }
     }
 
     override suspend fun getPost(request: Request, permalink: String, limit: Int?, sort: Sort): Resource<Post> {
         val response = safeApiCall {
-            getSource(request.service.instance)
-                .getPost(permalink, limit, sort, request.info.host)
+            tedditApi.getPost(request.getInstance(), permalink, limit, sort, request.info.host)
         }
 
         return getPost(response, request)
@@ -79,19 +82,25 @@ class RedditRepository(
         children: List<String>,
         linkId: String
     ): Resource<List<Feedable>> {
-        val childrenString = children.take(LOAD_MORE_LIMIT).joinToString(",")
-
-        return getMoreChildren(request) { getSource(request.service.instance).getMoreChildren(childrenString, linkId) }
+        return Resource.Exception(UnsupportedOperationException())
     }
 
     override suspend fun getUserInfo(request: Request, user: String): Resource<UserInfo> {
-        return getUserInfo(request) { getSource(request.service.instance).getUserInfo(user, request.info.host) }
+        return getUserInfo(request) {
+            tedditApi.getUserPosts(request.getInstance(), user, Sort.HOT, null, null, request.info.host).about
+        }
     }
 
     override suspend fun getUserPosts(request: Request, user: String, sorting: Sorting, after: String?): Feed {
         val response = safeApiCall {
-            getSource(request.service.instance)
-                .getUserPosts(user, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+            tedditApi.getUserPosts(
+                request.getInstance(),
+                user,
+                sorting.generalSorting,
+                sorting.timeSorting,
+                after,
+                request.info.host
+            ).overview
         }
 
         return getUserPosts(response, request)
@@ -99,8 +108,14 @@ class RedditRepository(
 
     override suspend fun getUserComments(request: Request, user: String, sorting: Sorting, after: String?): Feed {
         val response = safeApiCall {
-            getSource(request.service.instance)
-                .getUserComments(user, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+            tedditApi.getUserComments(
+                request.getInstance(),
+                user,
+                sorting.generalSorting,
+                sorting.timeSorting,
+                after,
+                request.info.host
+            ).overview
         }
 
         return getUserComments(response, request)
@@ -112,10 +127,7 @@ class RedditRepository(
         sorting: Sorting,
         after: String?
     ): Resource<SearchResults> {
-        return searchPost(request) {
-            getSource(request.service.instance)
-                .searchPost(query, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
-        }
+        return Resource.Exception(UnsupportedOperationException())
     }
 
     override suspend fun searchUser(
@@ -124,10 +136,7 @@ class RedditRepository(
         sorting: Sorting,
         after: String?
     ): Resource<SearchResults> {
-        return searchUser(request) {
-            getSource(request.service.instance)
-                .searchUser(query, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
-        }
+        return Resource.Exception(UnsupportedOperationException())
     }
 
     override suspend fun searchSubreddit(
@@ -137,23 +146,16 @@ class RedditRepository(
         after: String?
     ): Resource<SearchResults> {
         return searchSubreddit(request) {
-            getSource(request.service.instance)
-                .searchSubreddit(query, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+            tedditApi.searchSubreddit(
+                request.getInstance(),
+                query,
+                sorting.generalSorting,
+                sorting.timeSorting,
+                after,
+                request.info.host
+            )
         }
     }
 
-    private fun getSource(instance: String?): RedditApi {
-        val instanceUrl = LinkValidator(instance).validUrl
-
-        return when (instanceUrl?.host) {
-            SCRAP_URL.host -> scrapRedditApi
-            else -> dataRedditApi
-        }
-    }
-
-    companion object {
-        private const val LOAD_MORE_LIMIT = 100
-
-        private val SCRAP_URL = RedditApi.BASE_URL_OLD.toHttpUrl()
-    }
+    private fun Request.getInstance(): String = service.instance ?: TedditApi.BASE_URL
 }

@@ -30,6 +30,15 @@ class UrlSubstitutorTest {
 
     @Test
     fun testBuildUrl() = runTest {
+        val endpoint = "/subreddits/search"
+
+        val url = urlSubstitutor.buildUrl(endpoint)
+
+        assertEquals("/subreddits/search", url)
+    }
+
+    @Test
+    fun testBuildUrlNoParam() = runTest {
         val endpoint = "/r/{subreddit}/{sort}"
 
         val subredditParam = "subreddit" to "privacy"
@@ -56,6 +65,22 @@ class UrlSubstitutorTest {
         assertEquals("https://teddit.net/r/privacy/hot", url2)
         assertFailsWith(IllegalStateException::class) {
             urlSubstitutor.buildUrl("invalidurl.com", endpoint, subredditParam, sortParam)
+        }
+    }
+
+    @Test
+    fun testBuildWholeUrlNoParam() = runTest {
+        val baseUrl = "https://teddit.net"
+        val baseHttpUrl = baseUrl.toHttpUrl()
+        val endpoint = "/subreddits/search"
+
+        val url1 = urlSubstitutor.buildUrl(baseUrl, endpoint)
+        val url2 = urlSubstitutor.buildUrl(baseHttpUrl, endpoint)
+
+        assertEquals("https://teddit.net/subreddits/search", url1)
+        assertEquals("https://teddit.net/subreddits/search", url2)
+        assertFailsWith(IllegalStateException::class) {
+            urlSubstitutor.buildUrl("invalidurl.com", endpoint)
         }
     }
 
