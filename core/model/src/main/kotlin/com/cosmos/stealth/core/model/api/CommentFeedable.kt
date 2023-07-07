@@ -75,5 +75,8 @@ data class CommentFeedable (
     val awards: Awards? = null,
 
     @Json(name = "authorFlair")
-    val authorFlair: Flair? = null
+    val authorFlair: Flair? = null,
+
+    @Json(name = "submitter")
+    val submitter: Boolean,
 ) : Feedable(FeedableType.comment)

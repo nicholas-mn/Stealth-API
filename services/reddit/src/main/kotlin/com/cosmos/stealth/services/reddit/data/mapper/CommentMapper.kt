@@ -59,7 +59,8 @@ class CommentMapper(
                 stickied,
                 controversiality > 0,
                 getAwards(),
-                toFlair(authorFlairRichText, flair)
+                toFlair(authorFlairRichText, flair),
+                isSubmitter
             )
         }
     }
