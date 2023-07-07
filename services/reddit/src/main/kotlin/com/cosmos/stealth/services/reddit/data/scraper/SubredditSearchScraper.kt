@@ -32,8 +32,10 @@ class SubredditSearchScraper(
     }
 
     private fun Element.toSubreddit(): AboutChild {
+        val name = attr(Selector.Attr.FULLNAME)
+
         val subscribeButton = selectFirst("span.search-subscribe-button")
-        val name = subscribeButton?.attr(Selector.Attr.SR_NAME).orEmpty()
+        val displayName = subscribeButton?.attr(Selector.Attr.SR_NAME).orEmpty()
 
         val title = selectFirst("a.search-title")?.text().orEmpty()
 
@@ -50,8 +52,9 @@ class SubredditSearchScraper(
             ?.run { toIntOrNull() }
 
         val data = AboutData(
-            null,
             name,
+            null,
+            displayName,
             null,
             title,
             null,

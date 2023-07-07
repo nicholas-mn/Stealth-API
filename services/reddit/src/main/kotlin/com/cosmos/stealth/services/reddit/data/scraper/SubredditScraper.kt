@@ -17,7 +17,7 @@ class SubredditScraper(
         val redditName = document.selectFirst("h1.redditname")
             ?.selectFirst(Scraper.Selector.Tag.A)
 
-        val name = redditName?.text().orEmpty()
+        val displayName = redditName?.text().orEmpty()
         val link = redditName?.attr(Scraper.Selector.Attr.HREF).orEmpty()
 
         val communityIcon = document.selectFirst("img[id=header-img]")
@@ -33,13 +33,20 @@ class SubredditScraper(
             ?.selectFirst(Selector.NUMBER)
             ?.toInt()
 
-        val descriptionHtml = document.selectFirst("div.titlebox")
+        val titleBox = document.selectFirst("div.titlebox")
+        val descriptionHtml = titleBox
             ?.selectFirst(Selector.MD)
             ?.outerHtml()
 
+        val name = titleBox
+            ?.selectFirst("input[name=thing_id]")
+            ?.attr("value")
+            .orEmpty()
+
         val data = AboutData(
-            null,
             name,
+            null,
+            displayName,
             null,
             title,
             null,
