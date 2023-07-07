@@ -125,6 +125,6 @@ data class PostFeedable (
     @Json(name = "authorFlair")
     val authorFlair: Flair? = null,
 
-    @Json(name = "PosterType")
+    @Json(name = "posterType")
     val posterType: PosterType? = PosterType.regular
 ) : Feedable(FeedableType.post)
