@@ -9,7 +9,7 @@ fun Resource<*>.toStatus(service: Service): Status {
     return when (this) {
         is Resource.Success -> Status(service, HttpURLConnection.HTTP_OK)
         is Resource.Error -> Status(service, code, message)
-        is Resource.Exception -> Status(service, HttpURLConnection.HTTP_INTERNAL_ERROR)
+        is Resource.Exception -> Status(service, HttpURLConnection.HTTP_INTERNAL_ERROR, throwable.message)
     }
 }
 
