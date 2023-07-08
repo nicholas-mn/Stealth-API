@@ -6,10 +6,14 @@ import com.squareup.moshi.JsonClass
 /**
  * Error description
  *
+ * @param code
  * @param message 
  */
 @JsonClass(generateAdapter = true)
 data class Error (
+    @Json(name = "code")
+    val code: Int,
+
     @Json(name = "message")
     val message: String
 )
