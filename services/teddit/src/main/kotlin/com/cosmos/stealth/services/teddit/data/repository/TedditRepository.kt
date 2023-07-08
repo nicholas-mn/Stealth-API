@@ -16,6 +16,7 @@ import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.Sorting
 import com.cosmos.stealth.services.reddit.data.repository.Repository
 import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi
+import kotlinx.coroutines.CoroutineDispatcher
 
 @Suppress("TooManyFunctions")
 class TedditRepository(
@@ -23,8 +24,9 @@ class TedditRepository(
     postMapper: PostMapper,
     communityMapper: CommunityMapper,
     userMapper: UserMapper,
-    commentMapper: CommentMapper
-) : Repository(postMapper, communityMapper, userMapper, commentMapper) {
+    commentMapper: CommentMapper,
+    defaultDispatcher: CoroutineDispatcher
+) : Repository(postMapper, communityMapper, userMapper, commentMapper, defaultDispatcher) {
 
     override suspend fun getSubreddit(request: Request, subreddit: String, sorting: Sorting, after: String?): Feed {
         val response = safeApiCall {

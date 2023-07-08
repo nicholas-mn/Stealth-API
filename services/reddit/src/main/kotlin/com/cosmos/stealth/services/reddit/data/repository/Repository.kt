@@ -1,18 +1,25 @@
 package com.cosmos.stealth.services.reddit.data.repository
 
+import com.cosmos.stealth.core.common.util.extension.interlace
+import com.cosmos.stealth.core.model.api.After
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.CommunityResults
 import com.cosmos.stealth.core.model.api.Feed
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.FeedableResults
 import com.cosmos.stealth.core.model.api.Post
+import com.cosmos.stealth.core.model.api.PostFeedable
 import com.cosmos.stealth.core.model.api.SearchResults
+import com.cosmos.stealth.core.model.api.Status
 import com.cosmos.stealth.core.model.api.UserInfo
 import com.cosmos.stealth.core.model.api.UserResults
+import com.cosmos.stealth.core.model.api.string
 import com.cosmos.stealth.core.model.data.Request
 import com.cosmos.stealth.core.network.data.repository.NetworkRepository
 import com.cosmos.stealth.core.network.util.Resource
+import com.cosmos.stealth.services.base.util.extension.isSuccess
 import com.cosmos.stealth.services.base.util.extension.map
+import com.cosmos.stealth.services.base.util.extension.orInternalError
 import com.cosmos.stealth.services.base.util.extension.toAfter
 import com.cosmos.stealth.services.base.util.extension.toStatus
 import com.cosmos.stealth.services.reddit.data.mapper.CommentMapper
@@ -28,16 +35,90 @@ import com.cosmos.stealth.services.reddit.data.model.MoreChildren
 import com.cosmos.stealth.services.reddit.data.model.PostChild
 import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.Sorting
+import com.cosmos.stealth.services.reddit.util.joinSubredditList
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withContext
+import java.net.HttpURLConnection
+import kotlin.math.ceil
 
 @Suppress("TooManyFunctions")
 abstract class Repository(
     private val postMapper: PostMapper,
     private val communityMapper: CommunityMapper,
     private val userMapper: UserMapper,
-    private val commentMapper: CommentMapper
+    private val commentMapper: CommentMapper,
+    private val defaultDispatcher: CoroutineDispatcher
 ) : NetworkRepository() {
+
+    suspend fun getSubreddit(
+        request: Request,
+        subreddit: List<String>,
+        sorting: Sorting,
+        after: String?
+    ): Feed {
+        return if (subreddit.size > REDDIT_SUBREDDIT_LIMIT) {
+            getMultiSubreddit(request, subreddit, sorting, after)
+        } else {
+            getSubreddit(request, joinSubredditList(subreddit), sorting, after)
+        }
+    }
+
+    private suspend fun getMultiSubreddit(
+        request: Request,
+        subreddit: List<String>,
+        sorting: Sorting,
+        after: String?
+    ): Feed = supervisorScope {
+        // Find the optimal chunk size to have lists of similar sizes
+        val chunkSize = ceil(subreddit.size / ceil(subreddit.size / REDDIT_SUBREDDIT_LIMIT.toDouble())).toInt()
+
+        val keys = after?.split(KEY_DELIMITER)
+
+        val queries = withContext(defaultDispatcher) {
+            subreddit
+                // Step 1: Split the subreddit list into chunks
+                .chunked(chunkSize)
+                // Step 2: Create the query string for each chunk
+                .map { joinSubredditList(it) }
+                // Step 3: Map each chunk with its `after` key (if available)
+                .mapIndexed { index, chunkedList -> chunkedList to keys?.getOrNull(index) }
+        }
+
+        // Step 4: Request the posts for each chunk in parallel
+        val responses = queries
+            .map { async { getSubreddit(request, it.first, sorting, it.second) } }
+            .awaitAll()
+
+        val feedables = mutableListOf<List<Feedable>>()
+        val afters = mutableListOf<After?>()
+
+        responses.forEach { response ->
+            val status = response.status.firstOrNull().orInternalError(request.service)
+
+            when {
+                status.isSuccess -> {
+                    feedables.add(response.items)
+                    afters.add(response.after?.firstOrNull())
+                }
+                else -> return@supervisorScope Feed(listOf(), null, listOf(status))
+            }
+        }
+
+        // Step 5: Flatten (and sort) the responses in order to have a single list of posts
+        val data = withContext(defaultDispatcher) { feedables.sort(sorting) }
+
+        // Step 6: Retrieve the `after` key for each response and join them to a single string
+        val afterKeys = afters
+            .joinToString(separator = KEY_DELIMITER) { it?.key?.string ?: "" }
+            .toAfter(request.service)
+
+        val status = Status(request.service, HttpURLConnection.HTTP_OK)
+
+        Feed(data, listOf(afterKeys), listOf(status))
+    }
 
     abstract suspend fun getSubreddit(request: Request, subreddit: String, sorting: Sorting, after: String?): Feed
 
@@ -207,5 +288,22 @@ abstract class Repository(
             val results = communityMapper.dataToEntities(it.data.children as List<AboutChild>, request.service)
             CommunityResults(results)
         }
+    }
+
+    private fun List<List<Feedable>>.sort(sorting: Sorting): List<Feedable> {
+        return when (sorting.generalSorting) {
+            // If sorting is set to NEW, simply flatten the lists and sort the posts by date
+            Sort.NEW -> this.flatten().sortedByDescending { (it as PostFeedable).created }
+            // If sorting is set to TOP, simply flatten the lists and sort the posts by score
+            Sort.TOP -> this.flatten().sortedByDescending { (it as PostFeedable).upvotes }
+            // For all the other sorting methods, interlace the lists to have a consistent result
+            // [['a', 'b', 'c'], ['e', 'f', 'g'], ['h', 'i']] ==> ['a', 'e', 'h', 'b', 'f', 'i', 'c', 'g']
+            else -> this.interlace()
+        }
+    }
+
+    companion object {
+        private const val REDDIT_SUBREDDIT_LIMIT = 100
+        private const val KEY_DELIMITER = ","
     }
 }

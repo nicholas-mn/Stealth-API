@@ -22,7 +22,6 @@ import com.cosmos.stealth.services.base.util.extension.isFailure
 import com.cosmos.stealth.services.base.util.extension.map
 import com.cosmos.stealth.services.reddit.data.repository.Repository
 import com.cosmos.stealth.services.reddit.util.extension.redditSort
-import com.cosmos.stealth.services.reddit.util.joinSubredditList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import java.net.HttpURLConnection
@@ -37,7 +36,7 @@ abstract class Gateway(
         sort: Sort,
         afterKey: AfterKey?
     ): Feed {
-        return repository.getSubreddit(request, joinSubredditList(communities), sort.redditSort, afterKey.string)
+        return repository.getSubreddit(request, communities, sort.redditSort, afterKey.string)
     }
 
     override suspend fun getCommunity(
