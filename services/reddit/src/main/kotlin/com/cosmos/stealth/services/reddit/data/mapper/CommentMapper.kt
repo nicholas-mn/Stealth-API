@@ -65,14 +65,14 @@ class CommentMapper(
         }
     }
 
-    private fun dataToEntity(data: MoreData, context: Service?): MoreContentFeedable {
+    private fun dataToEntity(data: MoreData, context: Service?, parent: PostData?): MoreContentFeedable {
         with(data) {
             return MoreContentFeedable(
                 context ?: Service(ServiceName.reddit),
                 id,
                 count,
                 children,
-                parentId,
+                parent?.name.orEmpty(),
                 depth ?: 0
             )
         }
@@ -85,7 +85,7 @@ class CommentMapper(
     ): Feedable = withContext(defaultDispatcher) {
         when (data.kind) {
             ChildType.t1 -> dataToEntity((data as CommentChild).data, context, parent)
-            ChildType.more -> dataToEntity((data as MoreChild).data, context)
+            ChildType.more -> dataToEntity((data as MoreChild).data, context, parent)
             else -> error("Unknown kind ${data.kind}")
         }
     }
