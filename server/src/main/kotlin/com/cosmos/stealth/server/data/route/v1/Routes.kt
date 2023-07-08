@@ -9,5 +9,6 @@ fun Routing.v1() {
         communityRouting()
         userRouting()
         postRouting()
+        servicesRouting()
     }
 }
