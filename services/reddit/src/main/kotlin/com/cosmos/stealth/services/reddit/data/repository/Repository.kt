@@ -28,21 +28,16 @@ import com.cosmos.stealth.services.reddit.data.model.MoreChildren
 import com.cosmos.stealth.services.reddit.data.model.PostChild
 import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.Sorting
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.supervisorScope
 
 @Suppress("TooManyFunctions")
 abstract class Repository(
     private val postMapper: PostMapper,
     private val communityMapper: CommunityMapper,
     private val userMapper: UserMapper,
-    private val commentMapper: CommentMapper,
-    mainImmediateDispatcher: CoroutineDispatcher
+    private val commentMapper: CommentMapper
 ) : NetworkRepository() {
-
-    private val scope = CoroutineScope(mainImmediateDispatcher + SupervisorJob())
 
     abstract suspend fun getSubreddit(request: Request, subreddit: String, sorting: Sorting, after: String?): Feed
 
@@ -89,12 +84,15 @@ abstract class Repository(
 
     abstract suspend fun getPost(request: Request, permalink: String, limit: Int?, sort: Sort): Resource<Post>
 
-    protected suspend fun getPost(response: Resource<List<Listing>>, request: Request): Resource<Post> {
-        return response.map {
+    protected suspend fun getPost(
+        response: Resource<List<Listing>>,
+        request: Request
+    ): Resource<Post> = supervisorScope {
+        response.map {
             val postChild = it[0].data.children[0] as PostChild
 
-            val post = scope.async { postMapper.dataToEntity(postChild, request.service) }
-            val replies = scope.async {
+            val post = async { postMapper.dataToEntity(postChild, request.service) }
+            val replies = async {
                 commentMapper.dataToEntities(it[1].data.children, request.service, postChild.data)
             }
 

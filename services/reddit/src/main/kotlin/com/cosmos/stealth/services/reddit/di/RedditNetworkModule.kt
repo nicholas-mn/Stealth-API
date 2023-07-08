@@ -1,7 +1,6 @@
 package com.cosmos.stealth.services.reddit.di
 
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.IO_DISPATCHER_QUALIFIER
-import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.MAIN_IMMEDIATE_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.common.util.TimeValue
 import com.cosmos.stealth.core.network.data.converter.MoshiContentConverter
 import com.cosmos.stealth.core.network.util.UrlSubstitutor
@@ -71,7 +70,6 @@ object NetworkModule {
             provideScrapRedditApi(
                 get(REDDIT_SCRAP_QUALIFIER),
                 get(),
-                get(MAIN_IMMEDIATE_DISPATCHER_QUALIFIER),
                 get(IO_DISPATCHER_QUALIFIER)
             )
         }
@@ -162,9 +160,8 @@ object NetworkModule {
     private fun provideScrapRedditApi(
         httpClient: HttpClient,
         urlSubstitutor: UrlSubstitutor,
-        mainImmediateDispatcher: CoroutineDispatcher,
         ioDispatcher: CoroutineDispatcher
     ): RedditApi {
-        return ScrapRedditApi(httpClient, urlSubstitutor, mainImmediateDispatcher, ioDispatcher)
+        return ScrapRedditApi(httpClient, urlSubstitutor, ioDispatcher)
     }
 }

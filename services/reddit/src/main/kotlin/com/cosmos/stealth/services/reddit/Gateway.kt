@@ -23,18 +23,13 @@ import com.cosmos.stealth.services.base.util.extension.map
 import com.cosmos.stealth.services.reddit.data.repository.Repository
 import com.cosmos.stealth.services.reddit.util.extension.redditSort
 import com.cosmos.stealth.services.reddit.util.joinSubredditList
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.supervisorScope
 import java.net.HttpURLConnection
 
 abstract class Gateway(
-    private val repository: Repository,
-    mainImmediateDispatcher: CoroutineDispatcher
+    private val repository: Repository
 ) : ServiceGateway {
-
-    private val scope = CoroutineScope(mainImmediateDispatcher + SupervisorJob())
 
     override suspend fun getFeed(
         request: Request,
@@ -50,18 +45,18 @@ abstract class Gateway(
         community: String,
         sort: Sort,
         afterKey: AfterKey?
-    ): Resource<Community> {
-        val feedAsync = scope.async {
+    ): Resource<Community> = supervisorScope {
+        val feedAsync = async {
             repository.getSubreddit(request, community, sort.redditSort, afterKey.string)
         }
-        val communityInfoAsync = scope.async { repository.getSubredditInfo(request, community) }
+        val communityInfoAsync = async { repository.getSubredditInfo(request, community) }
 
         val feed = feedAsync.await()
         val communityInfo = communityInfoAsync.await()
 
         val feedStatus = feed.status.firstOrNull() ?: Status(request.service, HttpURLConnection.HTTP_INTERNAL_ERROR)
 
-        return when {
+        when {
             feedStatus.isFailure -> Resource.Error(feedStatus.code, feedStatus.error.orEmpty())
             else -> communityInfo.map { Community(it, feed) }
         }
@@ -77,8 +72,8 @@ abstract class Gateway(
         sort: Sort,
         afterKey: AfterKey?,
         type: FeedableType
-    ): Resource<User> {
-        val feedAsync = scope.async {
+    ): Resource<User> = supervisorScope {
+        val feedAsync = async {
             when (type) {
                 FeedableType.post -> repository.getUserPosts(request, user, sort.redditSort, afterKey.string)
                 FeedableType.comment -> {
@@ -90,14 +85,14 @@ abstract class Gateway(
                 }
             }
         }
-        val userInfoAsync = scope.async { repository.getUserInfo(request, user) }
+        val userInfoAsync = async { repository.getUserInfo(request, user) }
 
         val feed = feedAsync.await()
         val userInfo = userInfoAsync.await()
 
         val feedStatus = feed.status.firstOrNull() ?: Status(request.service, HttpURLConnection.HTTP_INTERNAL_ERROR)
 
-        return when {
+        when {
             feedStatus.isFailure -> Resource.Error(feedStatus.code, feedStatus.error.orEmpty())
             else -> userInfo.map { User(it, feed) }
         }

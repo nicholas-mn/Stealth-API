@@ -16,7 +16,6 @@ import com.cosmos.stealth.services.reddit.data.mapper.UserMapper
 import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.Sorting
 import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi
-import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
 @Suppress("TooManyFunctions", "LongParameterList")
@@ -26,9 +25,8 @@ class RedditRepository(
     postMapper: PostMapper,
     communityMapper: CommunityMapper,
     userMapper: UserMapper,
-    commentMapper: CommentMapper,
-    mainImmediateDispatcher: CoroutineDispatcher
-) : Repository(postMapper, communityMapper, userMapper, commentMapper, mainImmediateDispatcher) {
+    commentMapper: CommentMapper
+) : Repository(postMapper, communityMapper, userMapper, commentMapper) {
 
     override suspend fun getSubreddit(request: Request, subreddit: String, sorting: Sorting, after: String?): Feed {
         val response = safeApiCall {

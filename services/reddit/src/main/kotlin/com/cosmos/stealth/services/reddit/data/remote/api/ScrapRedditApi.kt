@@ -17,19 +17,15 @@ import com.cosmos.stealth.services.reddit.data.scraper.UserScaper
 import io.ktor.client.HttpClient
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.supervisorScope
 
 @Suppress("TooManyFunctions")
 class ScrapRedditApi(
     client: HttpClient,
     urlSubstitutor: UrlSubstitutor,
-    mainImmediateDispatcher: CoroutineDispatcher,
     private val ioDispatcher: CoroutineDispatcher
 ) : BaseRedditApi(client, urlSubstitutor) {
-
-    private val scope = CoroutineScope(mainImmediateDispatcher + SupervisorJob())
 
     override suspend fun getSubreddit(
         subreddit: String,
@@ -60,19 +56,24 @@ class ScrapRedditApi(
         return Listing("t3", ListingData(null, null, emptyList(), null, null))
     }
 
-    override suspend fun getPost(permalink: String, limit: Int?, sort: Sort, host: String?): List<Listing> {
+    override suspend fun getPost(
+        permalink: String,
+        limit: Int?,
+        sort: Sort,
+        host: String?
+    ): List<Listing> = supervisorScope {
         val response = getRawPost(permalink, limit, sort, host)
         val body = response.bodyAsText()
 
-        val post = scope.async {
+        val post = async {
             PostScraper(ioDispatcher).scrap(body)
         }
 
-        val comments = scope.async {
+        val comments = async {
             CommentScraper(ioDispatcher).scrap(body)
         }
 
-        return listOf(post.await(), comments.await())
+        listOf(post.await(), comments.await())
     }
 
     override suspend fun getMoreChildren(children: String, linkId: String, host: String?): MoreChildren {
