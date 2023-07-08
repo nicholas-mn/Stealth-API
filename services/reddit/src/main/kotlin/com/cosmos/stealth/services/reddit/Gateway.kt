@@ -20,6 +20,7 @@ import com.cosmos.stealth.core.network.util.Resource
 import com.cosmos.stealth.services.base.data.ServiceGateway
 import com.cosmos.stealth.services.base.util.extension.isFailure
 import com.cosmos.stealth.services.base.util.extension.map
+import com.cosmos.stealth.services.reddit.data.model.Sort.BEST
 import com.cosmos.stealth.services.reddit.data.repository.Repository
 import com.cosmos.stealth.services.reddit.util.extension.redditSort
 import kotlinx.coroutines.async
@@ -102,7 +103,9 @@ abstract class Gateway(
     }
 
     override suspend fun getPost(request: Request, post: String, sort: Sort): Resource<Post> {
-        return repository.getPost(request, post, null, sort.redditSort.generalSorting)
+        // TODO: Special sort for posts
+        val redditSort = if (sort == Sort.best) BEST else sort.redditSort.generalSorting
+        return repository.getPost(request, post, null, redditSort)
     }
 
     override suspend fun getMoreContent(

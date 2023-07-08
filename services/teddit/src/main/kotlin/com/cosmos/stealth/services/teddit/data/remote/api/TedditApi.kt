@@ -46,7 +46,7 @@ interface TedditApi {
 
     //endregion
 
-    @GET("{permalink}?api")
+    @GET("/{permalink}?api")
     suspend fun getPost(
         @Url instance: String,
         @Path("permalink", encoded = true) permalink: String,

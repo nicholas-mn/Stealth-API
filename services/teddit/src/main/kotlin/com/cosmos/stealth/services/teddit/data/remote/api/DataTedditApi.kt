@@ -11,9 +11,12 @@ import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.TimeSorting
 import com.cosmos.stealth.services.teddit.data.model.TedditUser
 import io.ktor.client.HttpClient
+import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.request
 
 class DataTedditApi(private val client: HttpClient, private val urlSubstitutor: UrlSubstitutor) : TedditApi {
 
@@ -77,6 +80,7 @@ class DataTedditApi(private val client: HttpClient, private val urlSubstitutor: 
         }.body()
     }
 
+    @Suppress("SwallowedException")
     override suspend fun getPost(
         instance: String,
         permalink: String,
@@ -90,12 +94,31 @@ class DataTedditApi(private val client: HttpClient, private val urlSubstitutor: 
 
         val url = urlSubstitutor.buildUrl(instance, endpoint, permalinkParam)
 
-        return client.get(url) {
-            forward(host, host == null)
+        suspend fun apiCall(url: String): HttpResponse {
+            return client.get(url) {
+                forward(host, host == null)
 
-            parameter(TedditApi::getPost.getQueryParameter(0), limit)
-            parameter(TedditApi::getPost.getQueryParameter(1), sort.type)
-        }.body()
+                parameter(TedditApi::getPost.getQueryParameter(0), limit)
+                parameter(TedditApi::getPost.getQueryParameter(1), sort.type)
+            }
+        }
+
+        val response = apiCall(url)
+
+        return try {
+            response.body<List<Listing>>()
+        } catch (e: NoTransformationFoundException) {
+            // Workaround for Teddit not keeping query parameters on redirections.
+            // Requests with only the post ID will redirect to the full URL before being processed, e.g.
+            // https://teddit.net/14u4w33 ->
+            // https://teddit.net/r/privacy/comments/14u4w33/how_threads_privacy_policy_compares_to_twitters/.
+            // It means that the api parameter (along with other query parameters) will be lost during the redirection,
+            // making the response un-parseable (since it is an HTML page).
+            // Here, the redirect URL from the response is used to make another call to the right endpoint and thus
+            // getting the API response.
+            val redirectUrl = response.request.url.toString().plus("?api")
+            apiCall(redirectUrl).body()
+        }
     }
 
     override suspend fun getUserPosts(
