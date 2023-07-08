@@ -3,6 +3,7 @@ package com.cosmos.stealth.server.di
 import com.cosmos.stealth.server.data.service.CommunityService
 import com.cosmos.stealth.server.data.service.FeedService
 import com.cosmos.stealth.server.data.service.PostService
+import com.cosmos.stealth.server.data.service.SearchService
 import com.cosmos.stealth.server.data.service.ServicesService
 import com.cosmos.stealth.server.data.service.UserService
 import com.cosmos.stealth.services.reddit.RedditGateway
@@ -17,6 +18,7 @@ object ServiceModule {
         single { provideCommunityService(get(), get()) }
         single { provideUserService(get(), get()) }
         single { providePostService(get(), get()) }
+        single { provideSearchService(get(), get()) }
         single { provideServicesService() }
     }
 
@@ -34,6 +36,10 @@ object ServiceModule {
 
     private fun providePostService(redditGateway: RedditGateway, tedditGateway: TedditGateway): PostService {
         return PostService(redditGateway, tedditGateway)
+    }
+
+    private fun provideSearchService(redditGateway: RedditGateway, tedditGateway: TedditGateway): SearchService {
+        return SearchService(redditGateway, tedditGateway)
     }
 
     private fun provideServicesService(): ServicesService {
