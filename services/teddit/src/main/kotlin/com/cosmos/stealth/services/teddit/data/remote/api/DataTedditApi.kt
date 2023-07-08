@@ -55,6 +55,7 @@ class DataTedditApi(private val client: HttpClient, private val urlSubstitutor: 
         }.body()
     }
 
+    @Suppress("MagicNumber")
     override suspend fun searchInSubreddit(
         instance: String,
         subreddit: String,
@@ -67,16 +68,16 @@ class DataTedditApi(private val client: HttpClient, private val urlSubstitutor: 
         val endpoint = TedditApi::searchInSubreddit.getEndpoint()
 
         val subredditParam = TedditApi::searchInSubreddit.getPathParameter(0) to subreddit
-        val queryParam = TedditApi::searchInSubreddit.getPathParameter(1) to query
 
-        val url = urlSubstitutor.buildUrl(instance, endpoint, subredditParam, queryParam)
+        val url = urlSubstitutor.buildUrl(instance, endpoint, subredditParam)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(TedditApi::searchInSubreddit.getQueryParameter(0), sort?.type)
-            parameter(TedditApi::searchInSubreddit.getQueryParameter(1), timeSorting?.type)
-            parameter(TedditApi::searchInSubreddit.getQueryParameter(2), after)
+            parameter(TedditApi::searchInSubreddit.getQueryParameter(0), query)
+            parameter(TedditApi::searchInSubreddit.getQueryParameter(1), sort?.type)
+            parameter(TedditApi::searchInSubreddit.getQueryParameter(2), timeSorting?.type)
+            parameter(TedditApi::searchInSubreddit.getQueryParameter(3), after)
         }.body()
     }
 

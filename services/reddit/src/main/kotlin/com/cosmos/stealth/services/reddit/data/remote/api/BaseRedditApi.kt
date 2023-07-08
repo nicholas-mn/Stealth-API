@@ -51,6 +51,7 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
         }
     }
 
+    @Suppress("MagicNumber")
     protected suspend fun searchInSubredditRaw(
         subreddit: String,
         query: String,
@@ -62,16 +63,16 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
         val endpoint = RedditApi::searchInSubreddit.getEndpoint()
 
         val subredditParam = RedditApi::searchInSubreddit.getPathParameter(0) to subreddit
-        val queryParam = RedditApi::searchInSubreddit.getPathParameter(1) to query
 
-        val url = urlSubstitutor.buildUrl(endpoint, subredditParam, queryParam)
+        val url = urlSubstitutor.buildUrl(endpoint, subredditParam)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(RedditApi::searchInSubreddit.getQueryParameter(0), sort?.type)
-            parameter(RedditApi::searchInSubreddit.getQueryParameter(1), timeSorting?.type)
-            parameter(RedditApi::searchInSubreddit.getQueryParameter(2), after)
+            parameter(RedditApi::searchInSubreddit.getQueryParameter(0), query)
+            parameter(RedditApi::searchInSubreddit.getQueryParameter(1), sort?.type)
+            parameter(RedditApi::searchInSubreddit.getQueryParameter(2), timeSorting?.type)
+            parameter(RedditApi::searchInSubreddit.getQueryParameter(3), after)
         }
     }
 
