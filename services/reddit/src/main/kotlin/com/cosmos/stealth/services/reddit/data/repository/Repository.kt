@@ -232,7 +232,8 @@ abstract class Repository(
             is Resource.Success -> {
                 val items = commentMapper.dataToEntities(
                     response.data.data.children as List<CommentChild>,
-                    request.service
+                    request.service,
+                    null
                 )
                 val afterData = response.data.data.after
                     ?.toAfter(request.service)
