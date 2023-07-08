@@ -1,17 +1,20 @@
 package com.cosmos.stealth.services.reddit.di
 
+import com.cosmos.stealth.core.common.di.DispatchersModule
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.IO_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.common.util.TimeValue
 import com.cosmos.stealth.core.network.data.converter.MoshiContentConverter
-import com.cosmos.stealth.core.network.util.UrlSubstitutor
 import com.cosmos.stealth.core.network.data.converter.moshi
-import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi
-import com.cosmos.stealth.services.reddit.data.remote.api.DataRedditApi
-import com.cosmos.stealth.services.reddit.data.remote.api.ScrapRedditApi
+import com.cosmos.stealth.core.network.util.UrlSubstitutor
+import com.cosmos.stealth.services.reddit.RedditGateway
 import com.cosmos.stealth.services.reddit.data.adapter.EditedAdapter
 import com.cosmos.stealth.services.reddit.data.adapter.MediaMetadataAdapter
 import com.cosmos.stealth.services.reddit.data.adapter.NullToEmptyStringAdapter
 import com.cosmos.stealth.services.reddit.data.adapter.RepliesAdapter
+import com.cosmos.stealth.services.reddit.data.mapper.CommentMapper
+import com.cosmos.stealth.services.reddit.data.mapper.CommunityMapper
+import com.cosmos.stealth.services.reddit.data.mapper.PostMapper
+import com.cosmos.stealth.services.reddit.data.mapper.UserMapper
 import com.cosmos.stealth.services.reddit.data.model.AboutChild
 import com.cosmos.stealth.services.reddit.data.model.AboutUserChild
 import com.cosmos.stealth.services.reddit.data.model.Child
@@ -19,11 +22,15 @@ import com.cosmos.stealth.services.reddit.data.model.ChildType
 import com.cosmos.stealth.services.reddit.data.model.CommentChild
 import com.cosmos.stealth.services.reddit.data.model.MoreChild
 import com.cosmos.stealth.services.reddit.data.model.PostChild
-import com.cosmos.stealth.services.reddit.di.NetworkModule.Qualifier.REDDIT_QUALIFIER
-import com.cosmos.stealth.services.reddit.di.NetworkModule.Qualifier.REDDIT_SCRAP_QUALIFIER
 import com.cosmos.stealth.services.reddit.data.remote.JsonInterceptor
 import com.cosmos.stealth.services.reddit.data.remote.RawJsonInterceptor
 import com.cosmos.stealth.services.reddit.data.remote.RedditCookieJar
+import com.cosmos.stealth.services.reddit.data.remote.api.DataRedditApi
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi
+import com.cosmos.stealth.services.reddit.data.remote.api.ScrapRedditApi
+import com.cosmos.stealth.services.reddit.data.repository.RedditRepository
+import com.cosmos.stealth.services.reddit.di.RedditNetworkModule.Qualifier.REDDIT_QUALIFIER
+import com.cosmos.stealth.services.reddit.di.RedditNetworkModule.Qualifier.REDDIT_SCRAP_QUALIFIER
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import io.ktor.client.HttpClient
@@ -36,7 +43,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
 
-object NetworkModule {
+object RedditNetworkModule {
 
     @Suppress("MagicNumber")
     private val TIMEOUT = TimeValue<Long>(60, TimeUnit.SECONDS)
@@ -47,7 +54,7 @@ object NetworkModule {
     }
 
     @Suppress("MemberNameEqualsClassName")
-    val networkModule = module {
+    val redditNetworkModule = module {
         single(REDDIT_QUALIFIER) { provideRedditMoshi() }
         single(REDDIT_QUALIFIER) { provideRedditOkHttpClient() }
         single(REDDIT_QUALIFIER) {
@@ -73,6 +80,20 @@ object NetworkModule {
                 get(IO_DISPATCHER_QUALIFIER)
             )
         }
+
+        single {
+            provideRedditRepository(
+                get(REDDIT_QUALIFIER),
+                get(REDDIT_SCRAP_QUALIFIER),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER)
+            )
+        }
+
+        single { provideRedditGateway(get()) }
     }
 
     private fun provideRedditMoshi(): Moshi {
@@ -163,5 +184,30 @@ object NetworkModule {
         ioDispatcher: CoroutineDispatcher
     ): RedditApi {
         return ScrapRedditApi(httpClient, urlSubstitutor, ioDispatcher)
+    }
+
+    @Suppress("LongParameterList")
+    private fun provideRedditRepository(
+        dataRedditApi: RedditApi,
+        scrapRedditApi: RedditApi,
+        postMapper: PostMapper,
+        communityMapper: CommunityMapper,
+        userMapper: UserMapper,
+        commentMapper: CommentMapper,
+        defaultDispatcher: CoroutineDispatcher
+    ): RedditRepository {
+        return RedditRepository(
+            dataRedditApi,
+            scrapRedditApi,
+            postMapper,
+            communityMapper,
+            userMapper,
+            commentMapper,
+            defaultDispatcher
+        )
+    }
+
+    private fun provideRedditGateway(repository: RedditRepository): RedditGateway {
+        return RedditGateway(repository)
     }
 }
