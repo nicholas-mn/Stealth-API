@@ -7,3 +7,7 @@ import com.cosmos.stealth.core.model.api.Service
 fun String.toAfter(service: Service): After {
     return After(service, AfterKey(this))
 }
+
+fun String.toAfterKey(): AfterKey {
+    return AfterKey(this)
+}

@@ -6,5 +6,6 @@ import io.ktor.server.routing.route
 fun Routing.v1() {
     route("/v1") {
         feedRouting()
+        communityRouting()
     }
 }

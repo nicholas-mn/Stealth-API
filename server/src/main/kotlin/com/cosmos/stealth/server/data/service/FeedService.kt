@@ -16,7 +16,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
 
-class FeedService(redditGateway: RedditGateway, tedditGateway: TedditGateway) : Service(redditGateway, tedditGateway) {
+class FeedService(
+    redditGateway: RedditGateway,
+    tedditGateway: TedditGateway
+) : BaseService(redditGateway, tedditGateway) {
 
     suspend fun getFeed(requestInfo: RequestInfo, feedRequest: FeedRequest): Feed = supervisorScope {
         val requests = feedRequest.services.associateWith { serviceRequest ->
