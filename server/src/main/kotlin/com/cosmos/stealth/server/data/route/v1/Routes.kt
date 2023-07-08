@@ -8,5 +8,6 @@ fun Routing.v1() {
         feedRouting()
         communityRouting()
         userRouting()
+        postRouting()
     }
 }

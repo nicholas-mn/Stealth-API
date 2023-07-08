@@ -22,7 +22,7 @@ fun Route.userRouting() {
     route("/user") {
 
         get("/{user}") {
-            val user = call.getPath("user") ?: error("User id is required")
+            val user = call.getPath("user") ?: error("User ID is required")
             val service = call.getQuery("service") ?: error("Service is required")
 
             val serviceName = ServiceName.decode(service) ?: error("Unknown service $service")
