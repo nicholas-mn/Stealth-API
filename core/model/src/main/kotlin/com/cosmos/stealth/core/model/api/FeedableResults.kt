@@ -7,9 +7,13 @@ import com.squareup.moshi.JsonClass
  * 
  *
  * @param results
+ * @param after
  */
 @JsonClass(generateAdapter = true)
 data class FeedableResults (
     @Json(name = "results")
-    val results: List<Feedable>
+    val results: List<Feedable>,
+
+    @Json(name = "after")
+    val after: AfterKey?
 ) : SearchResults(SearchType.feedable)

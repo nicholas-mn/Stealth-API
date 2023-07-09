@@ -7,9 +7,13 @@ import com.squareup.moshi.JsonClass
  * 
  *
  * @param results
+ * @param after
  */
 @JsonClass(generateAdapter = true)
 data class CommunityResults (
     @Json(name = "results")
-    val results: List<CommunityInfo>
+    val results: List<CommunityInfo>,
+
+    @Json(name = "after")
+    val after: AfterKey?
 ) : SearchResults(SearchType.community)

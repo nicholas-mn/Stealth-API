@@ -21,6 +21,7 @@ import com.cosmos.stealth.services.base.util.extension.isSuccess
 import com.cosmos.stealth.services.base.util.extension.map
 import com.cosmos.stealth.services.base.util.extension.orInternalError
 import com.cosmos.stealth.services.base.util.extension.toAfter
+import com.cosmos.stealth.services.base.util.extension.toAfterKey
 import com.cosmos.stealth.services.base.util.extension.toStatus
 import com.cosmos.stealth.services.reddit.data.mapper.CommentMapper
 import com.cosmos.stealth.services.reddit.data.mapper.CommunityMapper
@@ -158,8 +159,9 @@ abstract class Repository(
     @Suppress("UNCHECKED_CAST")
     protected suspend fun searchInSubreddit(request: Request, apiCall: suspend () -> Listing): Resource<SearchResults> {
         return safeApiCall(apiCall) {
+            val afterKey = it.data.after?.toAfterKey()
             val results = postMapper.dataToEntities(it.data.children as List<PostChild>, request.service)
-            FeedableResults(results)
+            FeedableResults(results, afterKey)
         }
     }
 
@@ -256,8 +258,9 @@ abstract class Repository(
     @Suppress("UNCHECKED_CAST")
     protected suspend fun searchPost(request: Request, apiCall: suspend () -> Listing): Resource<SearchResults> {
         return safeApiCall(apiCall) {
+            val afterKey = it.data.after?.toAfterKey()
             val results = postMapper.dataToEntities(it.data.children as List<PostChild>, request.service)
-            FeedableResults(results)
+            FeedableResults(results, afterKey)
         }
     }
 
@@ -271,8 +274,9 @@ abstract class Repository(
     @Suppress("UNCHECKED_CAST")
     protected suspend fun searchUser(request: Request, apiCall: suspend () -> Listing): Resource<SearchResults> {
         return safeApiCall(apiCall) {
+            val afterKey = it.data.after?.toAfterKey()
             val results = userMapper.dataToEntities(it.data.children as List<AboutUserChild>, request.service)
-            UserResults(results)
+            UserResults(results, afterKey)
         }
     }
 
@@ -286,8 +290,9 @@ abstract class Repository(
     @Suppress("UNCHECKED_CAST")
     protected suspend fun searchSubreddit(request: Request, apiCall: suspend () -> Listing): Resource<SearchResults> {
         return safeApiCall(apiCall) {
+            val afterKey = it.data.after?.toAfterKey()
             val results = communityMapper.dataToEntities(it.data.children as List<AboutChild>, request.service)
-            CommunityResults(results)
+            CommunityResults(results, afterKey)
         }
     }
 

@@ -16,6 +16,7 @@ import com.cosmos.stealth.core.model.api.User
 import com.cosmos.stealth.core.model.api.UserInfo
 import com.cosmos.stealth.core.model.api.string
 import com.cosmos.stealth.core.model.data.Request
+import com.cosmos.stealth.core.model.data.SearchRequest
 import com.cosmos.stealth.core.network.util.Resource
 import com.cosmos.stealth.services.base.data.ServiceGateway
 import com.cosmos.stealth.services.base.util.extension.isFailure
@@ -115,33 +116,47 @@ abstract class Gateway(
         return repository.getMoreChildren(request, moreContentFeedable.content, moreContentFeedable.parentId)
     }
 
-    override suspend fun getSearchResults(
-        request: Request,
-        query: String,
-        sort: Sort,
-        afterKey: AfterKey?,
-        type: SearchType
-    ): Resource<SearchResults> {
-        return when (type) {
-            SearchType.feedable -> repository.searchPost(request, query, sort.redditSort, afterKey.string)
-            SearchType.community -> repository.searchSubreddit(request, query, sort.redditSort, afterKey.string)
-            SearchType.user -> repository.searchUser(request, query, sort.redditSort, afterKey.string)
+    override suspend fun getSearchResults(searchRequest: SearchRequest): Resource<SearchResults> {
+        return when (searchRequest.type) {
+            SearchType.feedable -> getFeedableResults(searchRequest)
+            SearchType.community -> getCommunityResults(searchRequest)
+            SearchType.user -> getUserResults(searchRequest)
         }
     }
 
-    override suspend fun getCommunitySearchResults(
-        request: Request,
-        community: String,
-        query: String,
-        sort: Sort,
-        afterKey: AfterKey?,
-        type: SearchType
-    ): Resource<SearchResults> {
-        return when (type) {
-            SearchType.feedable -> {
-                repository.searchInSubreddit(request, community, query, sort.redditSort, afterKey.string)
+    private suspend fun getFeedableResults(searchRequest: SearchRequest): Resource<SearchResults> {
+        return with(searchRequest) {
+            val request = Request(service, info)
+            val sorting = sort.redditSort
+            val after = afterKey.string
+
+            when {
+                community != null -> repository.searchInSubreddit(request, community.orEmpty(), query, sorting, after)
+                user != null -> Resource.Exception(IllegalStateException("Cannot search for feedables in user"))
+                else -> repository.searchPost(request, query, sorting, after)
             }
-            else -> Resource.Exception(IllegalStateException("Cannot search for type $type in community"))
+        }
+    }
+
+    private suspend fun getCommunityResults(searchRequest: SearchRequest): Resource<SearchResults> {
+        return with(searchRequest) {
+            when {
+                community != null -> {
+                    Resource.Exception(IllegalStateException("Cannot search for communities in community"))
+                }
+                user != null -> Resource.Exception(IllegalStateException("Cannot search for communities in user"))
+                else -> repository.searchSubreddit(Request(service, info), query, sort.redditSort, afterKey.string)
+            }
+        }
+    }
+
+    private suspend fun getUserResults(searchRequest: SearchRequest): Resource<SearchResults> {
+        return with(searchRequest) {
+            when {
+                community != null -> Resource.Exception(IllegalStateException("Cannot search for users in community"))
+                user != null -> Resource.Exception(IllegalStateException("Cannot search for users in user"))
+                else -> repository.searchUser(Request(service, info), query, sort.redditSort, afterKey.string)
+            }
         }
     }
 }

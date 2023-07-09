@@ -15,6 +15,7 @@ import com.cosmos.stealth.core.model.api.Sort
 import com.cosmos.stealth.core.model.api.User
 import com.cosmos.stealth.core.model.api.UserInfo
 import com.cosmos.stealth.core.model.data.Request
+import com.cosmos.stealth.core.model.data.SearchRequest
 import com.cosmos.stealth.core.network.util.Resource
 
 interface ServiceGateway {
@@ -41,21 +42,5 @@ interface ServiceGateway {
 
     suspend fun getMoreContent(request: Request, moreContentFeedable: MoreContentFeedable): Resource<List<Feedable>>
 
-    suspend fun getSearchResults(
-        request: Request,
-        query: String,
-        sort: Sort,
-        afterKey: AfterKey?,
-        type: SearchType
-    ): Resource<SearchResults>
-
-    @Suppress("LongParameterList")
-    suspend fun getCommunitySearchResults(
-        request: Request,
-        community: String,
-        query: String,
-        sort: Sort,
-        afterKey: AfterKey?,
-        type: SearchType
-    ): Resource<SearchResults>
+    suspend fun getSearchResults(searchRequest: SearchRequest): Resource<SearchResults>
 }
