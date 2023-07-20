@@ -4,6 +4,7 @@ import com.cosmos.stealth.core.model.api.Error
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.request.ContentTransformationException
 import io.ktor.server.response.respond
@@ -15,7 +16,7 @@ fun Application.configureStatusPage() {
             val errorMessage: String
 
             when (throwable) {
-                is ContentTransformationException -> {
+                is ContentTransformationException, is BadRequestException -> {
                     statusCode = HttpStatusCode.BadRequest
                     errorMessage = "Malformed request"
                 }
