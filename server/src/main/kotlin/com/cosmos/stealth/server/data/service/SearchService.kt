@@ -3,16 +3,12 @@ package com.cosmos.stealth.server.data.service
 import com.cosmos.stealth.core.model.api.SearchResults
 import com.cosmos.stealth.core.model.data.SearchRequest
 import com.cosmos.stealth.core.network.util.Resource
-import com.cosmos.stealth.services.reddit.RedditGateway
-import com.cosmos.stealth.services.teddit.TedditGateway
+import com.cosmos.stealth.server.data.manager.GatewayManager
 
-class SearchService(
-    redditGateway: RedditGateway,
-    tedditGateway: TedditGateway
-) : BaseService(redditGateway, tedditGateway) {
+class SearchService(private val gatewayManager: GatewayManager) {
 
     @Suppress("LongParameterList")
     suspend fun getSearchResults(searchRequest: SearchRequest): Resource<SearchResults> {
-        return getServiceGateway(searchRequest.service).getSearchResults(searchRequest)
+        return gatewayManager.getServiceGateway(searchRequest.service).getSearchResults(searchRequest)
     }
 }

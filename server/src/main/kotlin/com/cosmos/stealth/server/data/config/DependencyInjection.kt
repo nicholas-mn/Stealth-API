@@ -2,6 +2,7 @@ package com.cosmos.stealth.server.data.config
 
 import com.cosmos.stealth.core.common.di.DispatchersModule
 import com.cosmos.stealth.core.network.di.NetworkModule
+import com.cosmos.stealth.server.di.ManagerModule
 import com.cosmos.stealth.server.di.ServiceModule
 import com.cosmos.stealth.services.reddit.di.RedditMapperModule
 import com.cosmos.stealth.services.reddit.di.RedditNetworkModule
@@ -18,6 +19,7 @@ fun Application.configureDependencyInjection() {
             RedditMapperModule.redditMapperModule,
             RedditNetworkModule.redditNetworkModule,
             TedditNetworkModule.tedditNetworkModule,
+            ManagerModule.managerModule,
             ServiceModule.serviceModule
         )
     }

@@ -9,13 +9,9 @@ import com.cosmos.stealth.core.model.api.UserInfo
 import com.cosmos.stealth.core.model.data.Request
 import com.cosmos.stealth.core.model.data.RequestInfo
 import com.cosmos.stealth.core.network.util.Resource
-import com.cosmos.stealth.services.reddit.RedditGateway
-import com.cosmos.stealth.services.teddit.TedditGateway
+import com.cosmos.stealth.server.data.manager.GatewayManager
 
-class UserService(
-    redditGateway: RedditGateway,
-    tedditGateway: TedditGateway
-) : BaseService(redditGateway, tedditGateway) {
+class UserService(private val gatewayManager: GatewayManager) {
 
     @Suppress("LongParameterList")
     suspend fun getUser(
@@ -26,7 +22,8 @@ class UserService(
         afterKey: AfterKey?,
         type: FeedableType
     ): Resource<User> {
-        return getServiceGateway(service).getUser(Request(service, requestInfo), user, sort, afterKey, type)
+        return gatewayManager.getServiceGateway(service)
+            .getUser(Request(service, requestInfo), user, sort, afterKey, type)
     }
 
     suspend fun getUserInfo(
@@ -34,6 +31,6 @@ class UserService(
         user: String,
         service: Service
     ): Resource<UserInfo> {
-        return getServiceGateway(service).getUserInfo(Request(service, requestInfo), user)
+        return gatewayManager.getServiceGateway(service).getUserInfo(Request(service, requestInfo), user)
     }
 }

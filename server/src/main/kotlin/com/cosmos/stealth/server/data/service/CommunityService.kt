@@ -8,13 +8,9 @@ import com.cosmos.stealth.core.model.api.Sort
 import com.cosmos.stealth.core.model.data.Request
 import com.cosmos.stealth.core.model.data.RequestInfo
 import com.cosmos.stealth.core.network.util.Resource
-import com.cosmos.stealth.services.reddit.RedditGateway
-import com.cosmos.stealth.services.teddit.TedditGateway
+import com.cosmos.stealth.server.data.manager.GatewayManager
 
-class CommunityService(
-    redditGateway: RedditGateway,
-    tedditGateway: TedditGateway
-) : BaseService(redditGateway, tedditGateway) {
+class CommunityService(private val gatewayManager: GatewayManager) {
 
     suspend fun getCommunity(
         requestInfo: RequestInfo,
@@ -23,7 +19,8 @@ class CommunityService(
         sort: Sort,
         afterKey: AfterKey?
     ): Resource<Community> {
-        return getServiceGateway(service).getCommunity(Request(service, requestInfo), community, sort, afterKey)
+        return gatewayManager.getServiceGateway(service)
+            .getCommunity(Request(service, requestInfo), community, sort, afterKey)
     }
 
     suspend fun getCommunityInfo(
@@ -31,6 +28,7 @@ class CommunityService(
         community: String,
         service: Service
     ): Resource<CommunityInfo> {
-        return getServiceGateway(service).getCommunityInfo(Request(service, requestInfo), community)
+        return gatewayManager.getServiceGateway(service)
+            .getCommunityInfo(Request(service, requestInfo), community)
     }
 }
