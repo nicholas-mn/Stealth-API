@@ -34,6 +34,7 @@ class UserMapper(
                 null,
                 null,
                 null,
+                null,
                 totalKarma
             )
         }

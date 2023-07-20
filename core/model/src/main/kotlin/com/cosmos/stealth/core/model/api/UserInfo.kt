@@ -39,6 +39,9 @@ data class UserInfo (
     @Json(name = "icon")
     val icon: Media? = null,
 
+    @Json(name = "header")
+    val header: Media? = null,
+
     @Json(name = "description")
     val description: String? = null,
 
