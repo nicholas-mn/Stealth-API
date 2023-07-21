@@ -4,6 +4,8 @@ import com.cosmos.stealth.core.model.api.FeedableType
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
 import com.cosmos.stealth.core.model.api.Sort
+import com.cosmos.stealth.core.model.data.UserInfoRequest
+import com.cosmos.stealth.core.model.data.UserRequest
 import com.cosmos.stealth.server.data.service.UserService
 import com.cosmos.stealth.server.util.extension.getPath
 import com.cosmos.stealth.server.util.extension.getQuery
@@ -32,7 +34,9 @@ fun Route.userRouting() {
             val after = call.getQuery("after")?.toAfterKey()
             val type = FeedableType.decode(call.getQuery("type")) ?: FeedableType.post
 
-            val userResource = userService.getUser(call.info, user, Service(serviceName, instance), sort, after, type)
+            val userRequest = UserRequest(call.info, user, Service(serviceName, instance), sort, after, type)
+
+            val userResource = userService.getUser(userRequest)
 
             call.respondWithResource(userResource)
         }
@@ -45,7 +49,9 @@ fun Route.userRouting() {
 
             val instance = call.getQuery("instance")
 
-            val userInfo = userService.getUserInfo(call.info, user, Service(serviceName, instance))
+            val userInfoRequest = UserInfoRequest(call.info, user, Service(serviceName, instance))
+
+            val userInfo = userService.getUserInfo(userInfoRequest)
 
             call.respondWithResource(userInfo)
         }

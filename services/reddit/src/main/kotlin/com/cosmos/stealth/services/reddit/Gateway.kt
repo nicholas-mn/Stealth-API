@@ -1,12 +1,10 @@
 package com.cosmos.stealth.services.reddit
 
-import com.cosmos.stealth.core.model.api.AfterKey
 import com.cosmos.stealth.core.model.api.Community
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.Feed
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.FeedableType
-import com.cosmos.stealth.core.model.api.MoreContentFeedable
 import com.cosmos.stealth.core.model.api.Post
 import com.cosmos.stealth.core.model.api.SearchResults
 import com.cosmos.stealth.core.model.api.SearchType
@@ -15,8 +13,15 @@ import com.cosmos.stealth.core.model.api.Status
 import com.cosmos.stealth.core.model.api.User
 import com.cosmos.stealth.core.model.api.UserInfo
 import com.cosmos.stealth.core.model.api.string
+import com.cosmos.stealth.core.model.data.CommunityInfoRequest
+import com.cosmos.stealth.core.model.data.CommunityRequest
+import com.cosmos.stealth.core.model.data.MoreContentRequest
+import com.cosmos.stealth.core.model.data.PostRequest
 import com.cosmos.stealth.core.model.data.Request
 import com.cosmos.stealth.core.model.data.SearchRequest
+import com.cosmos.stealth.core.model.data.SingleFeedRequest
+import com.cosmos.stealth.core.model.data.UserInfoRequest
+import com.cosmos.stealth.core.model.data.UserRequest
 import com.cosmos.stealth.core.network.util.Resource
 import com.cosmos.stealth.services.base.data.ServiceGateway
 import com.cosmos.stealth.services.base.util.extension.isFailure
@@ -32,88 +37,97 @@ abstract class Gateway(
     private val repository: Repository
 ) : ServiceGateway {
 
-    override suspend fun getFeed(
-        request: Request,
-        communities: List<String>,
-        sort: Sort,
-        afterKey: AfterKey?
-    ): Feed {
-        return repository.getSubreddit(request, communities, sort.redditSort, afterKey.string)
-    }
+    override suspend fun getFeed(singleFeedRequest: SingleFeedRequest): Feed {
+        return with(singleFeedRequest) {
+            val request = Request(service, info)
 
-    override suspend fun getCommunity(
-        request: Request,
-        community: String,
-        sort: Sort,
-        afterKey: AfterKey?
-    ): Resource<Community> = supervisorScope {
-        val feedAsync = async {
-            repository.getSubreddit(request, community, sort.redditSort, afterKey.string)
-        }
-        val communityInfoAsync = async { repository.getSubredditInfo(request, community) }
-
-        val feed = feedAsync.await()
-        val communityInfo = communityInfoAsync.await()
-
-        val feedStatus = feed.status.firstOrNull() ?: Status(request.service, HttpURLConnection.HTTP_INTERNAL_ERROR)
-
-        when {
-            feedStatus.isFailure -> Resource.Error(feedStatus.code, feedStatus.error.orEmpty())
-            else -> communityInfo.map { Community(it, feed) }
+            repository.getSubreddit(request, communities, sort.redditSort, afterKey.string)
         }
     }
 
-    override suspend fun getCommunityInfo(request: Request, community: String): Resource<CommunityInfo> {
-        return repository.getSubredditInfo(request, community)
-    }
+    override suspend fun getCommunity(communityRequest: CommunityRequest): Resource<Community> = supervisorScope {
+        with(communityRequest) {
+            val request = Request(service, info)
 
-    override suspend fun getUser(
-        request: Request,
-        user: String,
-        sort: Sort,
-        afterKey: AfterKey?,
-        type: FeedableType
-    ): Resource<User> = supervisorScope {
-        val feedAsync = async {
-            when (type) {
-                FeedableType.post -> repository.getUserPosts(request, user, sort.redditSort, afterKey.string)
-                FeedableType.comment -> {
-                    repository.getUserComments(request, user, sort.redditSort, afterKey.string)
-                }
-                else -> {
-                    val status = Status(request.service, HttpURLConnection.HTTP_BAD_REQUEST)
-                    Feed(listOf(), null, listOf(status))
-                }
+            val feedAsync = async {
+                repository.getSubreddit(request, community, sort.redditSort, afterKey.string)
+            }
+            val communityInfoAsync = async { repository.getSubredditInfo(request, community) }
+
+            val feed = feedAsync.await()
+            val communityInfo = communityInfoAsync.await()
+
+            val feedStatus = feed.status.firstOrNull() ?: Status(request.service, HttpURLConnection.HTTP_INTERNAL_ERROR)
+
+            when {
+                feedStatus.isFailure -> Resource.Error(feedStatus.code, feedStatus.error.orEmpty())
+                else -> communityInfo.map { Community(it, feed) }
             }
         }
-        val userInfoAsync = async { repository.getUserInfo(request, user) }
+    }
 
-        val feed = feedAsync.await()
-        val userInfo = userInfoAsync.await()
+    override suspend fun getCommunityInfo(communityInfoRequest: CommunityInfoRequest): Resource<CommunityInfo> {
+        return with(communityInfoRequest) {
+            val request = Request(service, info)
 
-        val feedStatus = feed.status.firstOrNull() ?: Status(request.service, HttpURLConnection.HTTP_INTERNAL_ERROR)
-
-        when {
-            feedStatus.isFailure -> Resource.Error(feedStatus.code, feedStatus.error.orEmpty())
-            else -> userInfo.map { User(it, feed) }
+            repository.getSubredditInfo(request, community)
         }
     }
 
-    override suspend fun getUserInfo(request: Request, user: String): Resource<UserInfo> {
-        return repository.getUserInfo(request, user)
+    override suspend fun getUser(userRequest: UserRequest): Resource<User> = supervisorScope {
+        with(userRequest) {
+            val request = Request(service, info)
+
+            val feedAsync = async {
+                when (type) {
+                    FeedableType.post -> repository.getUserPosts(request, user, sort.redditSort, afterKey.string)
+                    FeedableType.comment -> {
+                        repository.getUserComments(request, user, sort.redditSort, afterKey.string)
+                    }
+                    else -> {
+                        val status = Status(request.service, HttpURLConnection.HTTP_BAD_REQUEST)
+                        Feed(listOf(), null, listOf(status))
+                    }
+                }
+            }
+            val userInfoAsync = async { repository.getUserInfo(request, user) }
+
+            val feed = feedAsync.await()
+            val userInfo = userInfoAsync.await()
+
+            val feedStatus = feed.status.firstOrNull() ?: Status(request.service, HttpURLConnection.HTTP_INTERNAL_ERROR)
+
+            when {
+                feedStatus.isFailure -> Resource.Error(feedStatus.code, feedStatus.error.orEmpty())
+                else -> userInfo.map { User(it, feed) }
+            }
+        }
     }
 
-    override suspend fun getPost(request: Request, post: String, sort: Sort): Resource<Post> {
-        // TODO: Special sort for posts
-        val redditSort = if (sort == Sort.best) BEST else sort.redditSort.generalSorting
-        return repository.getPost(request, post, null, redditSort)
+    override suspend fun getUserInfo(userInfoRequest: UserInfoRequest): Resource<UserInfo> {
+        return with(userInfoRequest) {
+            val request = Request(service, info)
+
+            repository.getUserInfo(request, user)
+        }
     }
 
-    override suspend fun getMoreContent(
-        request: Request,
-        moreContentFeedable: MoreContentFeedable
-    ): Resource<List<Feedable>> {
-        return repository.getMoreChildren(request, moreContentFeedable.content, moreContentFeedable.parentId)
+    override suspend fun getPost(postRequest: PostRequest): Resource<Post> {
+        return with(postRequest) {
+            val request = Request(service, info)
+
+            // TODO: Special sort for posts
+            val redditSort = if (sort == Sort.best) BEST else sort.redditSort.generalSorting
+            repository.getPost(request, post, null, redditSort)
+        }
+    }
+
+    override suspend fun getMoreContent(moreContentRequest: MoreContentRequest): Resource<List<Feedable>> {
+        return with(moreContentRequest) {
+            val request = Request(moreContentFeedable.service, info)
+
+            repository.getMoreChildren(request, moreContentFeedable.content, moreContentFeedable.parentId)
+        }
     }
 
     override suspend fun getSearchResults(searchRequest: SearchRequest): Resource<SearchResults> {

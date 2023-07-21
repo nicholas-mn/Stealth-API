@@ -7,8 +7,8 @@ import com.cosmos.stealth.core.model.api.FeedRequest
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.Sort
 import com.cosmos.stealth.core.model.api.Status
-import com.cosmos.stealth.core.model.data.Request
 import com.cosmos.stealth.core.model.data.RequestInfo
+import com.cosmos.stealth.core.model.data.SingleFeedRequest
 import com.cosmos.stealth.server.data.manager.GatewayManager
 import com.cosmos.stealth.services.base.util.extension.orInternalError
 import kotlinx.coroutines.async
@@ -25,15 +25,16 @@ class FeedService(private val gatewayManager: GatewayManager) {
         val responses = requests.map { requestEntry ->
             async {
                 val service = requestEntry.key.service
-                val request = Request(requestEntry.key.service, requestInfo)
 
-                val response = gatewayManager.getServiceGateway(service)
-                    .getFeed(
-                        request,
-                        requestEntry.key.communities,
-                        feedRequest.sort ?: Sort.best,
-                        requestEntry.value?.key
-                    )
+                val singleFeedRequest = SingleFeedRequest(
+                    requestInfo,
+                    requestEntry.key.communities,
+                    service,
+                    feedRequest.sort ?: Sort.best,
+                    requestEntry.value?.key
+                )
+
+                val response = gatewayManager.getServiceGateway(service).getFeed(singleFeedRequest)
 
                 Pair(requestEntry.key.service, response)
             }

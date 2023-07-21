@@ -1,20 +1,14 @@
 package com.cosmos.stealth.server.data.service
 
 import com.cosmos.stealth.core.model.api.Feedable
-import com.cosmos.stealth.core.model.api.MoreContentFeedable
-import com.cosmos.stealth.core.model.data.Request
-import com.cosmos.stealth.core.model.data.RequestInfo
+import com.cosmos.stealth.core.model.data.MoreContentRequest
 import com.cosmos.stealth.core.network.util.Resource
 import com.cosmos.stealth.server.data.manager.GatewayManager
 
 class ContentService(private val gatewayManager: GatewayManager) {
 
-    suspend fun getMoreContent(
-        requestInfo: RequestInfo,
-        moreContentFeedable: MoreContentFeedable
-    ): Resource<List<Feedable>> {
-        val service = moreContentFeedable.service
-        return gatewayManager.getServiceGateway(service)
-            .getMoreContent(Request(service, requestInfo), moreContentFeedable)
+    suspend fun getMoreContent(moreContentRequest: MoreContentRequest): Resource<List<Feedable>> {
+        val service = moreContentRequest.moreContentFeedable.service
+        return gatewayManager.getServiceGateway(service).getMoreContent(moreContentRequest)
     }
 }
