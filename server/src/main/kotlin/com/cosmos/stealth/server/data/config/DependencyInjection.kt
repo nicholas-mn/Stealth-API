@@ -4,6 +4,8 @@ import com.cosmos.stealth.core.common.di.DispatchersModule
 import com.cosmos.stealth.core.network.di.NetworkModule
 import com.cosmos.stealth.server.di.ManagerModule
 import com.cosmos.stealth.server.di.ServiceModule
+import com.cosmos.stealth.services.lemmy.di.LemmyMapperModule
+import com.cosmos.stealth.services.lemmy.di.LemmyNetworkModule
 import com.cosmos.stealth.services.reddit.di.RedditMapperModule
 import com.cosmos.stealth.services.reddit.di.RedditNetworkModule
 import com.cosmos.stealth.services.teddit.di.TedditNetworkModule
@@ -19,6 +21,8 @@ fun Application.configureDependencyInjection() {
             RedditMapperModule.redditMapperModule,
             RedditNetworkModule.redditNetworkModule,
             TedditNetworkModule.tedditNetworkModule,
+            LemmyNetworkModule.lemmyNetworkModule,
+            LemmyMapperModule.lemmyMapperModule,
             ManagerModule.managerModule,
             ServiceModule.serviceModule
         )

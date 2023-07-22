@@ -17,5 +17,7 @@ object Dependencies {
         const val jsoup = "1.15.3"
 
         const val apacheText = "1.10.0"
+
+        const val markdown = "0.4.1"
     }
 }

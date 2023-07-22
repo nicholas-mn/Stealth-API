@@ -1,0 +1,39 @@
+package com.cosmos.stealth.services.lemmy.data.mapper
+
+import com.cosmos.stealth.core.common.data.mapper.Mapper
+import com.cosmos.stealth.core.common.util.MarkdownParser
+import com.cosmos.stealth.core.model.api.Service
+import com.cosmos.stealth.core.model.api.ServiceName
+import com.cosmos.stealth.core.model.api.UserInfo
+import com.cosmos.stealth.core.model.api.UserType
+import com.cosmos.stealth.core.network.util.extension.toMedia
+import com.cosmos.stealth.services.lemmy.data.model.PersonView
+import com.cosmos.stealth.services.lemmy.util.extension.toDateInMillis
+import kotlinx.coroutines.CoroutineDispatcher
+
+class UserMapper(
+    private val markdownParser: MarkdownParser,
+    defaultDispatcher: CoroutineDispatcher
+) : Mapper<PersonView, Service, UserInfo>(defaultDispatcher) {
+
+    override suspend fun toEntity(from: PersonView, context: Service?): UserInfo {
+        return with(from) {
+            UserInfo(
+                UserType.user,
+                context ?: Service(ServiceName.lemmy),
+                person.id.toString(),
+                person.name,
+                person.published.toDateInMillis(),
+                person.avatar?.toMedia(),
+                person.banner?.toMedia(),
+                person.bio?.run { markdownParser.parse(this) },
+                null,
+                null,
+                null,
+                counts.postCount,
+                counts.commentCount,
+                counts.postScore + counts.commentScore
+            )
+        }
+    }
+}

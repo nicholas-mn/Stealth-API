@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:network"))
     implementation(project(":services:base"))
+    implementation(project(":services:lemmy"))
     implementation(project(":services:reddit"))
     implementation(project(":services:teddit"))
 

@@ -19,9 +19,12 @@ dependencyResolutionManagement {
 rootProject.name = "stealth-api"
 
 include(":server")
+
 include(":core:common")
 include(":core:model")
 include(":core:network")
+
 include(":services:base")
+include(":services:lemmy")
 include(":services:reddit")
 include(":services:teddit")
