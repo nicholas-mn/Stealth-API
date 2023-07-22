@@ -15,6 +15,6 @@ data class Post (
     val post: Feedable,
 
     @Json(name = "replies")
-    val replies: List<Feedable>
+    val replies: Feed
 )
 

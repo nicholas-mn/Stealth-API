@@ -179,7 +179,12 @@ abstract class Repository(
                 commentMapper.dataToEntities(it[1].data.children, request.service, postChild.data)
             }
 
-            Post(post.await(), replies.await())
+            val status = response.toStatus(request.service)
+                .run { listOf(this) }
+
+            val feed = Feed(replies.await(), null, status)
+
+            Post(post.await(), feed)
         }
     }
 
