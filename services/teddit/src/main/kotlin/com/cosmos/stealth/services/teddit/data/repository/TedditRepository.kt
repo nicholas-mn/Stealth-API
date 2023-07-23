@@ -30,9 +30,11 @@ class TedditRepository(
 ) : Repository(postMapper, communityMapper, userMapper, commentMapper, defaultDispatcher) {
 
     override suspend fun getSubreddit(request: Request, subreddit: String, sorting: Sorting, after: String?): Feed {
+        val newRequest = request.getRequest()
+
         val response = safeApiCall {
             tedditApi.getSubreddit(
-                request.getInstance(),
+                newRequest.getInstance(),
                 subreddit,
                 sorting.generalSorting,
                 sorting.timeSorting,
@@ -41,12 +43,14 @@ class TedditRepository(
             )
         }
 
-        return getSubreddit(response, request)
+        return getSubreddit(response, newRequest)
     }
 
     override suspend fun getSubredditInfo(request: Request, subreddit: String): Resource<CommunityInfo> {
-        return getSubredditInfo(request) {
-            tedditApi.getSubredditInfo(request.getInstance(), subreddit, request.info.host)
+        val newRequest = request.getRequest()
+
+        return getSubredditInfo(newRequest) {
+            tedditApi.getSubredditInfo(newRequest.getInstance(), subreddit, request.info.host)
         }
     }
 
@@ -57,9 +61,11 @@ class TedditRepository(
         sorting: Sorting,
         after: String?
     ): Resource<SearchResults> {
-        return searchInSubreddit(request) {
+        val newRequest = request.getRequest()
+
+        return searchInSubreddit(newRequest) {
             tedditApi.searchInSubreddit(
-                request.getInstance(),
+                newRequest.getInstance(),
                 subreddit,
                 query,
                 sorting.generalSorting,
@@ -71,11 +77,13 @@ class TedditRepository(
     }
 
     override suspend fun getPost(request: Request, permalink: String, limit: Int?, sort: Sort): Resource<Post> {
+        val newRequest = request.getRequest()
+
         val response = safeApiCall {
-            tedditApi.getPost(request.getInstance(), permalink, limit, sort, request.info.host)
+            tedditApi.getPost(newRequest.getInstance(), permalink, limit, sort, request.info.host)
         }
 
-        return getPost(response, request)
+        return getPost(response, newRequest)
     }
 
     override suspend fun getMoreChildren(
@@ -86,15 +94,19 @@ class TedditRepository(
     }
 
     override suspend fun getUserInfo(request: Request, user: String): Resource<UserInfo> {
-        return getUserInfo(request) {
-            tedditApi.getUserPosts(request.getInstance(), user, Sort.HOT, null, null, request.info.host).about
+        val newRequest = request.getRequest()
+
+        return getUserInfo(newRequest) {
+            tedditApi.getUserPosts(newRequest.getInstance(), user, Sort.HOT, null, null, request.info.host).about
         }
     }
 
     override suspend fun getUserPosts(request: Request, user: String, sorting: Sorting, after: String?): Feed {
+        val newRequest = request.getRequest()
+
         val response = safeApiCall {
             tedditApi.getUserPosts(
-                request.getInstance(),
+                newRequest.getInstance(),
                 user,
                 sorting.generalSorting,
                 sorting.timeSorting,
@@ -103,13 +115,15 @@ class TedditRepository(
             ).overview
         }
 
-        return getUserPosts(response, request)
+        return getUserPosts(response, newRequest)
     }
 
     override suspend fun getUserComments(request: Request, user: String, sorting: Sorting, after: String?): Feed {
+        val newRequest = request.getRequest()
+
         val response = safeApiCall {
             tedditApi.getUserComments(
-                request.getInstance(),
+                newRequest.getInstance(),
                 user,
                 sorting.generalSorting,
                 sorting.timeSorting,
@@ -118,7 +132,7 @@ class TedditRepository(
             ).overview
         }
 
-        return getUserComments(response, request)
+        return getUserComments(response, newRequest)
     }
 
     override suspend fun searchPost(
@@ -145,9 +159,11 @@ class TedditRepository(
         sorting: Sorting,
         after: String?
     ): Resource<SearchResults> {
-        return searchSubreddit(request) {
+        val newRequest = request.getRequest()
+
+        return searchSubreddit(newRequest) {
             tedditApi.searchSubreddit(
-                request.getInstance(),
+                newRequest.getInstance(),
                 query,
                 sorting.generalSorting,
                 sorting.timeSorting,
@@ -158,4 +174,8 @@ class TedditRepository(
     }
 
     private fun Request.getInstance(): String = service.instance ?: TedditApi.BASE_URL
+
+    private fun Request.getRequest(): Request {
+        return this.copy(service = service.copy(instance = service.instance ?: TedditApi.BASE_URL))
+    }
 }

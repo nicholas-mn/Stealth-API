@@ -16,7 +16,9 @@ import com.cosmos.stealth.services.reddit.data.mapper.PostMapper
 import com.cosmos.stealth.services.reddit.data.mapper.UserMapper
 import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.Sorting
+import com.cosmos.stealth.services.reddit.data.remote.api.DataRedditApi
 import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi
+import com.cosmos.stealth.services.reddit.data.remote.api.ScrapRedditApi
 import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
@@ -32,17 +34,20 @@ class RedditRepository(
 ) : Repository(postMapper, communityMapper, userMapper, commentMapper, defaultDispatcher) {
 
     override suspend fun getSubreddit(request: Request, subreddit: String, sorting: Sorting, after: String?): Feed {
+        val source = getSource(request.service.instance)
+
         val response = safeApiCall {
-            getSource(request.service.instance)
-                .getSubreddit(subreddit, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
+            source.getSubreddit(subreddit, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
         }
 
-        return getSubreddit(response, request)
+        return getSubreddit(response, source.getRequest(request))
     }
 
     override suspend fun getSubredditInfo(request: Request, subreddit: String): Resource<CommunityInfo> {
-        return getSubredditInfo(request) {
-            getSource(request.service.instance).getSubredditInfo(subreddit, request.info.host)
+        val source = getSource(request.service.instance)
+
+        return getSubredditInfo(source.getRequest(request)) {
+            source.getSubredditInfo(subreddit, request.info.host)
         }
     }
 
@@ -53,26 +58,28 @@ class RedditRepository(
         sorting: Sorting,
         after: String?
     ): Resource<SearchResults> {
-        return searchInSubreddit(request) {
-            getSource(request.service.instance)
-                .searchInSubreddit(
-                    subreddit,
-                    query,
-                    sorting.generalSorting,
-                    sorting.timeSorting,
-                    after,
-                    request.info.host
-                )
+        val source = getSource(request.service.instance)
+
+        return searchInSubreddit(source.getRequest(request)) {
+            source.searchInSubreddit(
+                subreddit,
+                query,
+                sorting.generalSorting,
+                sorting.timeSorting,
+                after,
+                request.info.host
+            )
         }
     }
 
     override suspend fun getPost(request: Request, permalink: String, limit: Int?, sort: Sort): Resource<Post> {
+        val source = getSource(request.service.instance)
+
         val response = safeApiCall {
-            getSource(request.service.instance)
-                .getPost(permalink, limit, sort, request.info.host)
+            source.getPost(permalink, limit, sort, request.info.host)
         }
 
-        return getPost(response, request)
+        return getPost(response, source.getRequest(request))
     }
 
     override suspend fun getMoreChildren(
@@ -98,31 +105,34 @@ class RedditRepository(
             )
         }
 
-        return getMoreChildren(request, moreContentFeedable, additionalContentFeedable) {
-            getSource(request.service.instance).getMoreChildren(children, moreContentFeedable.parentId)
+        val source = getSource(request.service.instance)
+
+        return getMoreChildren(source.getRequest(request), moreContentFeedable, additionalContentFeedable) {
+            source.getMoreChildren(children, moreContentFeedable.parentId)
         }
     }
 
     override suspend fun getUserInfo(request: Request, user: String): Resource<UserInfo> {
-        return getUserInfo(request) { getSource(request.service.instance).getUserInfo(user, request.info.host) }
+        val source = getSource(request.service.instance)
+        return getUserInfo(source.getRequest(request)) { source.getUserInfo(user, request.info.host) }
     }
 
     override suspend fun getUserPosts(request: Request, user: String, sorting: Sorting, after: String?): Feed {
+        val source = getSource(request.service.instance)
         val response = safeApiCall {
-            getSource(request.service.instance)
-                .getUserPosts(user, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+            source.getUserPosts(user, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
         }
 
-        return getUserPosts(response, request)
+        return getUserPosts(response, source.getRequest(request))
     }
 
     override suspend fun getUserComments(request: Request, user: String, sorting: Sorting, after: String?): Feed {
+        val source = getSource(request.service.instance)
         val response = safeApiCall {
-            getSource(request.service.instance)
-                .getUserComments(user, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+            source.getUserComments(user, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
         }
 
-        return getUserComments(response, request)
+        return getUserComments(response, source.getRequest(request))
     }
 
     override suspend fun searchPost(
@@ -131,9 +141,9 @@ class RedditRepository(
         sorting: Sorting,
         after: String?
     ): Resource<SearchResults> {
-        return searchPost(request) {
-            getSource(request.service.instance)
-                .searchPost(query, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+        val source = getSource(request.service.instance)
+        return searchPost(source.getRequest(request)) {
+            source.searchPost(query, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
         }
     }
 
@@ -143,9 +153,9 @@ class RedditRepository(
         sorting: Sorting,
         after: String?
     ): Resource<SearchResults> {
-        return searchUser(request) {
-            getSource(request.service.instance)
-                .searchUser(query, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+        val source = getSource(request.service.instance)
+        return searchUser(source.getRequest(request)) {
+            source.searchUser(query, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
         }
     }
 
@@ -155,9 +165,9 @@ class RedditRepository(
         sorting: Sorting,
         after: String?
     ): Resource<SearchResults> {
-        return searchSubreddit(request) {
-            getSource(request.service.instance)
-                .searchSubreddit(query, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+        val source = getSource(request.service.instance)
+        return searchSubreddit(source.getRequest(request)) {
+            source.searchSubreddit(query, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
         }
     }
 
@@ -170,9 +180,18 @@ class RedditRepository(
         }
     }
 
+    private fun RedditApi.getRequest(request: Request): Request {
+        return when (this) {
+            is DataRedditApi -> request.copy(service = request.service.copy(instance = BASE_URL.host))
+            is ScrapRedditApi -> request.copy(service = request.service.copy(instance = SCRAP_URL.host))
+            else -> request
+        }
+    }
+
     companion object {
         private const val LOAD_MORE_LIMIT = 100
 
+        private val BASE_URL = RedditApi.BASE_URL.toHttpUrl()
         private val SCRAP_URL = RedditApi.BASE_URL_OLD.toHttpUrl()
     }
 }
