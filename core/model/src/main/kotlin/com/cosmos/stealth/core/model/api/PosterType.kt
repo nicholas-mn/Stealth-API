@@ -7,7 +7,7 @@ import com.squareup.moshi.JsonClass
 /**
  * Type of poster
  *
- * Values: regular,moderator,admin
+ * Values: regular,moderator,admin,bot
  */
 @Suppress("EnumNaming")
 @JsonClass(generateAdapter = false)
@@ -20,7 +20,10 @@ enum class PosterType(val value: String) {
     moderator("moderator"),
 
     @Json(name = "admin")
-    admin("admin");
+    admin("admin"),
+
+    @Json(name = "bot")
+    bot("bot");
 
     override fun toString(): String = value
 

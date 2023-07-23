@@ -6,6 +6,7 @@ import com.cosmos.stealth.services.lemmy.data.model.Person
 fun Person.toPosterType(): PosterType {
     return when {
         admin -> PosterType.admin
+        botAccount -> PosterType.bot
         else -> PosterType.regular
     }
 }
