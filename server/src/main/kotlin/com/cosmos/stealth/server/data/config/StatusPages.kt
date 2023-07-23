@@ -1,6 +1,7 @@
 package com.cosmos.stealth.server.data.config
 
 import com.cosmos.stealth.core.model.api.Error
+import com.cosmos.stealth.core.network.data.exception.BadResponseException
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -22,6 +23,10 @@ fun Application.configureStatusPage() {
                 }
                 is IllegalStateException -> {
                     statusCode = HttpStatusCode.BadRequest
+                    errorMessage = throwable.message.orEmpty()
+                }
+                is BadResponseException -> {
+                    statusCode = HttpStatusCode.BadGateway
                     errorMessage = throwable.message.orEmpty()
                 }
                 else -> {

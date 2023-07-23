@@ -24,8 +24,10 @@ import com.cosmos.stealth.core.model.data.UserInfoRequest
 import com.cosmos.stealth.core.model.data.UserRequest
 import com.cosmos.stealth.core.network.util.Resource
 import com.cosmos.stealth.services.base.data.ServiceGateway
-import com.cosmos.stealth.services.base.util.extension.isFailure
+import com.cosmos.stealth.services.base.util.extension.isSuccess
 import com.cosmos.stealth.services.base.util.extension.map
+import com.cosmos.stealth.services.base.util.extension.orInternalError
+import com.cosmos.stealth.services.base.util.extension.toError
 import com.cosmos.stealth.services.reddit.data.model.Sort.BEST
 import com.cosmos.stealth.services.reddit.data.repository.Repository
 import com.cosmos.stealth.services.reddit.util.extension.redditSort
@@ -33,6 +35,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import java.net.HttpURLConnection
 
+@Suppress("TooManyFunctions")
 abstract class Gateway(
     private val repository: Repository
 ) : ServiceGateway {
@@ -57,11 +60,11 @@ abstract class Gateway(
             val feed = feedAsync.await()
             val communityInfo = communityInfoAsync.await()
 
-            val feedStatus = feed.status.firstOrNull() ?: Status(request.service, HttpURLConnection.HTTP_INTERNAL_ERROR)
+            val feedStatus = feed.status.firstOrNull().orInternalError(request.service)
 
             when {
-                feedStatus.isFailure -> Resource.Error(feedStatus.code, feedStatus.error.orEmpty())
-                else -> communityInfo.map { Community(it, feed) }
+                feedStatus.isSuccess -> communityInfo.map { Community(it, feed) }
+                else -> feedStatus.toError()
             }
         }
     }
@@ -95,11 +98,11 @@ abstract class Gateway(
             val feed = feedAsync.await()
             val userInfo = userInfoAsync.await()
 
-            val feedStatus = feed.status.firstOrNull() ?: Status(request.service, HttpURLConnection.HTTP_INTERNAL_ERROR)
+            val feedStatus = feed.status.firstOrNull().orInternalError(request.service)
 
             when {
-                feedStatus.isFailure -> Resource.Error(feedStatus.code, feedStatus.error.orEmpty())
-                else -> userInfo.map { User(it, feed) }
+                feedStatus.isSuccess -> userInfo.map { User(it, feed) }
+                else -> feedStatus.toError()
             }
         }
     }

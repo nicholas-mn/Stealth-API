@@ -23,9 +23,10 @@ import com.cosmos.stealth.core.model.data.UserInfoRequest
 import com.cosmos.stealth.core.model.data.UserRequest
 import com.cosmos.stealth.core.network.util.Resource
 import com.cosmos.stealth.services.base.data.ServiceGateway
-import com.cosmos.stealth.services.base.util.extension.isFailure
+import com.cosmos.stealth.services.base.util.extension.isSuccess
 import com.cosmos.stealth.services.base.util.extension.map
 import com.cosmos.stealth.services.base.util.extension.orInternalError
+import com.cosmos.stealth.services.base.util.extension.toError
 import com.cosmos.stealth.services.lemmy.data.model.SearchType.Communities
 import com.cosmos.stealth.services.lemmy.data.model.SearchType.Posts
 import com.cosmos.stealth.services.lemmy.data.model.SearchType.Users
@@ -60,8 +61,8 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
             val feedStatus = feed.status.firstOrNull().orInternalError(request.service)
 
             when {
-                feedStatus.isFailure -> Resource.Error(feedStatus.code, feedStatus.error.orEmpty())
-                else -> communityInfo.map { Community(it, feed) }
+                feedStatus.isSuccess -> communityInfo.map { Community(it, feed) }
+                else -> feedStatus.toError()
             }
         }
     }
@@ -109,8 +110,8 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
             val commentsStatus = comments.status.firstOrNull().orInternalError(request.service)
 
             when {
-                commentsStatus.isFailure -> Resource.Error(commentsStatus.code, commentsStatus.error.orEmpty())
-                else -> post.map { Post(it, comments) }
+                commentsStatus.isSuccess -> post.map { Post(it, comments) }
+                else -> commentsStatus.toError()
             }
         }
     }

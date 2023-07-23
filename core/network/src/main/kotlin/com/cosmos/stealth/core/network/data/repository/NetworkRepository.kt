@@ -1,9 +1,11 @@
 package com.cosmos.stealth.core.network.data.repository
 
 import com.cosmos.stealth.core.network.util.Resource
+import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.ServerResponseException
+import io.ktor.http.HttpStatusCode
 
 abstract class NetworkRepository {
 
@@ -38,6 +40,9 @@ abstract class NetworkRepository {
             is RedirectResponseException -> Resource.Error(e.response.status.value, e.message)
             is ClientRequestException -> Resource.Error(e.response.status.value, e.message)
             is ServerResponseException -> Resource.Error(e.response.status.value, e.message)
+            is NoTransformationFoundException -> {
+                Resource.Error(HttpStatusCode.BadGateway.value, "Error processing response from service")
+            }
             else -> Resource.Exception(e)
         }
     }
