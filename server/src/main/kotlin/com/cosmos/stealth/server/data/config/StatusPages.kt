@@ -25,6 +25,10 @@ fun Application.configureStatusPage() {
                     statusCode = HttpStatusCode.BadRequest
                     errorMessage = throwable.message.orEmpty()
                 }
+                is UnsupportedOperationException -> {
+                    statusCode = HttpStatusCode.NotImplemented
+                    errorMessage = "Operation is currently not supported"
+                }
                 is BadResponseException -> {
                     statusCode = HttpStatusCode.BadGateway
                     errorMessage = throwable.message.orEmpty()
