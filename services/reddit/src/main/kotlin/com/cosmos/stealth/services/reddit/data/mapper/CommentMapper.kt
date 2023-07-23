@@ -16,7 +16,7 @@ import com.cosmos.stealth.services.reddit.data.model.MoreChild
 import com.cosmos.stealth.services.reddit.data.model.MoreData
 import com.cosmos.stealth.services.reddit.data.model.PostData
 import com.cosmos.stealth.services.reddit.util.extension.toReaction
-import com.cosmos.stealth.services.reddit.util.toFlair
+import com.cosmos.stealth.services.reddit.util.toBadge
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
@@ -59,7 +59,7 @@ class CommentMapper(
                 stickied,
                 controversiality > 0,
                 getReactions(),
-                toFlair(authorFlairRichText, flair),
+                toBadge(authorFlairRichText, flair),
                 isSubmitter
             )
         }

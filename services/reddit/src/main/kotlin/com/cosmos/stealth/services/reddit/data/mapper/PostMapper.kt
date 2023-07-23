@@ -23,7 +23,7 @@ import com.cosmos.stealth.services.reddit.data.model.PostData
 import com.cosmos.stealth.services.reddit.util.extension.toMedia
 import com.cosmos.stealth.services.reddit.util.extension.toPosterType
 import com.cosmos.stealth.services.reddit.util.extension.toReaction
-import com.cosmos.stealth.services.reddit.util.toFlair
+import com.cosmos.stealth.services.reddit.util.toBadge
 import com.cosmos.stealth.services.reddit.util.toMedia
 import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
@@ -66,8 +66,8 @@ class PostMapper(defaultDispatcher: CoroutineDispatcher) : Mapper<PostChild, Ser
                 preview,
                 media,
                 gallery,
-                toFlair(linkFlairRichText, flair),
-                toFlair(authorFlairRichText, authorFlair),
+                toBadge(linkFlairRichText, flair),
+                toBadge(authorFlairRichText, authorFlair),
                 distinguished.toPosterType()
             )
         }

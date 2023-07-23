@@ -4,15 +4,15 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 /**
- * Flair description
+ * Badge description
  *
- * @param flairDataList
+ * @param badgeDataList
  * @param background 
  */
 @JsonClass(generateAdapter = true)
-data class Flair (
+data class Badge (
     @Json(name = "data")
-    val flairDataList: List<FlairData>,
+    val badgeDataList: List<BadgeData>,
 
     @Json(name = "background")
     val background: String? = null

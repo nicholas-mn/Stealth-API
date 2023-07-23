@@ -32,8 +32,8 @@ import com.squareup.moshi.JsonClass
  * @param reactions
  * @param media 
  * @param gallery 
- * @param postFlair 
- * @param authorFlair 
+ * @param postBadge
+ * @param authorBadge
  * @param posterType 
  */
 @JsonClass(generateAdapter = true)
@@ -119,11 +119,11 @@ data class PostFeedable (
     @Json(name = "gallery")
     val gallery: List<Media>? = null,
 
-    @Json(name = "postFlair")
-    val postFlair: Flair? = null,
+    @Json(name = "postBadge")
+    val postBadge: Badge? = null,
 
-    @Json(name = "authorFlair")
-    val authorFlair: Flair? = null,
+    @Json(name = "authorBadge")
+    val authorBadge: Badge? = null,
 
     @Json(name = "posterType")
     val posterType: PosterType? = PosterType.regular

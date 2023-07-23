@@ -4,7 +4,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 /**
- * Flair data
+ * Badge data
  *
  * @param type 
  * @param text 
@@ -12,7 +12,7 @@ import com.squareup.moshi.JsonClass
  */
 @Suppress("EnumNaming")
 @JsonClass(generateAdapter = true)
-data class FlairData (
+data class BadgeData (
     @Json(name = "type")
     val type: Type,
 
