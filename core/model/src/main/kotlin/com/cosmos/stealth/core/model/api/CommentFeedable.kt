@@ -60,7 +60,7 @@ data class CommentFeedable (
     val downvotes: Int? = null,
 
     @Json(name = "replies")
-    val replies: List<Feedable>? = null,
+    val replies: MutableList<Feedable>? = null,
 
     @Json(name = "edited")
     val edited: Long? = null,

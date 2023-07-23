@@ -3,6 +3,7 @@ package com.cosmos.stealth.services.reddit.data.repository
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.Feed
 import com.cosmos.stealth.core.model.api.Feedable
+import com.cosmos.stealth.core.model.api.MoreContentFeedable
 import com.cosmos.stealth.core.model.api.Post
 import com.cosmos.stealth.core.model.api.SearchResults
 import com.cosmos.stealth.core.model.api.UserInfo
@@ -76,12 +77,30 @@ class RedditRepository(
 
     override suspend fun getMoreChildren(
         request: Request,
-        children: List<String>,
-        linkId: String
+        moreContentFeedable: MoreContentFeedable
     ): Resource<List<Feedable>> {
-        val childrenString = children.take(LOAD_MORE_LIMIT).joinToString(",")
+        val containsMoreComments = moreContentFeedable.content.size > LOAD_MORE_LIMIT
 
-        return getMoreChildren(request) { getSource(request.service.instance).getMoreChildren(childrenString, linkId) }
+        val children = moreContentFeedable.content.take(LOAD_MORE_LIMIT).joinToString(",")
+
+        var additionalContentFeedable: MoreContentFeedable? = null
+
+        if (containsMoreComments) {
+            val count = moreContentFeedable.count
+
+            // Remove first 100 comments from list
+            val content = moreContentFeedable.content.toMutableList()
+                .apply { subList(0, LOAD_MORE_LIMIT).clear() }
+
+            additionalContentFeedable = moreContentFeedable.copy(
+                count = if (count > LOAD_MORE_LIMIT) count - LOAD_MORE_LIMIT else 0,
+                content = content.toList()
+            )
+        }
+
+        return getMoreChildren(request, moreContentFeedable, additionalContentFeedable) {
+            getSource(request.service.instance).getMoreChildren(children, moreContentFeedable.parentId)
+        }
     }
 
     override suspend fun getUserInfo(request: Request, user: String): Resource<UserInfo> {

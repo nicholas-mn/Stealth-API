@@ -60,7 +60,7 @@ class CommentMapper(
             commentView.comment.parentId?.let { parentId ->
                 // If the comment has a parent, it's a reply; add it to the replies of its parent
                 val parent = commentMap[parentId]?.feedable as? CommentFeedable?
-                (parent?.replies as? MutableList?)?.add(comment.feedable)
+                parent?.replies?.add(comment.feedable)
             } ?: run {
                 // If the comment has no parent, it's a top-level comment; add it to the list of comments
                 comments.add(comment.feedable)
@@ -84,7 +84,7 @@ class CommentMapper(
                     comment.id,
                     comment.depth
                 )
-                (comment.replies as? MutableList?)?.add(moreCommentFeedable)
+                comment.replies?.add(moreCommentFeedable)
             }
         }
 

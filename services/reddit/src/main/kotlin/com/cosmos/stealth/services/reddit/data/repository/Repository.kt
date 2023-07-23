@@ -2,11 +2,13 @@ package com.cosmos.stealth.services.reddit.data.repository
 
 import com.cosmos.stealth.core.common.util.extension.interlace
 import com.cosmos.stealth.core.model.api.After
+import com.cosmos.stealth.core.model.api.CommentFeedable
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.CommunityResults
 import com.cosmos.stealth.core.model.api.Feed
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.FeedableResults
+import com.cosmos.stealth.core.model.api.MoreContentFeedable
 import com.cosmos.stealth.core.model.api.Post
 import com.cosmos.stealth.core.model.api.PostFeedable
 import com.cosmos.stealth.core.model.api.SearchResults
@@ -190,15 +192,26 @@ abstract class Repository(
 
     abstract suspend fun getMoreChildren(
         request: Request,
-        children: List<String>,
-        linkId: String
+        moreContentFeedable: MoreContentFeedable
     ): Resource<List<Feedable>>
 
     protected suspend fun getMoreChildren(
         request: Request,
+        moreContentFeedable: MoreContentFeedable,
+        additionalContentFeedable: MoreContentFeedable?,
         apiCall: suspend () -> MoreChildren
     ): Resource<List<Feedable>> {
-        return safeApiCall(apiCall) { commentMapper.dataToEntities(it.json.data.things, request.service, null) }
+        return safeApiCall(apiCall) {
+            val items = commentMapper.dataToEntities(it.json.data.things, request.service, moreContentFeedable.parentId)
+
+            val data = if (additionalContentFeedable != null) {
+                items.toMutableList().apply { add(additionalContentFeedable) }.toList()
+            } else {
+                items
+            }
+
+            restoreCommentHierarchy(data, moreContentFeedable.depth)
+        }
     }
 
     abstract suspend fun getUserInfo(request: Request, user: String): Resource<UserInfo>
@@ -240,7 +253,7 @@ abstract class Repository(
                 val items = commentMapper.dataToEntities(
                     response.data.data.children as List<CommentChild>,
                     request.service,
-                    null
+                    parent = null
                 )
                 val afterData = response.data.data.after
                     ?.toAfter(request.service)
@@ -299,6 +312,44 @@ abstract class Repository(
             val results = communityMapper.dataToEntities(it.data.children as List<AboutChild>, request.service)
             CommunityResults(results, afterKey)
         }
+    }
+
+    @Suppress("CyclomaticComplexMethod", "LoopWithTooManyJumpStatements")
+    private suspend fun restoreCommentHierarchy(
+        comments: List<Feedable>,
+        depth: Int
+    ): List<Feedable> = withContext(defaultDispatcher) {
+        fun Feedable.getDepth(): Int? {
+            return when (this) {
+                is CommentFeedable -> this.depth
+                is MoreContentFeedable -> this.depth
+                is PostFeedable -> null
+            }
+        }
+
+        val restored = mutableListOf<Feedable>()
+
+        for (i in comments.indices) {
+            val comment = comments[i]
+            val commentDepth = comment.getDepth() ?: continue
+
+            if (commentDepth > depth) {
+                continue
+            } else if (commentDepth < depth) {
+                break
+            }
+
+            val nextComment = comments.getOrNull(i + 1)
+            val nextCommentDepth = nextComment?.getDepth() ?: -1
+
+            if (comment is CommentFeedable && nextComment != null && nextCommentDepth > depth) {
+                comment.replies?.addAll(restoreCommentHierarchy(comments.subList(i + 1, comments.lastIndex), depth + 1))
+            }
+
+            restored.add(comment)
+        }
+
+        restored
     }
 
     private fun List<List<Feedable>>.sort(sorting: Sorting): List<Feedable> {

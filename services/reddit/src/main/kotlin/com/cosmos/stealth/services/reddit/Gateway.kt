@@ -129,7 +129,7 @@ abstract class Gateway(
         return with(moreContentRequest) {
             val request = Request(moreContentFeedable.service, info)
 
-            repository.getMoreChildren(request, moreContentFeedable.content, moreContentFeedable.parentId)
+            repository.getMoreChildren(request, moreContentFeedable)
         }
     }
 

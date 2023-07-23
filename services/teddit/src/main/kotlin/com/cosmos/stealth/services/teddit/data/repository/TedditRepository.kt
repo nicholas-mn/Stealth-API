@@ -3,6 +3,7 @@ package com.cosmos.stealth.services.teddit.data.repository
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.Feed
 import com.cosmos.stealth.core.model.api.Feedable
+import com.cosmos.stealth.core.model.api.MoreContentFeedable
 import com.cosmos.stealth.core.model.api.Post
 import com.cosmos.stealth.core.model.api.SearchResults
 import com.cosmos.stealth.core.model.api.UserInfo
@@ -79,8 +80,7 @@ class TedditRepository(
 
     override suspend fun getMoreChildren(
         request: Request,
-        children: List<String>,
-        linkId: String
+        moreContentFeedable: MoreContentFeedable
     ): Resource<List<Feedable>> {
         return Resource.Exception(UnsupportedOperationException())
     }

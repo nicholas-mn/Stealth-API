@@ -32,14 +32,22 @@ class CommentMapper(
         data: List<Child>?,
         context: Service?,
         parent: PostData?
-    ): List<Feedable> = withContext(defaultDispatcher) {
-        data?.map { dataToEntity(it, context, parent) } ?: listOf()
+    ): MutableList<Feedable> = withContext(defaultDispatcher) {
+        dataToEntities(data, context, parent?.name)
+    }
+
+    suspend fun dataToEntities(
+        data: List<Child>?,
+        context: Service?,
+        parentId: String?
+    ): MutableList<Feedable> = withContext(defaultDispatcher) {
+        data?.map { dataToEntity(it, context, parentId) }?.toMutableList() ?: mutableListOf()
     }
 
     private suspend fun dataToEntity(
         data: CommentData,
         context: Service?,
-        parent: PostData?
+        parentId: String?
     ): CommentFeedable = withContext(defaultDispatcher) {
         with(data) {
             CommentFeedable(
@@ -54,7 +62,7 @@ class CommentMapper(
                 created.toMillis(),
                 depth ?: 0,
                 null,
-                dataToEntities(replies?.data?.children, context, parent),
+                dataToEntities(replies?.data?.children, context, parentId),
                 edited.takeIf { it > -1 },
                 stickied,
                 controversiality > 0,
@@ -65,14 +73,14 @@ class CommentMapper(
         }
     }
 
-    private fun dataToEntity(data: MoreData, context: Service?, parent: PostData?): MoreContentFeedable {
+    private fun dataToEntity(data: MoreData, context: Service?, parentId: String?): MoreContentFeedable {
         with(data) {
             return MoreContentFeedable(
                 context ?: Service(ServiceName.reddit),
                 id,
                 count,
                 children,
-                parent?.name.orEmpty(),
+                parentId.orEmpty(),
                 depth ?: 0
             )
         }
@@ -81,11 +89,11 @@ class CommentMapper(
     private suspend fun dataToEntity(
         data: Child,
         context: Service?,
-        parent: PostData? = null
+        parentId: String? = null
     ): Feedable = withContext(defaultDispatcher) {
         when (data.kind) {
-            ChildType.t1 -> dataToEntity((data as CommentChild).data, context, parent)
-            ChildType.more -> dataToEntity((data as MoreChild).data, context, parent)
+            ChildType.t1 -> dataToEntity((data as CommentChild).data, context, parentId)
+            ChildType.more -> dataToEntity((data as MoreChild).data, context, parentId)
             else -> error("Unknown kind ${data.kind}")
         }
     }
