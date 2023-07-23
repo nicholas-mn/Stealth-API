@@ -104,6 +104,8 @@ class PostMapper(defaultDispatcher: CoroutineDispatcher) : Mapper<PostChild, Ser
 
             media?.redditVideoPreview != null || mediaPreview?.videoPreview != null -> MediaType.VIDEO
 
+            mediaPreview?.images?.getOrNull(0)?.variants?.mp4 != null -> MediaType.VIDEO
+
             domain == "i.redd.it" -> MediaType.IMAGE
 
             else -> getLinkType(url)
