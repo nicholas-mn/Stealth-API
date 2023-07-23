@@ -4,7 +4,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 /**
- * Award description
+ * Reaction description
  *
  * @param count 
  * @param source 
@@ -13,7 +13,7 @@ import com.squareup.moshi.JsonClass
  * @param resolutions Other resolutions
  */
 @JsonClass(generateAdapter = true)
-data class Award (
+data class Reaction (
     @Json(name = "count")
     val count: Int,
 

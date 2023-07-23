@@ -2,12 +2,12 @@ package com.cosmos.stealth.services.reddit.data.mapper
 
 import com.cosmos.stealth.core.common.data.mapper.Mapper
 import com.cosmos.stealth.core.common.util.extension.toMillis
-import com.cosmos.stealth.core.model.api.Awards
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.Media
 import com.cosmos.stealth.core.model.api.MediaSource
 import com.cosmos.stealth.core.model.api.MediaType
 import com.cosmos.stealth.core.model.api.PostFeedable
+import com.cosmos.stealth.core.model.api.Reactions
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
 import com.cosmos.stealth.core.network.util.extension.isImage
@@ -20,9 +20,9 @@ import com.cosmos.stealth.core.network.util.getLinkType
 import com.cosmos.stealth.core.network.util.getUrlFromImgurId
 import com.cosmos.stealth.services.reddit.data.model.PostChild
 import com.cosmos.stealth.services.reddit.data.model.PostData
-import com.cosmos.stealth.services.reddit.util.extension.toAward
 import com.cosmos.stealth.services.reddit.util.extension.toMedia
 import com.cosmos.stealth.services.reddit.util.extension.toPosterType
+import com.cosmos.stealth.services.reddit.util.extension.toReaction
 import com.cosmos.stealth.services.reddit.util.toFlair
 import com.cosmos.stealth.services.reddit.util.toMedia
 import io.ktor.http.ContentType
@@ -62,7 +62,7 @@ class PostMapper(defaultDispatcher: CoroutineDispatcher) : Mapper<PostChild, Ser
                 isArchived,
                 isLocked,
                 isStickied,
-                getAwards(),
+                getReactions(),
                 preview,
                 media,
                 gallery,
@@ -73,10 +73,10 @@ class PostMapper(defaultDispatcher: CoroutineDispatcher) : Mapper<PostChild, Ser
         }
     }
 
-    private fun PostData.getAwards(): Awards {
-        return Awards(
+    private fun PostData.getReactions(): Reactions {
+        return Reactions(
             totalAwards,
-            awardings.map { it.toAward() }
+            awardings.map { it.toReaction() }
         )
     }
 

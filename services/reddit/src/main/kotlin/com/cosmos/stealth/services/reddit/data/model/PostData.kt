@@ -1,6 +1,5 @@
 package com.cosmos.stealth.services.reddit.data.model
 
-import com.cosmos.stealth.core.model.api.Awards
 import com.cosmos.stealth.services.reddit.data.adapter.NullToEmptyString
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -121,7 +120,4 @@ data class PostData(
     var thumbnail: String? = null
     @Transient
     var crosspost: Crosspost? = null
-
-    val awards: Awards
-        get() = Awards()
 }

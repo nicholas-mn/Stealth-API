@@ -21,7 +21,7 @@ import com.squareup.moshi.JsonClass
  * @param edited 
  * @param pinned 
  * @param controversial 
- * @param awards 
+ * @param reactions
  * @param authorFlair 
  */
 @JsonClass(generateAdapter = true)
@@ -71,8 +71,8 @@ data class CommentFeedable (
     @Json(name = "controversial")
     val controversial: Boolean? = null,
 
-    @Json(name = "awards")
-    val awards: Awards? = null,
+    @Json(name = "reactions")
+    val reactions: Reactions? = null,
 
     @Json(name = "authorFlair")
     val authorFlair: Flair? = null,

@@ -29,7 +29,7 @@ import com.squareup.moshi.JsonClass
  * @param archived 
  * @param locked 
  * @param pinned 
- * @param awards 
+ * @param reactions
  * @param media 
  * @param gallery 
  * @param postFlair 
@@ -107,8 +107,8 @@ data class PostFeedable (
     @Json(name = "pinned")
     val pinned: Boolean? = null,
 
-    @Json(name = "awards")
-    val awards: Awards? = null,
+    @Json(name = "reactions")
+    val reactions: Reactions? = null,
 
     @Json(name = "preview")
     val preview: Media? = null,

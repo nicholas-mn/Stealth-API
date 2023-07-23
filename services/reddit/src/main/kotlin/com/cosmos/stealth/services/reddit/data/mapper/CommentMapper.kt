@@ -2,10 +2,10 @@ package com.cosmos.stealth.services.reddit.data.mapper
 
 import com.cosmos.stealth.core.common.data.mapper.Mapper
 import com.cosmos.stealth.core.common.util.extension.toMillis
-import com.cosmos.stealth.core.model.api.Awards
 import com.cosmos.stealth.core.model.api.CommentFeedable
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.MoreContentFeedable
+import com.cosmos.stealth.core.model.api.Reactions
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
 import com.cosmos.stealth.services.reddit.data.model.Child
@@ -15,7 +15,7 @@ import com.cosmos.stealth.services.reddit.data.model.CommentData
 import com.cosmos.stealth.services.reddit.data.model.MoreChild
 import com.cosmos.stealth.services.reddit.data.model.MoreData
 import com.cosmos.stealth.services.reddit.data.model.PostData
-import com.cosmos.stealth.services.reddit.util.extension.toAward
+import com.cosmos.stealth.services.reddit.util.extension.toReaction
 import com.cosmos.stealth.services.reddit.util.toFlair
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -58,7 +58,7 @@ class CommentMapper(
                 edited.takeIf { it > -1 },
                 stickied,
                 controversiality > 0,
-                getAwards(),
+                getReactions(),
                 toFlair(authorFlairRichText, flair),
                 isSubmitter
             )
@@ -90,10 +90,10 @@ class CommentMapper(
         }
     }
 
-    private fun CommentData.getAwards(): Awards {
-        return Awards(
+    private fun CommentData.getReactions(): Reactions {
+        return Reactions(
             totalAwards,
-            awardings.map { it.toAward() }
+            awardings.map { it.toReaction() }
         )
     }
 }
