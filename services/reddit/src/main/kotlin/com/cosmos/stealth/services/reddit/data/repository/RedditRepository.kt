@@ -1,9 +1,9 @@
 package com.cosmos.stealth.services.reddit.data.repository
 
+import com.cosmos.stealth.core.model.api.Appendable
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.Feed
 import com.cosmos.stealth.core.model.api.Feedable
-import com.cosmos.stealth.core.model.api.MoreContentFeedable
 import com.cosmos.stealth.core.model.api.Post
 import com.cosmos.stealth.core.model.api.SearchResults
 import com.cosmos.stealth.core.model.api.UserInfo
@@ -84,22 +84,22 @@ class RedditRepository(
 
     override suspend fun getMoreChildren(
         request: Request,
-        moreContentFeedable: MoreContentFeedable
+        appendable: Appendable
     ): Resource<List<Feedable>> {
-        val containsMoreComments = moreContentFeedable.content.size > LOAD_MORE_LIMIT
+        val containsMoreComments = appendable.content.size > LOAD_MORE_LIMIT
 
-        val children = moreContentFeedable.content.take(LOAD_MORE_LIMIT).joinToString(",")
+        val children = appendable.content.take(LOAD_MORE_LIMIT).joinToString(",")
 
-        var additionalContentFeedable: MoreContentFeedable? = null
+        var additionalContentFeedable: Appendable? = null
 
         if (containsMoreComments) {
-            val count = moreContentFeedable.count
+            val count = appendable.count
 
             // Remove first 100 comments from list
-            val content = moreContentFeedable.content.toMutableList()
+            val content = appendable.content.toMutableList()
                 .apply { subList(0, LOAD_MORE_LIMIT).clear() }
 
-            additionalContentFeedable = moreContentFeedable.copy(
+            additionalContentFeedable = appendable.copy(
                 count = if (count > LOAD_MORE_LIMIT) count - LOAD_MORE_LIMIT else 0,
                 content = content.toList()
             )
@@ -107,8 +107,8 @@ class RedditRepository(
 
         val source = getSource(request.service.instance)
 
-        return getMoreChildren(source.getRequest(request), moreContentFeedable, additionalContentFeedable) {
-            source.getMoreChildren(children, moreContentFeedable.parentId)
+        return getMoreChildren(source.getRequest(request), appendable, additionalContentFeedable) {
+            source.getMoreChildren(children, appendable.parentId)
         }
     }
 

@@ -1,6 +1,6 @@
 package com.cosmos.stealth.server.data.route.v1
 
-import com.cosmos.stealth.core.model.api.MoreContentFeedable
+import com.cosmos.stealth.core.model.api.Appendable
 import com.cosmos.stealth.core.model.data.MoreContentRequest
 import com.cosmos.stealth.server.data.service.ContentService
 import com.cosmos.stealth.server.util.extension.info
@@ -15,9 +15,9 @@ fun Route.contentRouting() {
     val contentService by inject<ContentService>()
 
     post("/more") {
-        val moreContentFeedable = call.receive<MoreContentFeedable>()
+        val appendable = call.receive<Appendable>()
 
-        val moreContentRequest = MoreContentRequest(call.info, moreContentFeedable)
+        val moreContentRequest = MoreContentRequest(call.info, appendable)
 
         val feedables = contentService.getMoreContent(moreContentRequest)
 

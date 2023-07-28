@@ -14,7 +14,7 @@ import com.squareup.moshi.JsonClass
  * @param depth 
  */
 @JsonClass(generateAdapter = true)
-data class MoreContentFeedable (
+data class Appendable (
     @Json(name = "service")
     val service: Service,
 

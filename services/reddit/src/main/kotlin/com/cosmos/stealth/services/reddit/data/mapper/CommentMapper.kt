@@ -2,9 +2,9 @@ package com.cosmos.stealth.services.reddit.data.mapper
 
 import com.cosmos.stealth.core.common.data.mapper.Mapper
 import com.cosmos.stealth.core.common.util.extension.toMillis
-import com.cosmos.stealth.core.model.api.CommentFeedable
+import com.cosmos.stealth.core.model.api.Appendable
+import com.cosmos.stealth.core.model.api.Commentable
 import com.cosmos.stealth.core.model.api.Feedable
-import com.cosmos.stealth.core.model.api.MoreContentFeedable
 import com.cosmos.stealth.core.model.api.Reactions
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
@@ -48,9 +48,9 @@ class CommentMapper(
         data: CommentData,
         context: Service?,
         parentId: String?
-    ): CommentFeedable = withContext(defaultDispatcher) {
+    ): Commentable = withContext(defaultDispatcher) {
         with(data) {
-            CommentFeedable(
+            Commentable(
                 context ?: Service(ServiceName.reddit),
                 name,
                 linkId,
@@ -73,9 +73,9 @@ class CommentMapper(
         }
     }
 
-    private fun dataToEntity(data: MoreData, context: Service?, parentId: String?): MoreContentFeedable {
+    private fun dataToEntity(data: MoreData, context: Service?, parentId: String?): Appendable {
         with(data) {
-            return MoreContentFeedable(
+            return Appendable(
                 context ?: Service(ServiceName.reddit),
                 id,
                 count,

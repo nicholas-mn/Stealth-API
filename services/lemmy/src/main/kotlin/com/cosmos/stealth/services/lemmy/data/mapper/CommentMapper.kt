@@ -2,9 +2,9 @@ package com.cosmos.stealth.services.lemmy.data.mapper
 
 import com.cosmos.stealth.core.common.data.mapper.Mapper
 import com.cosmos.stealth.core.common.util.MarkdownParser
-import com.cosmos.stealth.core.model.api.CommentFeedable
+import com.cosmos.stealth.core.model.api.Appendable
+import com.cosmos.stealth.core.model.api.Commentable
 import com.cosmos.stealth.core.model.api.Feedable
-import com.cosmos.stealth.core.model.api.MoreContentFeedable
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
 import com.cosmos.stealth.services.lemmy.data.model.Comment
@@ -19,7 +19,7 @@ class CommentMapper(
 
     override suspend fun toEntity(from: CommentView, context: Service?): Feedable {
         return with(from) {
-            CommentFeedable(
+            Commentable(
                 context ?: Service(ServiceName.lemmy),
                 comment.id.toString(),
                 post.id.toString(),
@@ -59,7 +59,7 @@ class CommentMapper(
             // For each comment, find its parent
             commentView.comment.parentId?.let { parentId ->
                 // If the comment has a parent, it's a reply; add it to the replies of its parent
-                val parent = commentMap[parentId]?.feedable as? CommentFeedable?
+                val parent = commentMap[parentId]?.feedable as? Commentable?
                 parent?.replies?.add(comment.feedable)
             } ?: run {
                 // If the comment has no parent, it's a top-level comment; add it to the list of comments
@@ -70,13 +70,13 @@ class CommentMapper(
         from.forEach { commentView ->
             val commentData = commentMap[commentView.comment.id] ?: return@forEach
 
-            val comment = commentData.feedable as? CommentFeedable ?: return@forEach
+            val comment = commentData.feedable as? Commentable ?: return@forEach
 
             val childCount = commentData.commentView.counts.childCount
 
             // Check if a comment has more replies that need to be fetched
             if (childCount > 0 && comment.replies.isNullOrEmpty()) {
-                val moreCommentFeedable = MoreContentFeedable(
+                val moreCommentFeedable = Appendable(
                     context ?: Service(ServiceName.lemmy),
                     comment.id,
                     childCount,

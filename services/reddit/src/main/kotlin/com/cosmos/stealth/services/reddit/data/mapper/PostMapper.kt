@@ -6,7 +6,7 @@ import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.Media
 import com.cosmos.stealth.core.model.api.MediaSource
 import com.cosmos.stealth.core.model.api.MediaType
-import com.cosmos.stealth.core.model.api.PostFeedable
+import com.cosmos.stealth.core.model.api.Postable
 import com.cosmos.stealth.core.model.api.Reactions
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
@@ -38,7 +38,7 @@ class PostMapper(defaultDispatcher: CoroutineDispatcher) : Mapper<PostChild, Ser
 
             val preview = getPreview(media, gallery)
 
-            PostFeedable(
+            Postable(
                 context ?: Service(ServiceName.reddit),
                 name,
                 mediaType.toPostType(),

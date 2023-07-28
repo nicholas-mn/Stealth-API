@@ -37,7 +37,7 @@ import com.squareup.moshi.JsonClass
  * @param posterType 
  */
 @JsonClass(generateAdapter = true)
-data class PostFeedable (
+data class Postable (
     @Json(name = "service")
     val service: Service,
 

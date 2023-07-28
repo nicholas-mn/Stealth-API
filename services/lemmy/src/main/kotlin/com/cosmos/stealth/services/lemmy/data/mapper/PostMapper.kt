@@ -5,8 +5,8 @@ import com.cosmos.stealth.core.common.util.MarkdownParser
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.Media
 import com.cosmos.stealth.core.model.api.MediaSource
-import com.cosmos.stealth.core.model.api.PostFeedable
 import com.cosmos.stealth.core.model.api.PostType
+import com.cosmos.stealth.core.model.api.Postable
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
 import com.cosmos.stealth.core.network.util.extension.isImage
@@ -37,7 +37,7 @@ class PostMapper(
                 else -> null
             }
 
-            PostFeedable(
+            Postable(
                 context ?: Service(ServiceName.lemmy),
                 post.id.toString(),
                 postType,

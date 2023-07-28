@@ -132,9 +132,9 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
 
     override suspend fun getMoreContent(moreContentRequest: MoreContentRequest): Resource<List<Feedable>> {
         return with (moreContentRequest) {
-            val request = Request(moreContentFeedable.service, info)
+            val request = Request(appendable.service, info)
 
-            repository.getMoreComments(request, moreContentFeedable.parentId.toInt())
+            repository.getMoreComments(request, appendable.parentId.toInt())
         }
     }
 

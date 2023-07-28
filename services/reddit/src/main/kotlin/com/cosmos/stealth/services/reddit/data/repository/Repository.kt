@@ -2,15 +2,15 @@ package com.cosmos.stealth.services.reddit.data.repository
 
 import com.cosmos.stealth.core.common.util.extension.interlace
 import com.cosmos.stealth.core.model.api.After
-import com.cosmos.stealth.core.model.api.CommentFeedable
+import com.cosmos.stealth.core.model.api.Commentable
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.CommunityResults
 import com.cosmos.stealth.core.model.api.Feed
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.FeedableResults
-import com.cosmos.stealth.core.model.api.MoreContentFeedable
+import com.cosmos.stealth.core.model.api.Appendable
 import com.cosmos.stealth.core.model.api.Post
-import com.cosmos.stealth.core.model.api.PostFeedable
+import com.cosmos.stealth.core.model.api.Postable
 import com.cosmos.stealth.core.model.api.SearchResults
 import com.cosmos.stealth.core.model.api.Status
 import com.cosmos.stealth.core.model.api.UserInfo
@@ -192,17 +192,17 @@ abstract class Repository(
 
     abstract suspend fun getMoreChildren(
         request: Request,
-        moreContentFeedable: MoreContentFeedable
+        appendable: Appendable
     ): Resource<List<Feedable>>
 
     protected suspend fun getMoreChildren(
         request: Request,
-        moreContentFeedable: MoreContentFeedable,
-        additionalContentFeedable: MoreContentFeedable?,
+        appendable: Appendable,
+        additionalContentFeedable: Appendable?,
         apiCall: suspend () -> MoreChildren
     ): Resource<List<Feedable>> {
         return safeApiCall(apiCall) {
-            val items = commentMapper.dataToEntities(it.json.data.things, request.service, moreContentFeedable.parentId)
+            val items = commentMapper.dataToEntities(it.json.data.things, request.service, appendable.parentId)
 
             val data = if (additionalContentFeedable != null) {
                 items.toMutableList().apply { add(additionalContentFeedable) }.toList()
@@ -210,7 +210,7 @@ abstract class Repository(
                 items
             }
 
-            restoreCommentHierarchy(data, moreContentFeedable.depth)
+            restoreCommentHierarchy(data, appendable.depth)
         }
     }
 
@@ -321,9 +321,9 @@ abstract class Repository(
     ): List<Feedable> = withContext(defaultDispatcher) {
         fun Feedable.getDepth(): Int? {
             return when (this) {
-                is CommentFeedable -> this.depth
-                is MoreContentFeedable -> this.depth
-                is PostFeedable -> null
+                is Commentable -> this.depth
+                is Appendable -> this.depth
+                is Postable -> null
             }
         }
 
@@ -342,7 +342,7 @@ abstract class Repository(
             val nextComment = comments.getOrNull(i + 1)
             val nextCommentDepth = nextComment?.getDepth() ?: -1
 
-            if (comment is CommentFeedable && nextComment != null && nextCommentDepth > depth) {
+            if (comment is Commentable && nextComment != null && nextCommentDepth > depth) {
                 comment.replies?.addAll(restoreCommentHierarchy(comments.subList(i + 1, comments.lastIndex), depth + 1))
             }
 
@@ -355,9 +355,9 @@ abstract class Repository(
     private fun List<List<Feedable>>.sort(sorting: Sorting): List<Feedable> {
         return when (sorting.generalSorting) {
             // If sorting is set to NEW, simply flatten the lists and sort the posts by date
-            Sort.NEW -> this.flatten().sortedByDescending { (it as PostFeedable).created }
+            Sort.NEW -> this.flatten().sortedByDescending { (it as Postable).created }
             // If sorting is set to TOP, simply flatten the lists and sort the posts by score
-            Sort.TOP -> this.flatten().sortedByDescending { (it as PostFeedable).upvotes }
+            Sort.TOP -> this.flatten().sortedByDescending { (it as Postable).upvotes }
             // For all the other sorting methods, interlace the lists to have a consistent result
             // [['a', 'b', 'c'], ['e', 'f', 'g'], ['h', 'i']] ==> ['a', 'e', 'h', 'b', 'f', 'i', 'c', 'g']
             else -> this.interlace()

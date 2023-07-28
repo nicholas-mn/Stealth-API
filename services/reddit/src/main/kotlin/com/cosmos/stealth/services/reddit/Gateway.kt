@@ -127,9 +127,9 @@ abstract class Gateway(
 
     override suspend fun getMoreContent(moreContentRequest: MoreContentRequest): Resource<List<Feedable>> {
         return with(moreContentRequest) {
-            val request = Request(moreContentFeedable.service, info)
+            val request = Request(appendable.service, info)
 
-            repository.getMoreChildren(request, moreContentFeedable)
+            repository.getMoreChildren(request, appendable)
         }
     }
 

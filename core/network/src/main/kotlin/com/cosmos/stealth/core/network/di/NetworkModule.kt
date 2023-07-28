@@ -3,13 +3,13 @@ package com.cosmos.stealth.core.network.di
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.IO_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.model.adapter.AfterKeyAdapter
-import com.cosmos.stealth.core.model.api.CommentFeedable
+import com.cosmos.stealth.core.model.api.Appendable
+import com.cosmos.stealth.core.model.api.Commentable
 import com.cosmos.stealth.core.model.api.CommunityResults
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.FeedableResults
 import com.cosmos.stealth.core.model.api.FeedableType
-import com.cosmos.stealth.core.model.api.MoreContentFeedable
-import com.cosmos.stealth.core.model.api.PostFeedable
+import com.cosmos.stealth.core.model.api.Postable
 import com.cosmos.stealth.core.model.api.SearchResults
 import com.cosmos.stealth.core.model.api.SearchType
 import com.cosmos.stealth.core.model.api.UserResults
@@ -46,9 +46,9 @@ object NetworkModule {
         return Moshi.Builder()
             .add(
                 PolymorphicJsonAdapterFactory.of(Feedable::class.java, "type")
-                    .withSubtype(PostFeedable::class.java, FeedableType.post.value)
-                    .withSubtype(CommentFeedable::class.java, FeedableType.comment.value)
-                    .withSubtype(MoreContentFeedable::class.java, FeedableType.more.value)
+                    .withSubtype(Postable::class.java, FeedableType.post.value)
+                    .withSubtype(Commentable::class.java, FeedableType.comment.value)
+                    .withSubtype(Appendable::class.java, FeedableType.more.value)
             )
             .add(
                 PolymorphicJsonAdapterFactory.of(SearchResults::class.java, "type")

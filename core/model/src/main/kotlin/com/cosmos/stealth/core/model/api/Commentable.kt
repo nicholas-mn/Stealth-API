@@ -25,7 +25,7 @@ import com.squareup.moshi.JsonClass
  * @param authorBadge
  */
 @JsonClass(generateAdapter = true)
-data class CommentFeedable (
+data class Commentable (
     @Json(name = "service")
     val service: Service,
 
