@@ -15,8 +15,8 @@ import com.cosmos.stealth.core.model.api.UserResults
 import com.cosmos.stealth.core.model.data.Request
 import com.cosmos.stealth.core.network.data.repository.NetworkRepository
 import com.cosmos.stealth.core.network.util.Resource
+import com.cosmos.stealth.core.network.util.extension.map
 import com.cosmos.stealth.services.base.util.extension.isSuccess
-import com.cosmos.stealth.services.base.util.extension.map
 import com.cosmos.stealth.services.base.util.extension.orInternalError
 import com.cosmos.stealth.services.base.util.extension.sortPosts
 import com.cosmos.stealth.services.base.util.extension.toAfter

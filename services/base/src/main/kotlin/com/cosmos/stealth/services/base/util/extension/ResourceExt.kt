@@ -12,11 +12,3 @@ fun Resource<*>.toStatus(service: Service): Status {
         is Resource.Exception -> Status(service, HttpURLConnection.HTTP_INTERNAL_ERROR, throwable.message)
     }
 }
-
-suspend fun <T, R> Resource<T>.map(map: suspend (T) -> R): Resource<R> {
-    return when (this) {
-        is Resource.Success -> Resource.Success(map(data))
-        is Resource.Error -> this
-        is Resource.Exception -> this
-    }
-}
