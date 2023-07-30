@@ -18,6 +18,8 @@ import com.cosmos.stealth.services.reddit.data.model.PostData
 import com.cosmos.stealth.services.reddit.util.extension.toReaction
 import com.cosmos.stealth.services.reddit.util.toBadge
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 
 class CommentMapper(
@@ -41,7 +43,7 @@ class CommentMapper(
         context: Service?,
         parentId: String?
     ): MutableList<Feedable> = withContext(defaultDispatcher) {
-        data?.map { dataToEntity(it, context, parentId) }?.toMutableList() ?: mutableListOf()
+        data?.map { async { dataToEntity(it, context, parentId) } }?.awaitAll()?.toMutableList() ?: mutableListOf()
     }
 
     private suspend fun dataToEntity(
@@ -90,8 +92,8 @@ class CommentMapper(
         data: Child,
         context: Service?,
         parentId: String? = null
-    ): Feedable = withContext(defaultDispatcher) {
-        when (data.kind) {
+    ): Feedable {
+        return when (data.kind) {
             ChildType.t1 -> dataToEntity((data as CommentChild).data, context, parentId)
             ChildType.more -> dataToEntity((data as MoreChild).data, context, parentId)
             else -> error("Unknown kind ${data.kind}")

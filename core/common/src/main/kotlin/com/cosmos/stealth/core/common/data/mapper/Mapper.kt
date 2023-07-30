@@ -1,14 +1,17 @@
 package com.cosmos.stealth.core.common.data.mapper
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
 
 abstract class Mapper<From, Context, To>(protected val defaultDispatcher: CoroutineDispatcher) {
 
     protected abstract suspend fun toEntity(from: From, context: Context? = null): To
 
-    protected open suspend fun toEntities(from: List<From>, context: Context? = null): List<To> {
-        return from.map { toEntity(it, context) }
+    protected open suspend fun toEntities(from: List<From>, context: Context? = null): List<To> = supervisorScope {
+        from.map { async { toEntity(it, context) } }.awaitAll()
     }
 
     protected open suspend fun fromEntity(from: To): From {
