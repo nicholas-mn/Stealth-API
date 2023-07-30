@@ -13,3 +13,7 @@ fun <T> Iterable<Iterable<T>>.interlace(): List<T> {
 
     return result
 }
+
+fun <T> List<T>.nullIfEmpty(): List<T>? {
+    return takeIf { it.isNotEmpty() }
+}

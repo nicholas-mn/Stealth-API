@@ -2,6 +2,7 @@ package com.cosmos.stealth.services.reddit.data.mapper
 
 import com.cosmos.stealth.core.common.data.mapper.Mapper
 import com.cosmos.stealth.core.common.util.extension.toMillis
+import com.cosmos.stealth.core.data.repository.DashRepository
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.Media
 import com.cosmos.stealth.core.model.api.MediaSource
@@ -10,6 +11,7 @@ import com.cosmos.stealth.core.model.api.Postable
 import com.cosmos.stealth.core.model.api.Reactions
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
+import com.cosmos.stealth.core.network.util.Resource
 import com.cosmos.stealth.core.network.util.extension.isImage
 import com.cosmos.stealth.core.network.util.extension.mime
 import com.cosmos.stealth.core.network.util.extension.mimeType
@@ -20,6 +22,7 @@ import com.cosmos.stealth.core.network.util.getLinkType
 import com.cosmos.stealth.core.network.util.getUrlFromImgurId
 import com.cosmos.stealth.services.reddit.data.model.PostChild
 import com.cosmos.stealth.services.reddit.data.model.PostData
+import com.cosmos.stealth.services.reddit.data.model.RedditVideoPreview
 import com.cosmos.stealth.services.reddit.util.extension.toMedia
 import com.cosmos.stealth.services.reddit.util.extension.toPosterType
 import com.cosmos.stealth.services.reddit.util.extension.toReaction
@@ -28,7 +31,10 @@ import com.cosmos.stealth.services.reddit.util.toMedia
 import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
 
-class PostMapper(defaultDispatcher: CoroutineDispatcher) : Mapper<PostChild, Service, Feedable>(defaultDispatcher) {
+class PostMapper(
+    private val dashRepository: DashRepository,
+    defaultDispatcher: CoroutineDispatcher
+) : Mapper<PostChild, Service, Feedable>(defaultDispatcher) {
 
     override suspend fun toEntity(from: PostChild, context: Service?): Feedable {
         return with(from.data) {
@@ -113,12 +119,12 @@ class PostMapper(defaultDispatcher: CoroutineDispatcher) : Mapper<PostChild, Ser
     }
 
     @Suppress("CyclomaticComplexMethod")
-    private fun PostData.getMedia(mediaType: MediaType): Media? {
+    private suspend fun PostData.getMedia(mediaType: MediaType): Media? {
         return when (mediaType) {
             MediaType.REDDIT_VIDEO, MediaType.REDDIT_GIF -> {
                 crossposts?.firstOrNull()?.getMedia(mediaType)
-                    ?: media?.redditVideoPreview?.toMedia(mediaType == MediaType.REDDIT_VIDEO)
-                    ?: mediaPreview?.videoPreview?.toMedia(mediaType == MediaType.REDDIT_VIDEO)
+                    ?: media?.redditVideoPreview?.toMedia()
+                    ?: mediaPreview?.videoPreview?.toMedia()
             }
 
             MediaType.VIDEO -> {
@@ -167,5 +173,21 @@ class PostMapper(defaultDispatcher: CoroutineDispatcher) : Mapper<PostChild, Ser
             ?: media?.takeIf { it.mime.startsWith("image") }
             ?: url.takeIf { it.mimeType.isImage }?.run { toMedia() }
             ?: thumbnail?.toMedia()
+    }
+
+    private suspend fun RedditVideoPreview.toMedia(): Media? {
+        val url = fallbackUrl.substringBeforeLast('/')
+
+        val dashMedia = dashUrl
+            ?.run { dashRepository.getDash(this, url) }
+            ?.run { (this as? Resource.Success)?.data }
+
+        return dashMedia ?: toFallbackMedia()
+    }
+
+    private fun RedditVideoPreview.toFallbackMedia(): Media? {
+        val mime = fallbackUrl.mimeType?.mime ?: return null
+
+        return Media(mime, MediaSource(fallbackUrl, width, height), null, null)
     }
 }

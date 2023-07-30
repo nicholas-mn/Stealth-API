@@ -138,7 +138,8 @@ class PostScraper(
                         0,
                         0,
                         0,
-                        false
+                        false,
+                        null
                     )
                 )
             }
@@ -216,7 +217,8 @@ class PostScraper(
                         0,
                         0,
                         0,
-                        true
+                        true,
+                        null
                     )
                 )
             }

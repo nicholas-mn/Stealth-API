@@ -18,5 +18,8 @@ data class RedditVideoPreview (
     val duration: Int,
 
     @Json(name = "is_gif")
-    val isGif: Boolean
+    val isGif: Boolean,
+
+    @Json(name = "dash_url")
+    val dashUrl: String?
 )

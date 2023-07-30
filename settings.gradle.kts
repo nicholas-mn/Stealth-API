@@ -5,6 +5,7 @@ pluginManagement {
     plugins {
         kotlin("jvm") version kotlin apply false
         kotlin("kapt") version kotlin apply false
+        kotlin("plugin.serialization") version kotlin apply false
         id("io.ktor.plugin") version ktor apply false
     }
 }
@@ -21,6 +22,7 @@ rootProject.name = "stealth-api"
 include(":server")
 
 include(":core:common")
+include(":core:data")
 include(":core:model")
 include(":core:network")
 

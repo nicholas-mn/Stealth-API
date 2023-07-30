@@ -1,6 +1,7 @@
 package com.cosmos.stealth.services.reddit.di
 
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
+import com.cosmos.stealth.core.data.repository.DashRepository
 import com.cosmos.stealth.services.reddit.data.mapper.CommentMapper
 import com.cosmos.stealth.services.reddit.data.mapper.CommunityMapper
 import com.cosmos.stealth.services.reddit.data.mapper.PostMapper
@@ -14,7 +15,7 @@ object RedditMapperModule {
     val redditMapperModule = module {
         single { provideCommentMapper(get(DEFAULT_DISPATCHER_QUALIFIER)) }
         single { provideCommunityMapper(get(DEFAULT_DISPATCHER_QUALIFIER)) }
-        single { providePostMapper(get(DEFAULT_DISPATCHER_QUALIFIER)) }
+        single { providePostMapper(get(), get(DEFAULT_DISPATCHER_QUALIFIER)) }
         single { provideUserMapper(get(DEFAULT_DISPATCHER_QUALIFIER)) }
     }
 
@@ -26,8 +27,8 @@ object RedditMapperModule {
         return CommunityMapper(defaultDispatcher)
     }
 
-    private fun providePostMapper(defaultDispatcher: CoroutineDispatcher): PostMapper {
-        return PostMapper(defaultDispatcher)
+    private fun providePostMapper(dashRepository: DashRepository, defaultDispatcher: CoroutineDispatcher): PostMapper {
+        return PostMapper(dashRepository, defaultDispatcher)
     }
 
     private fun provideUserMapper(defaultDispatcher: CoroutineDispatcher): UserMapper {
