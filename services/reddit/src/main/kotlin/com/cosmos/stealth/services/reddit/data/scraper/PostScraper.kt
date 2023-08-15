@@ -26,6 +26,11 @@ class PostScraper(
     override suspend fun scrapDocument(document: Document): Listing {
         val posts = document.select(Selector.POST)
             .filter { element -> !element.attr(Selector.Attr.PROMOTED).toBoolean() }
+            .ifEmpty {
+                // Alternative selector for deleted posts
+                document.select(Selector.SITETABLE_LINK)
+                    .select("div.thing")
+            }
 
         val children = posts.map { it.toPost() }
         val after = getNextKey()
