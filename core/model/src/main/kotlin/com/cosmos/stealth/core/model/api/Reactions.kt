@@ -12,8 +12,8 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class Reactions (
     @Json(name = "total")
-    val total: Int? = null,
+    val total: Int,
 
     @Json(name = "reactions")
-    val reactions: List<Reaction>? = null
+    val reactions: List<Reaction>
 )

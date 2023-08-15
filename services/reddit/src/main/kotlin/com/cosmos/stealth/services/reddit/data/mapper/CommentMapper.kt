@@ -8,6 +8,7 @@ import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.Reactions
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
+import com.cosmos.stealth.services.base.util.extension.orNull
 import com.cosmos.stealth.services.reddit.data.model.Child
 import com.cosmos.stealth.services.reddit.data.model.ChildType
 import com.cosmos.stealth.services.reddit.data.model.CommentChild
@@ -100,10 +101,10 @@ class CommentMapper(
         }
     }
 
-    private fun CommentData.getReactions(): Reactions {
+    private fun CommentData.getReactions(): Reactions? {
         return Reactions(
             totalAwards,
             awardings.map { it.toReaction() }
-        )
+        ).orNull()
     }
 }

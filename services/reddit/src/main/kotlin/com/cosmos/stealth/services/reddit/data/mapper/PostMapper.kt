@@ -20,6 +20,7 @@ import com.cosmos.stealth.core.network.util.getImageIdFromImgurLink
 import com.cosmos.stealth.core.network.util.getImgurVideo
 import com.cosmos.stealth.core.network.util.getLinkType
 import com.cosmos.stealth.core.network.util.getUrlFromImgurId
+import com.cosmos.stealth.services.base.util.extension.orNull
 import com.cosmos.stealth.services.reddit.data.model.PostChild
 import com.cosmos.stealth.services.reddit.data.model.PostData
 import com.cosmos.stealth.services.reddit.data.model.RedditVideoPreview
@@ -79,11 +80,11 @@ class PostMapper(
         }
     }
 
-    private fun PostData.getReactions(): Reactions {
+    private fun PostData.getReactions(): Reactions? {
         return Reactions(
             totalAwards,
             awardings.map { it.toReaction() }
-        )
+        ).orNull()
     }
 
     private fun PostData.getMediaType(): MediaType {

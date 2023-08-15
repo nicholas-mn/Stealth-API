@@ -17,7 +17,7 @@ data class Reaction (
     val count: Int,
 
     @Json(name = "media")
-    val media: Media,
+    val media: Media? = null,
 
     @Json(name = "name")
     val name: String? = null,
