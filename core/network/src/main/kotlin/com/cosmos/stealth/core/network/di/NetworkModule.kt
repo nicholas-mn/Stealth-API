@@ -1,6 +1,6 @@
 package com.cosmos.stealth.core.network.di
 
-import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
+import com.cosmos.stealth.core.common.di.DispatchersModule
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.IO_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.model.adapter.AfterKeyAdapter
 import com.cosmos.stealth.core.model.api.Appendable
@@ -15,33 +15,25 @@ import com.cosmos.stealth.core.model.api.SearchType
 import com.cosmos.stealth.core.model.api.UserResults
 import com.cosmos.stealth.core.network.data.converter.MoshiContentConverter
 import com.cosmos.stealth.core.network.di.NetworkModule.Qualifier.STEALTH_QUALIFIER
-import com.cosmos.stealth.core.network.util.UrlSubstitutor
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import kotlinx.coroutines.CoroutineDispatcher
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Module
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
-object NetworkModule {
+@Module(includes = [DispatchersModule::class])
+@ComponentScan("com.cosmos.stealth.core.network")
+class NetworkModule {
 
     object Qualifier {
-        val STEALTH_QUALIFIER = named("stealth")
+        const val STEALTH_QUALIFIER = "stealth"
     }
 
-    @Suppress("MemberNameEqualsClassName")
-    val networkModule = module {
-        single { provideUrlSubstitutor(get(DEFAULT_DISPATCHER_QUALIFIER)) }
-
-        single(STEALTH_QUALIFIER) { provideStealthMoshi() }
-        single(STEALTH_QUALIFIER) {
-            provideStealthMoshiContentConverter(
-                get(STEALTH_QUALIFIER),
-                get(IO_DISPATCHER_QUALIFIER)
-            )
-        }
-    }
-
-    private fun provideStealthMoshi(): Moshi {
+    @Single
+    @Named(STEALTH_QUALIFIER)
+    fun provideStealthMoshi(): Moshi {
         // TODO
         return Moshi.Builder()
             .add(
@@ -60,14 +52,12 @@ object NetworkModule {
             .build()
     }
 
-    private fun provideStealthMoshiContentConverter(
-        moshi: Moshi,
-        ioDispatcher: CoroutineDispatcher
+    @Single
+    @Named(STEALTH_QUALIFIER)
+    fun provideStealthMoshiContentConverter(
+        @Named(STEALTH_QUALIFIER) moshi: Moshi,
+        @Named(IO_DISPATCHER_QUALIFIER) ioDispatcher: CoroutineDispatcher
     ): MoshiContentConverter {
         return MoshiContentConverter(moshi, ioDispatcher)
-    }
-
-    private fun provideUrlSubstitutor(defaultDispatcher: CoroutineDispatcher): UrlSubstitutor {
-        return UrlSubstitutor(defaultDispatcher)
     }
 }

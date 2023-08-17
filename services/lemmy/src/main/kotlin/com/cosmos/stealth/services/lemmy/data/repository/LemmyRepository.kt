@@ -1,5 +1,6 @@
 package com.cosmos.stealth.services.lemmy.data.repository
 
+import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.model.api.After
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.CommunityResults
@@ -28,22 +29,26 @@ import com.cosmos.stealth.services.lemmy.data.mapper.UserMapper
 import com.cosmos.stealth.services.lemmy.data.model.SearchType
 import com.cosmos.stealth.services.lemmy.data.model.SortType
 import com.cosmos.stealth.services.lemmy.data.remote.api.LemmyApi
+import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIER
 import com.cosmos.stealth.services.lemmy.util.extension.toSort
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import java.net.HttpURLConnection
 
 @Suppress("LongParameterList", "TooManyFunctions")
+@Single
 class LemmyRepository(
-    private val lemmyApi: LemmyApi,
+    @Named(LEMMY_QUALIFIER) private val lemmyApi: LemmyApi,
     private val postMapper: PostMapper,
     private val communityMapper: CommunityMapper,
     private val userMapper: UserMapper,
     private val commentMapper: CommentMapper,
-    private val defaultDispatcher: CoroutineDispatcher
+    @Named(DEFAULT_DISPATCHER_QUALIFIER) private val defaultDispatcher: CoroutineDispatcher
 ) : NetworkRepository() {
 
     suspend fun getPosts(request: Request, communities: List<String>, sort: SortType, page: Int?): Feed {

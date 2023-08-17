@@ -6,7 +6,9 @@ import com.cosmos.stealth.core.model.data.CommunityInfoRequest
 import com.cosmos.stealth.core.model.data.CommunityRequest
 import com.cosmos.stealth.core.network.util.Resource
 import com.cosmos.stealth.server.data.manager.GatewayManager
+import org.koin.core.annotation.Single
 
+@Single
 class CommunityService(private val gatewayManager: GatewayManager) {
 
     suspend fun getCommunity(communityRequest: CommunityRequest): Resource<Community> {

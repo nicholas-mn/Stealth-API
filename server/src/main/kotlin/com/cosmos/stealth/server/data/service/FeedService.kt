@@ -14,7 +14,9 @@ import com.cosmos.stealth.services.base.util.extension.orInternalError
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
+import org.koin.core.annotation.Single
 
+@Single
 class FeedService(private val gatewayManager: GatewayManager) {
 
     suspend fun getFeed(requestInfo: RequestInfo, feedRequest: FeedRequest): Feed = supervisorScope {

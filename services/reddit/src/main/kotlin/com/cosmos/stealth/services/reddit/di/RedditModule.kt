@@ -3,18 +3,15 @@ package com.cosmos.stealth.services.reddit.di
 import com.cosmos.stealth.core.common.di.DispatchersModule
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.IO_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.common.util.TimeValue
+import com.cosmos.stealth.core.data.di.DataModule
 import com.cosmos.stealth.core.network.data.converter.MoshiContentConverter
 import com.cosmos.stealth.core.network.data.converter.moshi
+import com.cosmos.stealth.core.network.di.NetworkModule
 import com.cosmos.stealth.core.network.util.UrlSubstitutor
-import com.cosmos.stealth.services.reddit.RedditGateway
 import com.cosmos.stealth.services.reddit.data.adapter.EditedAdapter
 import com.cosmos.stealth.services.reddit.data.adapter.MediaMetadataAdapter
 import com.cosmos.stealth.services.reddit.data.adapter.NullToEmptyStringAdapter
 import com.cosmos.stealth.services.reddit.data.adapter.RepliesAdapter
-import com.cosmos.stealth.services.reddit.data.mapper.CommentMapper
-import com.cosmos.stealth.services.reddit.data.mapper.CommunityMapper
-import com.cosmos.stealth.services.reddit.data.mapper.PostMapper
-import com.cosmos.stealth.services.reddit.data.mapper.UserMapper
 import com.cosmos.stealth.services.reddit.data.model.AboutChild
 import com.cosmos.stealth.services.reddit.data.model.AboutUserChild
 import com.cosmos.stealth.services.reddit.data.model.Child
@@ -28,9 +25,8 @@ import com.cosmos.stealth.services.reddit.data.remote.RedditCookieJar
 import com.cosmos.stealth.services.reddit.data.remote.api.DataRedditApi
 import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi
 import com.cosmos.stealth.services.reddit.data.remote.api.ScrapRedditApi
-import com.cosmos.stealth.services.reddit.data.repository.RedditRepository
-import com.cosmos.stealth.services.reddit.di.RedditNetworkModule.Qualifier.REDDIT_QUALIFIER
-import com.cosmos.stealth.services.reddit.di.RedditNetworkModule.Qualifier.REDDIT_SCRAP_QUALIFIER
+import com.cosmos.stealth.services.reddit.di.RedditModule.Qualifier.REDDIT_QUALIFIER
+import com.cosmos.stealth.services.reddit.di.RedditModule.Qualifier.REDDIT_SCRAP_QUALIFIER
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import io.ktor.client.HttpClient
@@ -39,64 +35,27 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.OkHttpClient
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Module
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import java.util.concurrent.TimeUnit
 
-object RedditNetworkModule {
+@Module(includes = [DispatchersModule::class, DataModule::class, NetworkModule::class])
+@ComponentScan("com.cosmos.stealth.services.reddit")
+class RedditModule {
 
-    @Suppress("MagicNumber")
+    @Suppress("MagicNumber", "VariableNaming")
     private val TIMEOUT = TimeValue<Long>(60, TimeUnit.SECONDS)
 
     object Qualifier {
-        val REDDIT_QUALIFIER = named("reddit")
-        val REDDIT_SCRAP_QUALIFIER = named("reddit_scrap")
+        const val REDDIT_QUALIFIER = "reddit"
+        const val REDDIT_SCRAP_QUALIFIER = "reddit_scrap"
     }
 
-    @Suppress("MemberNameEqualsClassName")
-    val redditNetworkModule = module {
-        single(REDDIT_QUALIFIER) { provideRedditMoshi() }
-        single(REDDIT_QUALIFIER) { provideRedditOkHttpClient() }
-        single(REDDIT_QUALIFIER) {
-            provideRedditMoshiContentConverter(
-                get(REDDIT_QUALIFIER),
-                get(IO_DISPATCHER_QUALIFIER)
-            )
-        }
-        single(REDDIT_QUALIFIER) {
-            provideRedditHttpClient(
-                get(REDDIT_QUALIFIER),
-                get(REDDIT_QUALIFIER)
-            )
-        }
-        single(REDDIT_QUALIFIER) { provideDataRedditApi(get(REDDIT_QUALIFIER), get()) }
-
-        single(REDDIT_SCRAP_QUALIFIER) { provideRedditScrapOkHttpClient() }
-        single(REDDIT_SCRAP_QUALIFIER) { provideRedditScrapHttpClient(get(REDDIT_SCRAP_QUALIFIER)) }
-        single(REDDIT_SCRAP_QUALIFIER) {
-            provideScrapRedditApi(
-                get(REDDIT_SCRAP_QUALIFIER),
-                get(),
-                get(IO_DISPATCHER_QUALIFIER)
-            )
-        }
-
-        single {
-            provideRedditRepository(
-                get(REDDIT_QUALIFIER),
-                get(REDDIT_SCRAP_QUALIFIER),
-                get(),
-                get(),
-                get(),
-                get(),
-                get(DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER)
-            )
-        }
-
-        single { provideRedditGateway(get()) }
-    }
-
-    private fun provideRedditMoshi(): Moshi {
+    @Single
+    @Named(REDDIT_QUALIFIER)
+    fun provideRedditMoshi(): Moshi {
         return Moshi.Builder()
             .add(
                 PolymorphicJsonAdapterFactory.of(Child::class.java, "kind")
@@ -113,14 +72,18 @@ object RedditNetworkModule {
             .build()
     }
 
-    private fun provideRedditMoshiContentConverter(
-        moshi: Moshi,
-        ioDispatcher: CoroutineDispatcher
+    @Single
+    @Named(REDDIT_QUALIFIER)
+    fun provideRedditMoshiContentConverter(
+        @Named(REDDIT_QUALIFIER) moshi: Moshi,
+        @Named(IO_DISPATCHER_QUALIFIER) ioDispatcher: CoroutineDispatcher
     ): MoshiContentConverter {
         return MoshiContentConverter(moshi, ioDispatcher)
     }
 
-    private fun provideRedditOkHttpClient(): OkHttpClient {
+    @Single
+    @Named(REDDIT_QUALIFIER)
+    fun provideRedditOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(RawJsonInterceptor())
             .addInterceptor(JsonInterceptor())
@@ -130,7 +93,9 @@ object RedditNetworkModule {
             .build()
     }
 
-    private fun provideRedditScrapOkHttpClient(): OkHttpClient {
+    @Single
+    @Named(REDDIT_SCRAP_QUALIFIER)
+    fun provideRedditScrapOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .connectTimeout(TIMEOUT.value, TIMEOUT.unit)
             .readTimeout(TIMEOUT.value, TIMEOUT.unit)
@@ -139,9 +104,11 @@ object RedditNetworkModule {
             .build()
     }
 
-    private fun provideRedditHttpClient(
-        okHttpClient: OkHttpClient,
-        moshiContentConverter: MoshiContentConverter
+    @Single
+    @Named(REDDIT_QUALIFIER)
+    fun provideRedditHttpClient(
+        @Named(REDDIT_QUALIFIER) okHttpClient: OkHttpClient,
+        @Named(REDDIT_QUALIFIER) moshiContentConverter: MoshiContentConverter
     ): HttpClient {
         return HttpClient(OkHttp) {
             defaultRequest {
@@ -160,7 +127,9 @@ object RedditNetworkModule {
         }
     }
 
-    private fun provideRedditScrapHttpClient(okHttpClient: OkHttpClient): HttpClient {
+    @Single
+    @Named(REDDIT_SCRAP_QUALIFIER)
+    fun provideRedditScrapHttpClient(@Named(REDDIT_SCRAP_QUALIFIER) okHttpClient: OkHttpClient): HttpClient {
         return HttpClient(OkHttp) {
             defaultRequest {
                 url(RedditApi.BASE_URL_OLD)
@@ -174,40 +143,23 @@ object RedditNetworkModule {
         }
     }
 
-    private fun provideDataRedditApi(httpClient: HttpClient, urlSubstitutor: UrlSubstitutor): RedditApi {
+
+    @Single
+    @Named(REDDIT_QUALIFIER)
+    fun provideDataRedditApi(
+        @Named(REDDIT_QUALIFIER) httpClient: HttpClient,
+        urlSubstitutor: UrlSubstitutor
+    ): RedditApi {
         return DataRedditApi(httpClient, urlSubstitutor)
     }
 
-    private fun provideScrapRedditApi(
-        httpClient: HttpClient,
+    @Single
+    @Named(REDDIT_SCRAP_QUALIFIER)
+    fun provideScrapRedditApi(
+        @Named(REDDIT_SCRAP_QUALIFIER) httpClient: HttpClient,
         urlSubstitutor: UrlSubstitutor,
-        ioDispatcher: CoroutineDispatcher
+        @Named(IO_DISPATCHER_QUALIFIER) ioDispatcher: CoroutineDispatcher
     ): RedditApi {
         return ScrapRedditApi(httpClient, urlSubstitutor, ioDispatcher)
-    }
-
-    @Suppress("LongParameterList")
-    private fun provideRedditRepository(
-        dataRedditApi: RedditApi,
-        scrapRedditApi: RedditApi,
-        postMapper: PostMapper,
-        communityMapper: CommunityMapper,
-        userMapper: UserMapper,
-        commentMapper: CommentMapper,
-        defaultDispatcher: CoroutineDispatcher
-    ): RedditRepository {
-        return RedditRepository(
-            dataRedditApi,
-            scrapRedditApi,
-            postMapper,
-            communityMapper,
-            userMapper,
-            commentMapper,
-            defaultDispatcher
-        )
-    }
-
-    private fun provideRedditGateway(repository: RedditRepository): RedditGateway {
-        return RedditGateway(repository)
     }
 }

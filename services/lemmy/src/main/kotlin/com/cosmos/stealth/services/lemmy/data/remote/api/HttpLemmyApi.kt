@@ -12,12 +12,20 @@ import com.cosmos.stealth.services.lemmy.data.model.GetPostsResponse
 import com.cosmos.stealth.services.lemmy.data.model.SearchResponse
 import com.cosmos.stealth.services.lemmy.data.model.SearchType
 import com.cosmos.stealth.services.lemmy.data.model.SortType
+import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIER
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
-class HttpLemmyApi(private val client: HttpClient, private val urlSubstitutor: UrlSubstitutor) : LemmyApi {
+@Single
+@Named(LEMMY_QUALIFIER)
+class HttpLemmyApi(
+    @Named(LEMMY_QUALIFIER) private val client: HttpClient,
+    private val urlSubstitutor: UrlSubstitutor
+) : LemmyApi {
 
     override suspend fun getPosts(
         instance: String,

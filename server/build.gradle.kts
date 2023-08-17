@@ -1,6 +1,11 @@
 plugins {
     kotlin("jvm")
     id("io.ktor.plugin")
+    id("com.google.devtools.ksp")
+}
+
+sourceSets.main {
+    java.srcDirs("build/generated/ksp/main/kotlin")
 }
 
 application {
@@ -27,6 +32,8 @@ dependencies {
     implementation("io.ktor:ktor-server-status-pages:${Dependencies.Versions.ktor}")
 
     implementation("io.insert-koin:koin-ktor:${Dependencies.Versions.koin}")
+    implementation("io.insert-koin:koin-annotations:${Dependencies.Versions.koinKsp}")
+    ksp("io.insert-koin:koin-ksp-compiler:${Dependencies.Versions.koinKsp}")
 
     implementation("ch.qos.logback:logback-classic:${Dependencies.Versions.logback}")
 

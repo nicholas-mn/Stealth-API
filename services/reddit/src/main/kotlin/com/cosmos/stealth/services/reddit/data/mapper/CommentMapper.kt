@@ -1,6 +1,7 @@
 package com.cosmos.stealth.services.reddit.data.mapper
 
 import com.cosmos.stealth.core.common.data.mapper.Mapper
+import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.common.util.extension.toMillis
 import com.cosmos.stealth.core.model.api.Appendable
 import com.cosmos.stealth.core.model.api.Commentable
@@ -22,9 +23,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
+@Single
 class CommentMapper(
-    defaultDispatcher: CoroutineDispatcher
+    @Named(DEFAULT_DISPATCHER_QUALIFIER) defaultDispatcher: CoroutineDispatcher
 ) : Mapper<Child, Service, Feedable>(defaultDispatcher) {
 
     override suspend fun toEntity(from: Child, context: Service?): Feedable {

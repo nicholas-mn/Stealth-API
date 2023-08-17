@@ -1,5 +1,6 @@
 package com.cosmos.stealth.services.teddit.data.repository
 
+import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.model.api.Appendable
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.Feed
@@ -17,16 +18,20 @@ import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.Sorting
 import com.cosmos.stealth.services.reddit.data.repository.Repository
 import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi
+import com.cosmos.stealth.services.teddit.di.TedditModule.Qualifier.TEDDIT_QUALIFIER
 import kotlinx.coroutines.CoroutineDispatcher
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
 @Suppress("TooManyFunctions")
+@Single
 class TedditRepository(
-    private val tedditApi: TedditApi,
+    @Named(TEDDIT_QUALIFIER) private val tedditApi: TedditApi,
     postMapper: PostMapper,
     communityMapper: CommunityMapper,
     userMapper: UserMapper,
     commentMapper: CommentMapper,
-    defaultDispatcher: CoroutineDispatcher
+    @Named(DEFAULT_DISPATCHER_QUALIFIER) defaultDispatcher: CoroutineDispatcher
 ) : Repository(postMapper, communityMapper, userMapper, commentMapper, defaultDispatcher) {
 
     override suspend fun getSubreddit(request: Request, subreddit: String, sorting: Sorting, after: String?): Feed {

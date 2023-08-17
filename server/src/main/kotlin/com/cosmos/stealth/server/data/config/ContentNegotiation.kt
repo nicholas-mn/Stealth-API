@@ -6,10 +6,11 @@ import com.cosmos.stealth.core.network.di.NetworkModule.Qualifier.STEALTH_QUALIF
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import org.koin.core.qualifier.named
 import org.koin.ktor.ext.inject
 
 fun Application.configureContentNegotiation() {
-    val moshiContentConverter by inject<MoshiContentConverter>(STEALTH_QUALIFIER)
+    val moshiContentConverter by inject<MoshiContentConverter>(named(STEALTH_QUALIFIER))
 
     install(ContentNegotiation) {
         moshi(moshiContentConverter)

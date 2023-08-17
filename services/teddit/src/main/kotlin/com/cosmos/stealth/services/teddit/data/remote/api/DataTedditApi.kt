@@ -10,6 +10,7 @@ import com.cosmos.stealth.services.reddit.data.model.Listing
 import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.TimeSorting
 import com.cosmos.stealth.services.teddit.data.model.TedditUser
+import com.cosmos.stealth.services.teddit.di.TedditModule.Qualifier.TEDDIT_QUALIFIER
 import io.ktor.client.HttpClient
 import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
@@ -17,8 +18,15 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
-class DataTedditApi(private val client: HttpClient, private val urlSubstitutor: UrlSubstitutor) : TedditApi {
+@Single
+@Named(TEDDIT_QUALIFIER)
+class DataTedditApi(
+    @Named(TEDDIT_QUALIFIER) private val client: HttpClient,
+    private val urlSubstitutor: UrlSubstitutor
+) : TedditApi {
 
     override suspend fun getSubreddit(
         instance: String,

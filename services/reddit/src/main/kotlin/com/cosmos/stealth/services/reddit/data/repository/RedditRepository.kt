@@ -1,5 +1,6 @@
 package com.cosmos.stealth.services.reddit.data.repository
 
+import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.model.api.Appendable
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.Feed
@@ -19,18 +20,23 @@ import com.cosmos.stealth.services.reddit.data.model.Sorting
 import com.cosmos.stealth.services.reddit.data.remote.api.DataRedditApi
 import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi
 import com.cosmos.stealth.services.reddit.data.remote.api.ScrapRedditApi
+import com.cosmos.stealth.services.reddit.di.RedditModule.Qualifier.REDDIT_QUALIFIER
+import com.cosmos.stealth.services.reddit.di.RedditModule.Qualifier.REDDIT_SCRAP_QUALIFIER
 import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
 @Suppress("TooManyFunctions", "LongParameterList")
+@Single
 class RedditRepository(
-    private val dataRedditApi: RedditApi,
-    private val scrapRedditApi: RedditApi,
+    @Named(REDDIT_QUALIFIER) private val dataRedditApi: RedditApi,
+    @Named(REDDIT_SCRAP_QUALIFIER) private val scrapRedditApi: RedditApi,
     postMapper: PostMapper,
     communityMapper: CommunityMapper,
     userMapper: UserMapper,
     commentMapper: CommentMapper,
-    defaultDispatcher: CoroutineDispatcher
+    @Named(DEFAULT_DISPATCHER_QUALIFIER) defaultDispatcher: CoroutineDispatcher
 ) : Repository(postMapper, communityMapper, userMapper, commentMapper, defaultDispatcher) {
 
     override suspend fun getSubreddit(request: Request, subreddit: String, sorting: Sorting, after: String?): Feed {

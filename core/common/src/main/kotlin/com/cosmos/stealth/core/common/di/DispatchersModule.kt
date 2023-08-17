@@ -6,31 +6,33 @@ import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.MAIN_DISPAT
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.MAIN_IMMEDIATE_DISPATCHER_QUALIFIER
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
+import org.koin.core.annotation.Module
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
-object DispatchersModule {
+@Module
+class DispatchersModule {
 
     object Qualifier {
-        val DEFAULT_DISPATCHER_QUALIFIER = named("default_dispatcher")
-        val IO_DISPATCHER_QUALIFIER = named("io_dispatcher")
-        val MAIN_DISPATCHER_QUALIFIER = named("main_dispatcher")
-        val MAIN_IMMEDIATE_DISPATCHER_QUALIFIER = named("main_immediate_dispatcher")
+        const val DEFAULT_DISPATCHER_QUALIFIER = "default_dispatcher"
+        const val IO_DISPATCHER_QUALIFIER = "io_dispatcher"
+        const val MAIN_DISPATCHER_QUALIFIER = "main_dispatcher"
+        const val MAIN_IMMEDIATE_DISPATCHER_QUALIFIER = "main_immediate_dispatcher"
     }
 
-    @Suppress("MemberNameEqualsClassName")
-    val dispatchersModule = module {
-        single(DEFAULT_DISPATCHER_QUALIFIER) { providesDefaultDispatcher() }
-        single(IO_DISPATCHER_QUALIFIER) { providesIoDispatcher() }
-        single(MAIN_DISPATCHER_QUALIFIER) { providesMainDispatcher() }
-        single(MAIN_IMMEDIATE_DISPATCHER_QUALIFIER) { providesMainImmediateDispatcher() }
-    }
+    @Single
+    @Named(DEFAULT_DISPATCHER_QUALIFIER)
+    fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 
-    private fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+    @Single
+    @Named(IO_DISPATCHER_QUALIFIER)
+    fun providesIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
 
-    private fun providesIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
+    @Single
+    @Named(MAIN_DISPATCHER_QUALIFIER)
+    fun providesMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
 
-    private fun providesMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
-
-    private fun providesMainImmediateDispatcher(): CoroutineDispatcher = Dispatchers.Main.immediate
+    @Single
+    @Named(MAIN_IMMEDIATE_DISPATCHER_QUALIFIER)
+    fun providesMainImmediateDispatcher(): CoroutineDispatcher = Dispatchers.Main.immediate
 }

@@ -6,7 +6,9 @@ import com.cosmos.stealth.core.model.data.UserInfoRequest
 import com.cosmos.stealth.core.model.data.UserRequest
 import com.cosmos.stealth.core.network.util.Resource
 import com.cosmos.stealth.server.data.manager.GatewayManager
+import org.koin.core.annotation.Single
 
+@Single
 class UserService(private val gatewayManager: GatewayManager) {
 
     @Suppress("LongParameterList")

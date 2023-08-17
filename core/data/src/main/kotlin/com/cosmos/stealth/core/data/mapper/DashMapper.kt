@@ -1,6 +1,7 @@
 package com.cosmos.stealth.core.data.mapper
 
 import com.cosmos.stealth.core.common.data.mapper.Mapper
+import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.common.util.extension.nullIfEmpty
 import com.cosmos.stealth.core.data.model.dash.AdaptationSet
 import com.cosmos.stealth.core.data.model.dash.MPD
@@ -8,8 +9,13 @@ import com.cosmos.stealth.core.data.model.dash.Representation
 import com.cosmos.stealth.core.model.api.Media
 import com.cosmos.stealth.core.model.api.MediaSource
 import kotlinx.coroutines.CoroutineDispatcher
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
-class DashMapper(defaultDispatcher: CoroutineDispatcher) : Mapper<MPD, String, Media?>(defaultDispatcher) {
+@Single
+class DashMapper(
+    @Named(DEFAULT_DISPATCHER_QUALIFIER) defaultDispatcher: CoroutineDispatcher
+) : Mapper<MPD, String, Media?>(defaultDispatcher) {
 
     override suspend fun toEntity(from: MPD, context: String?): Media? {
 

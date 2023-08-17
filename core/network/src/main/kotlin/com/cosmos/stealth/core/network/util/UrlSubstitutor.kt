@@ -1,11 +1,15 @@
 package com.cosmos.stealth.core.network.util
 
+import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import org.apache.commons.text.StringSubstitutor
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
-class UrlSubstitutor(private val defaultDispatcher: CoroutineDispatcher) {
+@Single
+class UrlSubstitutor(@Named(DEFAULT_DISPATCHER_QUALIFIER) private val defaultDispatcher: CoroutineDispatcher) {
 
     suspend fun buildUrl(baseUrl: String, path: String, vararg params: Pair<String, String>): String =
         withContext(defaultDispatcher) {

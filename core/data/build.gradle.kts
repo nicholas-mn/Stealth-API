@@ -2,6 +2,11 @@ plugins {
     kotlin("jvm")
     kotlin("kapt")
     kotlin("plugin.serialization")
+    id("com.google.devtools.ksp")
+}
+
+sourceSets.main {
+    java.srcDirs("build/generated/ksp/main/kotlin")
 }
 
 dependencies {
@@ -15,4 +20,6 @@ dependencies {
     implementation("io.ktor:ktor-client-okhttp:${Dependencies.Versions.ktor}")
 
     implementation("io.insert-koin:koin-ktor:${Dependencies.Versions.koin}")
+    implementation("io.insert-koin:koin-annotations:${Dependencies.Versions.koinKsp}")
+    ksp("io.insert-koin:koin-ksp-compiler:${Dependencies.Versions.koinKsp}")
 }

@@ -7,6 +7,7 @@ object Dependencies {
         const val kotlin = "1.8.22"
         const val coroutines = "1.7.2"
         const val koin = "3.4.1"
+        const val koinKsp = "1.2.2"
 
         const val logback = "1.2.11"
 

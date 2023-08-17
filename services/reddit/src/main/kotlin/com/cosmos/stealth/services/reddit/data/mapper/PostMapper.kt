@@ -1,6 +1,7 @@
 package com.cosmos.stealth.services.reddit.data.mapper
 
 import com.cosmos.stealth.core.common.data.mapper.Mapper
+import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.common.util.extension.toMillis
 import com.cosmos.stealth.core.data.repository.DashRepository
 import com.cosmos.stealth.core.model.api.Feedable
@@ -31,10 +32,13 @@ import com.cosmos.stealth.services.reddit.util.toBadge
 import com.cosmos.stealth.services.reddit.util.toMedia
 import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
+@Single
 class PostMapper(
     private val dashRepository: DashRepository,
-    defaultDispatcher: CoroutineDispatcher
+    @Named(DEFAULT_DISPATCHER_QUALIFIER) defaultDispatcher: CoroutineDispatcher
 ) : Mapper<PostChild, Service, Feedable>(defaultDispatcher) {
 
     override suspend fun toEntity(from: PostChild, context: Service?): Feedable {

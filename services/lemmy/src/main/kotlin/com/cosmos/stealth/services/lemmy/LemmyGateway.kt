@@ -38,7 +38,9 @@ import com.cosmos.stealth.services.lemmy.util.extension.sortType
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
+import org.koin.core.annotation.Single
 
+@Single
 class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
 
     override val name: ServiceName

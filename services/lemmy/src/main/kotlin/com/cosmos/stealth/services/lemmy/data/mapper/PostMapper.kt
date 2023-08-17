@@ -1,6 +1,7 @@
 package com.cosmos.stealth.services.lemmy.data.mapper
 
 import com.cosmos.stealth.core.common.data.mapper.Mapper
+import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.common.util.MarkdownParser
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.Media
@@ -14,15 +15,19 @@ import com.cosmos.stealth.core.network.util.extension.mime
 import com.cosmos.stealth.core.network.util.extension.mimeType
 import com.cosmos.stealth.core.network.util.extension.toMedia
 import com.cosmos.stealth.services.lemmy.data.model.PostView
+import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIER
 import com.cosmos.stealth.services.lemmy.util.extension.toDateInMillis
 import com.cosmos.stealth.services.lemmy.util.extension.toPosterType
 import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 
+@Single
 class PostMapper(
-    private val markdownParser: MarkdownParser,
-    defaultDispatcher: CoroutineDispatcher
+    @Named(LEMMY_QUALIFIER) private val markdownParser: MarkdownParser,
+    @Named(DEFAULT_DISPATCHER_QUALIFIER) defaultDispatcher: CoroutineDispatcher
 ) : Mapper<PostView, Service, Feedable>(defaultDispatcher) {
 
     override suspend fun toEntity(from: PostView, context: Service?): Feedable {
