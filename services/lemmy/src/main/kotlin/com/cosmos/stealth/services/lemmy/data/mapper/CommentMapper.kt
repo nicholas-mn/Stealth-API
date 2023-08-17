@@ -105,5 +105,5 @@ class CommentMapper(
         get() = path.split(".").size.minus(2)
 
     private val Comment.parentId: Int?
-        get() = path.split(".").run { this[lastIndex - 1] }.toInt().takeIf { it != 0 }
+        get() = path.split(".").run { getOrNull(lastIndex - 1) }?.toInt().takeIf { it != 0 }
 }
