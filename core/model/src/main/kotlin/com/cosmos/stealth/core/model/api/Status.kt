@@ -8,7 +8,7 @@ import com.squareup.moshi.JsonClass
  *
  * @param service 
  * @param code 
- * @param error 
+ * @param message
  */
 @JsonClass(generateAdapter = true)
 data class Status (
@@ -18,6 +18,6 @@ data class Status (
     @Json(name = "code")
     val code: Int,
 
-    @Json(name = "error")
-    val error: String? = null
+    @Json(name = "message")
+    val message: String? = null
 )

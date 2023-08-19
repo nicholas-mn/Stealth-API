@@ -15,7 +15,7 @@ fun Status?.orInternalError(service: Service): Status {
 
 fun <T> Status.toError(): Resource<T> {
     return when (this.code) {
-        HttpURLConnection.HTTP_BAD_GATEWAY -> Resource.Exception(BadResponseException(this.error.orEmpty()))
-        else -> Resource.Error(this.code, this.error.orEmpty())
+        HttpURLConnection.HTTP_BAD_GATEWAY -> Resource.Exception(BadResponseException(this.message.orEmpty()))
+        else -> Resource.Error(this.code, this.message.orEmpty())
     }
 }
