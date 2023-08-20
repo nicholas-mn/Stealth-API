@@ -15,11 +15,13 @@ import io.ktor.client.statement.HttpResponse
 @Suppress("TooManyFunctions", "LongParameterList")
 abstract class BaseRedditApi(private val client: HttpClient, private val urlSubstitutor: UrlSubstitutor) : RedditApi {
 
+    @Suppress("MagicNumber")
     protected suspend fun getRawSubreddit(
         subreddit: String,
         sort: Sort,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         geoFilter: String?,
         host: String?
     ): HttpResponse {
@@ -35,7 +37,8 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
 
             parameter(RedditApi::getSubreddit.getQueryParameter(0), timeSorting?.type)
             parameter(RedditApi::getSubreddit.getQueryParameter(1), after)
-            parameter(RedditApi::getSubreddit.getQueryParameter(2), geoFilter)
+            parameter(RedditApi::getSubreddit.getQueryParameter(2), limit)
+            parameter(RedditApi::getSubreddit.getQueryParameter(3), geoFilter)
         }
     }
 
@@ -58,6 +61,7 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
         sort: Sort?,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): HttpResponse {
         val endpoint = RedditApi::searchInSubreddit.getEndpoint()
@@ -73,6 +77,7 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
             parameter(RedditApi::searchInSubreddit.getQueryParameter(1), sort?.type)
             parameter(RedditApi::searchInSubreddit.getQueryParameter(2), timeSorting?.type)
             parameter(RedditApi::searchInSubreddit.getQueryParameter(3), after)
+            parameter(RedditApi::searchInSubreddit.getQueryParameter(4), limit)
         }
     }
 
@@ -114,11 +119,13 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
         }
     }
 
+    @Suppress("MagicNumber")
     protected suspend fun getRawUserPosts(
         user: String,
         sort: Sort,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): HttpResponse {
         val endpoint = RedditApi::getUserPosts.getEndpoint()
@@ -133,14 +140,17 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
             parameter(RedditApi::getUserPosts.getQueryParameter(0), sort.type)
             parameter(RedditApi::getUserPosts.getQueryParameter(1), timeSorting?.type)
             parameter(RedditApi::getUserPosts.getQueryParameter(2), after)
+            parameter(RedditApi::getUserPosts.getQueryParameter(3), limit)
         }
     }
 
+    @Suppress("MagicNumber")
     protected suspend fun getRawUserComments(
         user: String,
         sort: Sort,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): HttpResponse {
         val endpoint = RedditApi::getUserComments.getEndpoint()
@@ -155,6 +165,7 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
             parameter(RedditApi::getUserComments.getQueryParameter(0), sort.type)
             parameter(RedditApi::getUserComments.getQueryParameter(1), timeSorting?.type)
             parameter(RedditApi::getUserComments.getQueryParameter(2), after)
+            parameter(RedditApi::getUserComments.getQueryParameter(3), limit)
         }
     }
 
@@ -164,6 +175,7 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
         sort: Sort?,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): HttpResponse {
         val endpoint = RedditApi::searchPost.getEndpoint()
@@ -175,6 +187,7 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
             parameter(RedditApi::searchPost.getQueryParameter(1), sort?.type)
             parameter(RedditApi::searchPost.getQueryParameter(2), timeSorting?.type)
             parameter(RedditApi::searchPost.getQueryParameter(3), after)
+            parameter(RedditApi::searchPost.getQueryParameter(4), limit)
         }
     }
 
@@ -184,6 +197,7 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
         sort: Sort?,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): HttpResponse {
         val endpoint = RedditApi::searchUser.getEndpoint()
@@ -195,6 +209,7 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
             parameter(RedditApi::searchUser.getQueryParameter(1), sort?.type)
             parameter(RedditApi::searchUser.getQueryParameter(2), timeSorting?.type)
             parameter(RedditApi::searchUser.getQueryParameter(3), after)
+            parameter(RedditApi::searchUser.getQueryParameter(4), limit)
         }
     }
 
@@ -204,6 +219,7 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
         sort: Sort?,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): HttpResponse {
         val endpoint = RedditApi::searchSubreddit.getEndpoint()
@@ -215,6 +231,7 @@ abstract class BaseRedditApi(private val client: HttpClient, private val urlSubs
             parameter(RedditApi::searchSubreddit.getQueryParameter(1), sort?.type)
             parameter(RedditApi::searchSubreddit.getQueryParameter(2), timeSorting?.type)
             parameter(RedditApi::searchSubreddit.getQueryParameter(3), after)
+            parameter(RedditApi::searchSubreddit.getQueryParameter(4), limit)
         }
     }
 }

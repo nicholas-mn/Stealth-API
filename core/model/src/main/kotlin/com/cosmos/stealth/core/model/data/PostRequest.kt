@@ -10,5 +10,7 @@ data class PostRequest(
 
     val service: Service,
 
-    val sort: Sort = Sort.best
+    val sort: Sort = Default.SORT,
+
+    val limit: Int = Default.POST_LIMIT
 )

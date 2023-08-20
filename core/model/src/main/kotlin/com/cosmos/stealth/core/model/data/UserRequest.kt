@@ -12,9 +12,11 @@ data class UserRequest(
 
     val service: Service,
 
-    val sort: Sort = Sort.best,
+    val sort: Sort = Default.SORT,
+
+    val limit: Int = Default.LIMIT,
 
     val afterKey: AfterKey? = null,
 
-    val type: FeedableType = FeedableType.post
+    val type: FeedableType = Default.USER_FEEDABLE_TYPE
 )

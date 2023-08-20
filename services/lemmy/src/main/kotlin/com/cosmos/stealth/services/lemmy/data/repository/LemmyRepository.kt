@@ -39,6 +39,8 @@ import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 import java.net.HttpURLConnection
+import kotlin.math.ceil
+import kotlin.math.min
 
 @Suppress("LongParameterList", "TooManyFunctions")
 @Single
@@ -51,17 +53,17 @@ class LemmyRepository(
     @Named(DEFAULT_DISPATCHER_QUALIFIER) private val defaultDispatcher: CoroutineDispatcher
 ) : NetworkRepository() {
 
-    suspend fun getPosts(request: Request, communities: List<String>, sort: SortType, page: Int?): Feed {
+    suspend fun getPosts(request: Request, communities: List<String>, sort: SortType, limit: Int, page: Int?): Feed {
         return if (communities.size == 1) {
-            getPosts(request, communities[0], sort, page)
+            getPosts(request, communities[0], sort, limit, page)
         } else {
-            getMultiCommunities(request, communities, sort, page)
+            getMultiCommunities(request, communities, sort, limit, page)
         }
     }
 
-    suspend fun getPosts(request: Request, communityName: String, sort: SortType, page: Int?): Feed {
+    suspend fun getPosts(request: Request, communityName: String, sort: SortType, limit: Int, page: Int?): Feed {
         val response = safeApiCall {
-            lemmyApi.getPosts(request.service.instance.orEmpty(), communityName, sort, page, request.info.host)
+            lemmyApi.getPosts(request.service.instance.orEmpty(), communityName, sort, page, limit, request.info.host)
         }
 
         val status = response.toStatus(request.service).run { listOf(this) }
@@ -82,11 +84,15 @@ class LemmyRepository(
         request: Request,
         communities: List<String>,
         sort: SortType,
+        limit: Int,
         page: Int?
     ): Feed = supervisorScope {
+        val splitLimit = min(communities.size, MAX_COMMUNITIES)
+            .run { ceil(limit / this.toDouble()).toInt() }
+
         val responses = communities
             .take(MAX_COMMUNITIES)
-            .map { async { getPosts(request, it, sort, page) } }
+            .map { async { getPosts(request, it, sort, splitLimit, page) } }
             .awaitAll()
 
         val feedables = mutableListOf<List<Feedable>>()
@@ -127,7 +133,7 @@ class LemmyRepository(
 
     suspend fun getUser(request: Request, username: String): Resource<UserInfo> {
         val response = safeApiCall {
-            lemmyApi.getUser(request.service.instance.orEmpty(), username, null, null, request.info.host)
+            lemmyApi.getUser(request.service.instance.orEmpty(), username, null, null, null, request.info.host)
         }
 
         return response.map { userMapper.dataToEntity(it.personView) }
@@ -137,10 +143,11 @@ class LemmyRepository(
         request: Request,
         username: String,
         sort: SortType,
+        limit: Int,
         page: Int?
     ): Resource<User> = supervisorScope {
         val response = safeApiCall {
-            lemmyApi.getUser(request.service.instance.orEmpty(), username, sort, page, request.info.host)
+            lemmyApi.getUser(request.service.instance.orEmpty(), username, sort, page, limit, request.info.host)
         }
 
         val status = response.toStatus(request.service).run { listOf(this) }
@@ -161,10 +168,11 @@ class LemmyRepository(
         request: Request,
         username: String,
         sort: SortType,
+        limit: Int,
         page: Int?
     ): Resource<User> = supervisorScope {
         val response = safeApiCall {
-            lemmyApi.getUser(request.service.instance.orEmpty(), username, sort, page, request.info.host)
+            lemmyApi.getUser(request.service.instance.orEmpty(), username, sort, page, limit, request.info.host)
         }
 
         val status = response.toStatus(request.service).run { listOf(this) }
@@ -181,9 +189,9 @@ class LemmyRepository(
         }
     }
 
-    suspend fun getComments(request: Request, postId: Int, sort: SortType, page: Int?): Feed {
+    suspend fun getComments(request: Request, postId: Int, sort: SortType, limit: Int, page: Int?): Feed {
         val response = safeApiCall {
-            lemmyApi.getComments(request.service.instance.orEmpty(), postId, null, sort, page, request.info.host)
+            lemmyApi.getComments(request.service.instance.orEmpty(), postId, null, sort, page, limit, request.info.host)
         }
 
         val status = response.toStatus(request.service).run { listOf(this) }
@@ -202,7 +210,15 @@ class LemmyRepository(
 
     suspend fun getMoreComments(request: Request, parentId: Int): Resource<List<Feedable>> {
         val response = safeApiCall {
-            lemmyApi.getComments(request.service.instance.orEmpty(), null, parentId, null, null)
+            lemmyApi.getComments(
+                request.service.instance.orEmpty(),
+                null,
+                parentId,
+                null,
+                null,
+                null,
+                request.info.host
+            )
         }
 
         return response.map { commentMapper.dataToEntities(it.comments, request.service) }
@@ -214,6 +230,7 @@ class LemmyRepository(
         type: SearchType,
         communityName: String?,
         sort: SortType,
+        limit: Int,
         page: Int?
     ): Resource<SearchResults> {
         val response = safeApiCall {
@@ -224,6 +241,7 @@ class LemmyRepository(
                 communityName,
                 sort,
                 page,
+                limit,
                 request.info.host
             )
         }
@@ -235,16 +253,19 @@ class LemmyRepository(
                     val afterKey = page.nextKey(request.service, posts.size)?.key
                     FeedableResults(posts, afterKey)
                 }
+
                 SearchType.Communities -> {
                     val communities = communityMapper.dataToEntities(it.communities, request.service)
                     val afterKey = page.nextKey(request.service, communities.size)?.key
                     CommunityResults(communities, afterKey)
                 }
+
                 SearchType.Users -> {
                     val users = userMapper.dataToEntities(it.users, request.service)
                     val afterKey = page.nextKey(request.service, users.size)?.key
                     UserResults(users, afterKey)
                 }
+
                 else -> throw UnsupportedOperationException("Cannot search for type $type")
             }
         }

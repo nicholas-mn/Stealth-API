@@ -5,8 +5,8 @@ import com.cosmos.stealth.core.model.api.After
 import com.cosmos.stealth.core.model.api.Feed
 import com.cosmos.stealth.core.model.api.FeedRequest
 import com.cosmos.stealth.core.model.api.Feedable
-import com.cosmos.stealth.core.model.api.Sort
 import com.cosmos.stealth.core.model.api.Status
+import com.cosmos.stealth.core.model.data.Default
 import com.cosmos.stealth.core.model.data.RequestInfo
 import com.cosmos.stealth.core.model.data.SingleFeedRequest
 import com.cosmos.stealth.server.data.manager.GatewayManager
@@ -15,6 +15,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
 import org.koin.core.annotation.Single
+import kotlin.math.ceil
 
 @Single
 class FeedService(private val gatewayManager: GatewayManager) {
@@ -24,6 +25,8 @@ class FeedService(private val gatewayManager: GatewayManager) {
             feedRequest.after?.find { it.service.name == serviceRequest.service.name }
         }
 
+        val splitLimit = ceil((feedRequest.limit ?: Default.LIMIT) / requests.size.toDouble()).toInt()
+
         val responses = requests.map { requestEntry ->
             async {
                 val service = requestEntry.key.service
@@ -32,7 +35,8 @@ class FeedService(private val gatewayManager: GatewayManager) {
                     requestInfo,
                     requestEntry.key.communities,
                     service,
-                    feedRequest.sort ?: Sort.best,
+                    feedRequest.sort ?: Default.SORT,
+                    splitLimit,
                     requestEntry.value?.key
                 )
 

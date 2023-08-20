@@ -4,6 +4,7 @@ import com.cosmos.stealth.core.model.api.SearchType
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
 import com.cosmos.stealth.core.model.api.Sort
+import com.cosmos.stealth.core.model.data.Default
 import com.cosmos.stealth.core.model.data.SearchRequest
 import com.cosmos.stealth.server.data.service.SearchService
 import com.cosmos.stealth.server.util.extension.getPath
@@ -26,11 +27,12 @@ fun Route.searchRouting() {
         val serviceName = ServiceName.decode(service) ?: error("Unknown service $service")
 
         val instance = call.getQuery("instance")
-        val sort = Sort.decode(call.getQuery("sort")) ?: Sort.best
+        val sort = Sort.decode(call.getQuery("sort")) ?: Default.SORT
         val community = call.getQuery("community")
         val user = call.getQuery("user")
+        val limit = call.getQuery("limit")?.toIntOrNull() ?: Default.LIMIT
         val after = call.getQuery("after")?.toAfterKey()
-        val type = SearchType.decode(call.getQuery("type")) ?: SearchType.feedable
+        val type = SearchType.decode(call.getQuery("type")) ?: Default.SEARCH_TYPE
 
         val searchRequest = SearchRequest(
             call.info,
@@ -40,6 +42,7 @@ fun Route.searchRouting() {
             community,
             user,
             sort,
+            limit,
             after
         )
 

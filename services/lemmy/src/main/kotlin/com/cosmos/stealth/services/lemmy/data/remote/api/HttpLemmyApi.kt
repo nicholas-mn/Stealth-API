@@ -27,11 +27,13 @@ class HttpLemmyApi(
     private val urlSubstitutor: UrlSubstitutor
 ) : LemmyApi {
 
+    @Suppress("MagicNumber")
     override suspend fun getPosts(
         instance: String,
         communityName: String,
         sort: SortType?,
         page: Int?,
+        limit: Int?,
         host: String?
     ): GetPostsResponse {
         val endpoint = LemmyApi::getPosts.getEndpoint()
@@ -44,6 +46,7 @@ class HttpLemmyApi(
             parameter(LemmyApi::getPosts.getQueryParameter(0), communityName)
             parameter(LemmyApi::getPosts.getQueryParameter(1), sort?.value)
             parameter(LemmyApi::getPosts.getQueryParameter(2), page)
+            parameter(LemmyApi::getPosts.getQueryParameter(3), limit)
         }.body()
     }
 
@@ -71,11 +74,13 @@ class HttpLemmyApi(
         }.body()
     }
 
+    @Suppress("MagicNumber")
     override suspend fun getUser(
         instance: String,
         username: String,
         sort: SortType?,
         page: Int?,
+        limit: Int?,
         host: String?
     ): GetPersonDetailsResponse {
         val endpoint = LemmyApi::getUser.getEndpoint()
@@ -88,6 +93,7 @@ class HttpLemmyApi(
             parameter(LemmyApi::getUser.getQueryParameter(0), username)
             parameter(LemmyApi::getUser.getQueryParameter(1), sort?.value)
             parameter(LemmyApi::getUser.getQueryParameter(2), page)
+            parameter(LemmyApi::getUser.getQueryParameter(3), limit)
         }.body()
     }
 
@@ -98,6 +104,7 @@ class HttpLemmyApi(
         parentId: Int?,
         sort: SortType?,
         page: Int?,
+        limit: Int?,
         host: String?
     ): GetCommentsResponse {
         val endpoint = LemmyApi::getComments.getEndpoint()
@@ -111,6 +118,7 @@ class HttpLemmyApi(
             parameter(LemmyApi::getComments.getQueryParameter(1), parentId)
             parameter(LemmyApi::getComments.getQueryParameter(2), sort?.value)
             parameter(LemmyApi::getComments.getQueryParameter(3), page)
+            parameter(LemmyApi::getComments.getQueryParameter(4), limit)
 
             // TODO: Remove hardcoded parameters
             parameter("max_depth", LemmyApi.MAX_DEPTH)
@@ -126,6 +134,7 @@ class HttpLemmyApi(
         communityName: String?,
         sort: SortType?,
         page: Int?,
+        limit: Int?,
         host: String?
     ): SearchResponse {
         val endpoint = LemmyApi::search.getEndpoint()
@@ -140,6 +149,7 @@ class HttpLemmyApi(
             parameter(LemmyApi::search.getQueryParameter(2), communityName)
             parameter(LemmyApi::search.getQueryParameter(3), sort?.value)
             parameter(LemmyApi::search.getQueryParameter(4), page)
+            parameter(LemmyApi::search.getQueryParameter(5), limit)
         }.body()
     }
 }

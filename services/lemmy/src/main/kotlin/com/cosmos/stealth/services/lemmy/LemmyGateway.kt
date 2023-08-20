@@ -55,7 +55,7 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
                 return Feed(listOf(), null, listOf(status))
             }
 
-            repository.getPosts(request, communities, sort.sortType, afterKey.int)
+            repository.getPosts(request, communities, sort.sortType, limit, afterKey.int)
         }
     }
 
@@ -64,7 +64,7 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
             val request = getRequest(service, info)
                 ?: return@supervisorScope Resource.Error(HttpStatusCode.BadRequest.value, MISSING_INSTANCE_ERROR)
 
-            val feedAsync = async { repository.getPosts(request, community, sort.sortType, afterKey.int) }
+            val feedAsync = async { repository.getPosts(request, community, sort.sortType, limit, afterKey.int) }
             val communityInfoAsync = async { repository.getCommunity(request, community) }
 
             val feed = feedAsync.await()
@@ -94,8 +94,8 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
                 ?: return Resource.Error(HttpStatusCode.BadRequest.value, MISSING_INSTANCE_ERROR)
 
             when (type) {
-                FeedableType.post -> repository.getUserPosts(request, user, sort.sortType, afterKey.int)
-                FeedableType.comment -> repository.getUserComments(request, user, sort.sortType, afterKey.int)
+                FeedableType.post -> repository.getUserPosts(request, user, sort.sortType, limit, afterKey.int)
+                FeedableType.comment -> repository.getUserComments(request, user, sort.sortType, limit, afterKey.int)
                 else -> Resource.Exception(UnsupportedOperationException("Cannot get type $type for user"))
             }
         }
@@ -118,7 +118,7 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
             val id = post.toInt()
 
             val postAsync = async { repository.getPost(request, id) }
-            val commentsAsync = async { repository.getComments(request, id, sort.sortType, null) }
+            val commentsAsync = async { repository.getComments(request, id, sort.sortType, limit, null) }
 
             val post = postAsync.await()
             val comments = commentsAsync.await()
@@ -146,11 +146,15 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
                 ?: return Resource.Error(HttpStatusCode.BadRequest.value, MISSING_INSTANCE_ERROR)
 
             when (type) {
-                SearchType.feedable -> repository.search(request, query, Posts, community, sort.sortType, afterKey.int)
-                SearchType.community -> {
-                    repository.search(request, query, Communities, community, sort.sortType, afterKey.int)
+                SearchType.feedable -> {
+                    repository.search(request, query, Posts, community, sort.sortType, limit, afterKey.int)
                 }
-                SearchType.user -> repository.search(request, query, Users, community, sort.sortType, afterKey.int)
+                SearchType.community -> {
+                    repository.search(request, query, Communities, community, sort.sortType, limit, afterKey.int)
+                }
+                SearchType.user -> {
+                    repository.search(request, query, Users, community, sort.sortType, limit, afterKey.int)
+                }
             }
         }
     }

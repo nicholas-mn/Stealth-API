@@ -17,10 +17,11 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         sort: Sort,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         geoFilter: String?,
         host: String?
     ): Listing {
-        return getRawSubreddit(subreddit, sort, timeSorting, after, geoFilter, host).body()
+        return getRawSubreddit(subreddit, sort, timeSorting, after, limit, geoFilter, host).body()
     }
 
     override suspend fun getSubredditInfo(subreddit: String, host: String?): Child {
@@ -33,9 +34,10 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         sort: Sort?,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): Listing {
-        return searchInSubredditRaw(subreddit, query, sort, timeSorting, after, host).body()
+        return searchInSubredditRaw(subreddit, query, sort, timeSorting, after, limit, host).body()
     }
 
     override suspend fun getPost(permalink: String, limit: Int?, sort: Sort, host: String?): List<Listing> {
@@ -55,9 +57,10 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         sort: Sort,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): Listing {
-        return getRawUserPosts(user, sort, timeSorting, after, host).body()
+        return getRawUserPosts(user, sort, timeSorting, after, limit, host).body()
     }
 
     override suspend fun getUserComments(
@@ -65,9 +68,10 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         sort: Sort,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): Listing {
-        return getRawUserComments(user, sort, timeSorting, after, host).body()
+        return getRawUserComments(user, sort, timeSorting, after, limit, host).body()
     }
 
     override suspend fun searchPost(
@@ -75,9 +79,10 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         sort: Sort?,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): Listing {
-        return searchPostRaw(query, sort, timeSorting, after, host).body()
+        return searchPostRaw(query, sort, timeSorting, after, limit, host).body()
     }
 
     override suspend fun searchUser(
@@ -85,9 +90,10 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         sort: Sort?,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): Listing {
-        return searchUserRaw(query, sort, timeSorting, after, host).body()
+        return searchUserRaw(query, sort, timeSorting, after, limit, host).body()
     }
 
     override suspend fun searchSubreddit(
@@ -95,8 +101,9 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         sort: Sort?,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): Listing {
-        return searchSubredditRaw(query, sort, timeSorting, after, host).body()
+        return searchSubredditRaw(query, sort, timeSorting, after, limit, host).body()
     }
 }

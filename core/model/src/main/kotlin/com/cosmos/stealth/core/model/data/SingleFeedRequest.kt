@@ -11,7 +11,9 @@ data class SingleFeedRequest(
 
     val service: Service,
 
-    val sort: Sort = Sort.best,
+    val sort: Sort = Default.SORT,
+
+    val limit: Int = Default.LIMIT,
 
     val afterKey: AfterKey? = null
 )

@@ -39,11 +39,24 @@ class RedditRepository(
     @Named(DEFAULT_DISPATCHER_QUALIFIER) defaultDispatcher: CoroutineDispatcher
 ) : Repository(postMapper, communityMapper, userMapper, commentMapper, defaultDispatcher) {
 
-    override suspend fun getSubreddit(request: Request, subreddit: String, sorting: Sorting, after: String?): Feed {
+    override suspend fun getSubreddit(
+        request: Request,
+        subreddit: String,
+        sorting: Sorting,
+        limit: Int,
+        after: String?
+    ): Feed {
         val source = getSource(request.service.instance)
 
         val response = safeApiCall {
-            source.getSubreddit(subreddit, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
+            source.getSubreddit(
+                subreddit,
+                sorting.generalSorting,
+                sorting.timeSorting,
+                after,
+                limit,
+                host = request.info.host
+            )
         }
 
         return getSubreddit(response, source.getRequest(request))
@@ -62,6 +75,7 @@ class RedditRepository(
         subreddit: String,
         query: String,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Resource<SearchResults> {
         val source = getSource(request.service.instance)
@@ -73,7 +87,7 @@ class RedditRepository(
                 sorting.generalSorting,
                 sorting.timeSorting,
                 after,
-                request.info.host
+                host = request.info.host
             )
         }
     }
@@ -123,19 +137,31 @@ class RedditRepository(
         return getUserInfo(source.getRequest(request)) { source.getUserInfo(user, request.info.host) }
     }
 
-    override suspend fun getUserPosts(request: Request, user: String, sorting: Sorting, after: String?): Feed {
+    override suspend fun getUserPosts(
+        request: Request,
+        user: String,
+        sorting: Sorting,
+        limit: Int,
+        after: String?
+    ): Feed {
         val source = getSource(request.service.instance)
         val response = safeApiCall {
-            source.getUserPosts(user, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+            source.getUserPosts(user, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
         }
 
         return getUserPosts(response, source.getRequest(request))
     }
 
-    override suspend fun getUserComments(request: Request, user: String, sorting: Sorting, after: String?): Feed {
+    override suspend fun getUserComments(
+        request: Request,
+        user: String,
+        sorting: Sorting,
+        limit: Int,
+        after: String?
+    ): Feed {
         val source = getSource(request.service.instance)
         val response = safeApiCall {
-            source.getUserComments(user, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+            source.getUserComments(user, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
         }
 
         return getUserComments(response, source.getRequest(request))
@@ -145,11 +171,12 @@ class RedditRepository(
         request: Request,
         query: String,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Resource<SearchResults> {
         val source = getSource(request.service.instance)
         return searchPost(source.getRequest(request)) {
-            source.searchPost(query, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+            source.searchPost(query, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
         }
     }
 
@@ -157,11 +184,12 @@ class RedditRepository(
         request: Request,
         query: String,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Resource<SearchResults> {
         val source = getSource(request.service.instance)
         return searchUser(source.getRequest(request)) {
-            source.searchUser(query, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+            source.searchUser(query, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
         }
     }
 
@@ -169,11 +197,12 @@ class RedditRepository(
         request: Request,
         query: String,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Resource<SearchResults> {
         val source = getSource(request.service.instance)
         return searchSubreddit(source.getRequest(request)) {
-            source.searchSubreddit(query, sorting.generalSorting, sorting.timeSorting, after, request.info.host)
+            source.searchSubreddit(query, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
         }
     }
 

@@ -44,7 +44,7 @@ abstract class Gateway(
         return with(singleFeedRequest) {
             val request = Request(service, info)
 
-            repository.getSubreddit(request, communities, sort.redditSort, afterKey.string)
+            repository.getSubreddit(request, communities, sort.redditSort, limit, afterKey.string)
         }
     }
 
@@ -53,7 +53,7 @@ abstract class Gateway(
             val request = Request(service, info)
 
             val feedAsync = async {
-                repository.getSubreddit(request, community, sort.redditSort, afterKey.string)
+                repository.getSubreddit(request, community, sort.redditSort, limit, afterKey.string)
             }
             val communityInfoAsync = async { repository.getSubredditInfo(request, community) }
 
@@ -83,9 +83,9 @@ abstract class Gateway(
 
             val feedAsync = async {
                 when (type) {
-                    FeedableType.post -> repository.getUserPosts(request, user, sort.redditSort, afterKey.string)
+                    FeedableType.post -> repository.getUserPosts(request, user, sort.redditSort, limit, afterKey.string)
                     FeedableType.comment -> {
-                        repository.getUserComments(request, user, sort.redditSort, afterKey.string)
+                        repository.getUserComments(request, user, sort.redditSort, limit, afterKey.string)
                     }
                     else -> {
                         val status = Status(request.service, HttpURLConnection.HTTP_BAD_REQUEST)
@@ -121,7 +121,7 @@ abstract class Gateway(
 
             // TODO: Special sort for posts
             val redditSort = if (sort == Sort.best) BEST else sort.redditSort.generalSorting
-            repository.getPost(request, post, null, redditSort)
+            repository.getPost(request, post, limit, redditSort)
         }
     }
 
@@ -148,9 +148,11 @@ abstract class Gateway(
             val after = afterKey.string
 
             when {
-                community != null -> repository.searchInSubreddit(request, community.orEmpty(), query, sorting, after)
+                community != null -> {
+                    repository.searchInSubreddit(request, community.orEmpty(), query, sorting, limit, after)
+                }
                 user != null -> Resource.Exception(IllegalStateException("Cannot search for feedables in user"))
-                else -> repository.searchPost(request, query, sorting, after)
+                else -> repository.searchPost(request, query, sorting, limit, after)
             }
         }
     }
@@ -162,7 +164,9 @@ abstract class Gateway(
                     Resource.Exception(IllegalStateException("Cannot search for communities in community"))
                 }
                 user != null -> Resource.Exception(IllegalStateException("Cannot search for communities in user"))
-                else -> repository.searchSubreddit(Request(service, info), query, sort.redditSort, afterKey.string)
+                else -> {
+                    repository.searchSubreddit(Request(service, info), query, sort.redditSort, limit, afterKey.string)
+                }
             }
         }
     }
@@ -172,7 +176,7 @@ abstract class Gateway(
             when {
                 community != null -> Resource.Exception(IllegalStateException("Cannot search for users in community"))
                 user != null -> Resource.Exception(IllegalStateException("Cannot search for users in user"))
-                else -> repository.searchUser(Request(service, info), query, sort.redditSort, afterKey.string)
+                else -> repository.searchUser(Request(service, info), query, sort.redditSort, limit, afterKey.string)
             }
         }
     }

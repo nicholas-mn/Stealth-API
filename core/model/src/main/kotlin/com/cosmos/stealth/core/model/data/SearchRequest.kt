@@ -12,13 +12,15 @@ data class SearchRequest(
 
     val service: Service,
 
-    val type: SearchType = SearchType.feedable,
+    val type: SearchType = Default.SEARCH_TYPE,
 
     val community: String? = null,
 
     val user: String? = null,
 
-    val sort: Sort = Sort.best,
+    val sort: Sort = Default.SORT,
+
+    val limit: Int = Default.LIMIT,
 
     val afterKey: AfterKey? = null
 )

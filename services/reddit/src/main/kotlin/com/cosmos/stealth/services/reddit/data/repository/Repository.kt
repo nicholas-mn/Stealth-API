@@ -2,13 +2,13 @@ package com.cosmos.stealth.services.reddit.data.repository
 
 import com.cosmos.stealth.core.common.util.extension.interlace
 import com.cosmos.stealth.core.model.api.After
+import com.cosmos.stealth.core.model.api.Appendable
 import com.cosmos.stealth.core.model.api.Commentable
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.CommunityResults
 import com.cosmos.stealth.core.model.api.Feed
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.FeedableResults
-import com.cosmos.stealth.core.model.api.Appendable
 import com.cosmos.stealth.core.model.api.Post
 import com.cosmos.stealth.core.model.api.Postable
 import com.cosmos.stealth.core.model.api.SearchResults
@@ -47,7 +47,7 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import kotlin.math.ceil
 
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "LongParameterList")
 abstract class Repository(
     private val postMapper: PostMapper,
     private val communityMapper: CommunityMapper,
@@ -60,12 +60,13 @@ abstract class Repository(
         request: Request,
         subreddit: List<String>,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Feed {
         return if (subreddit.size > REDDIT_SUBREDDIT_LIMIT) {
-            getMultiSubreddit(request, subreddit, sorting, after)
+            getMultiSubreddit(request, subreddit, sorting, limit, after)
         } else {
-            getSubreddit(request, joinSubredditList(subreddit), sorting, after)
+            getSubreddit(request, joinSubredditList(subreddit), sorting, limit, after)
         }
     }
 
@@ -73,10 +74,15 @@ abstract class Repository(
         request: Request,
         subreddit: List<String>,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Feed = supervisorScope {
         // Find the optimal chunk size to have lists of similar sizes
-        val chunkSize = ceil(subreddit.size / ceil(subreddit.size / REDDIT_SUBREDDIT_LIMIT.toDouble())).toInt()
+        val chunk = ceil(subreddit.size / REDDIT_SUBREDDIT_LIMIT.toDouble())
+        val chunkSize = ceil(subreddit.size / chunk).toInt()
+
+        // Split the limit across the different chunks to have a consistent limit
+        val splitLimit = ceil(limit / chunk).toInt()
 
         val keys = after?.split(KEY_DELIMITER)
 
@@ -92,7 +98,7 @@ abstract class Repository(
 
         // Step 4: Request the posts for each chunk in parallel
         val responses = queries
-            .map { async { getSubreddit(request, it.first, sorting, it.second) } }
+            .map { async { getSubreddit(request, it.first, sorting, splitLimit, it.second) } }
             .awaitAll()
 
         val feedables = mutableListOf<List<Feedable>>()
@@ -106,6 +112,7 @@ abstract class Repository(
                     feedables.add(response.items)
                     afters.add(response.after?.firstOrNull())
                 }
+
                 else -> return@supervisorScope Feed(listOf(), null, listOf(status))
             }
         }
@@ -123,7 +130,13 @@ abstract class Repository(
         Feed(data, listOf(afterKeys), listOf(status))
     }
 
-    abstract suspend fun getSubreddit(request: Request, subreddit: String, sorting: Sorting, after: String?): Feed
+    abstract suspend fun getSubreddit(
+        request: Request,
+        subreddit: String,
+        sorting: Sorting,
+        limit: Int,
+        after: String?
+    ): Feed
 
     @Suppress("UNCHECKED_CAST")
     protected suspend fun getSubreddit(response: Resource<Listing>, request: Request): Feed {
@@ -155,6 +168,7 @@ abstract class Repository(
         subreddit: String,
         query: String,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Resource<SearchResults>
 
@@ -220,7 +234,13 @@ abstract class Repository(
         return safeApiCall(apiCall) { userMapper.dataToEntity(it as AboutUserChild, request.service) }
     }
 
-    abstract suspend fun getUserPosts(request: Request, user: String, sorting: Sorting, after: String?): Feed
+    abstract suspend fun getUserPosts(
+        request: Request,
+        user: String,
+        sorting: Sorting,
+        limit: Int,
+        after: String?
+    ): Feed
 
     protected suspend fun getUserPosts(response: Resource<Listing>, request: Request): Feed {
         val status = response.toStatus(request.service)
@@ -241,7 +261,13 @@ abstract class Repository(
         }
     }
 
-    abstract suspend fun getUserComments(request: Request, user: String, sorting: Sorting, after: String?): Feed
+    abstract suspend fun getUserComments(
+        request: Request,
+        user: String,
+        sorting: Sorting,
+        limit: Int,
+        after: String?
+    ): Feed
 
     @Suppress("UNCHECKED_CAST")
     protected suspend fun getUserComments(response: Resource<Listing>, request: Request): Feed {
@@ -270,6 +296,7 @@ abstract class Repository(
         request: Request,
         query: String,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Resource<SearchResults>
 
@@ -286,6 +313,7 @@ abstract class Repository(
         request: Request,
         query: String,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Resource<SearchResults>
 
@@ -302,6 +330,7 @@ abstract class Repository(
         request: Request,
         query: String,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Resource<SearchResults>
 

@@ -34,7 +34,13 @@ class TedditRepository(
     @Named(DEFAULT_DISPATCHER_QUALIFIER) defaultDispatcher: CoroutineDispatcher
 ) : Repository(postMapper, communityMapper, userMapper, commentMapper, defaultDispatcher) {
 
-    override suspend fun getSubreddit(request: Request, subreddit: String, sorting: Sorting, after: String?): Feed {
+    override suspend fun getSubreddit(
+        request: Request,
+        subreddit: String,
+        sorting: Sorting,
+        limit: Int,
+        after: String?
+    ): Feed {
         val newRequest = request.getRequest()
 
         val response = safeApiCall {
@@ -64,6 +70,7 @@ class TedditRepository(
         subreddit: String,
         query: String,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Resource<SearchResults> {
         val newRequest = request.getRequest()
@@ -106,7 +113,13 @@ class TedditRepository(
         }
     }
 
-    override suspend fun getUserPosts(request: Request, user: String, sorting: Sorting, after: String?): Feed {
+    override suspend fun getUserPosts(
+        request: Request,
+        user: String,
+        sorting: Sorting,
+        limit: Int,
+        after: String?
+    ): Feed {
         val newRequest = request.getRequest()
 
         val response = safeApiCall {
@@ -123,7 +136,13 @@ class TedditRepository(
         return getUserPosts(response, newRequest)
     }
 
-    override suspend fun getUserComments(request: Request, user: String, sorting: Sorting, after: String?): Feed {
+    override suspend fun getUserComments(
+        request: Request,
+        user: String,
+        sorting: Sorting,
+        limit: Int,
+        after: String?
+    ): Feed {
         val newRequest = request.getRequest()
 
         val response = safeApiCall {
@@ -144,6 +163,7 @@ class TedditRepository(
         request: Request,
         query: String,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Resource<SearchResults> {
         return Resource.Exception(UnsupportedOperationException())
@@ -153,6 +173,7 @@ class TedditRepository(
         request: Request,
         query: String,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Resource<SearchResults> {
         return Resource.Exception(UnsupportedOperationException())
@@ -162,6 +183,7 @@ class TedditRepository(
         request: Request,
         query: String,
         sorting: Sorting,
+        limit: Int,
         after: String?
     ): Resource<SearchResults> {
         val newRequest = request.getRequest()

@@ -3,6 +3,7 @@ package com.cosmos.stealth.server.data.route.v1
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
 import com.cosmos.stealth.core.model.api.Sort
+import com.cosmos.stealth.core.model.data.Default
 import com.cosmos.stealth.core.model.data.PostRequest
 import com.cosmos.stealth.server.data.service.PostService
 import com.cosmos.stealth.server.util.extension.getPath
@@ -24,9 +25,10 @@ fun Route.postRouting() {
         val serviceName = ServiceName.decode(service) ?: error("Unknown service $service")
 
         val instance = call.getQuery("instance")
-        val sort = Sort.decode(call.getQuery("sort")) ?: Sort.best
+        val sort = Sort.decode(call.getQuery("sort")) ?: Default.SORT
+        val limit = call.getQuery("limit")?.toIntOrNull() ?: Default.POST_LIMIT
 
-        val postRequest = PostRequest(call.info, post, Service(serviceName, instance), sort)
+        val postRequest = PostRequest(call.info, post, Service(serviceName, instance), sort, limit)
 
         val postResource = postService.getPost(postRequest)
 

@@ -21,6 +21,7 @@ interface RedditApi {
         @Path("sort") sort: Sort,
         @Query("t") timeSorting: TimeSorting?,
         @Query("after") after: String? = null,
+        @Query("limit") limit: Int? = null,
         @Query("geo_filter") geoFilter: String? = "GLOBAL",
         @Header("Forwarded") host: String? = null
     ): Listing
@@ -35,6 +36,7 @@ interface RedditApi {
         @Query("sort") sort: Sort?,
         @Query("t") timeSorting: TimeSorting?,
         @Query("after") after: String? = null,
+        @Query("limit") limit: Int? = null,
         @Header("Forwarded") host: String? = null
     ): Listing
 
@@ -66,6 +68,7 @@ interface RedditApi {
         @Query("sort") sort: Sort,
         @Query("t") timeSorting: TimeSorting?,
         @Query("after") after: String? = null,
+        @Query("limit") limit: Int? = null,
         @Header("Forwarded") host: String? = null
     ): Listing
 
@@ -75,6 +78,7 @@ interface RedditApi {
         @Query("sort") sort: Sort,
         @Query("t") timeSorting: TimeSorting?,
         @Query("after") after: String? = null,
+        @Query("limit") limit: Int? = null,
         @Header("Forwarded") host: String? = null
     ): Listing
 
@@ -88,6 +92,7 @@ interface RedditApi {
         @Query("sort") sort: Sort?,
         @Query("t") timeSorting: TimeSorting?,
         @Query("after") after: String? = null,
+        @Query("limit") limit: Int? = null,
         @Header("Forwarded") host: String? = null
     ): Listing
 
@@ -97,6 +102,7 @@ interface RedditApi {
         @Query("sort") sort: Sort?,
         @Query("t") timeSorting: TimeSorting?,
         @Query("after") after: String? = null,
+        @Query("limit") limit: Int? = null,
         @Header("Forwarded") host: String? = null
     ): Listing
 
@@ -106,6 +112,7 @@ interface RedditApi {
         @Query("sort") sort: Sort?,
         @Query("t") timeSorting: TimeSorting?,
         @Query("after") after: String? = null,
+        @Query("limit") limit: Int? = null,
         @Header("Forwarded") host: String? = null
     ): Listing
 

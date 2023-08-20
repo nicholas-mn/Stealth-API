@@ -22,6 +22,7 @@ interface LemmyApi {
         @Query("community_name") communityName: String,
         @Query("sort") sort: SortType?,
         @Query("page") page: Int?,
+        @Query("limit") limit: Int? = null,
         @Header("Forwarded") host: String? = null
     ): GetPostsResponse
 
@@ -45,6 +46,7 @@ interface LemmyApi {
         @Query("username") username: String,
         @Query("sort") sort: SortType?,
         @Query("page") page: Int?,
+        @Query("limit") limit: Int? = null,
         @Header("Forwarded") host: String? = null
     ): GetPersonDetailsResponse
 
@@ -55,6 +57,7 @@ interface LemmyApi {
         @Query("parent_id") parentId: Int?,
         @Query("sort") sort: SortType?,
         @Query("page") page: Int?,
+        @Query("limit") limit: Int? = null,
         @Header("Forwarded") host: String? = null
     ): GetCommentsResponse
 
@@ -66,6 +69,7 @@ interface LemmyApi {
         @Query("community_name") communityName: String? = null,
         @Query("sort") sort: SortType?,
         @Query("page") page: Int?,
+        @Query("limit") limit: Int? = null,
         @Header("Forwarded") host: String? = null
     ): SearchResponse
 

@@ -32,15 +32,16 @@ class ScrapRedditApi(
         sort: Sort,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         geoFilter: String?,
         host: String?
     ): Listing {
-        val response = getRawSubreddit(subreddit, sort, timeSorting, after, geoFilter, host)
+        val response = getRawSubreddit(subreddit, sort, timeSorting, after, limit, geoFilter, host)
         return PostScraper(ioDispatcher).scrap(response.bodyAsText())
     }
 
     override suspend fun getSubredditInfo(subreddit: String, host: String?): Child {
-        val response = getRawSubreddit(subreddit, Sort.HOT, null, null, null, host)
+        val response = getRawSubreddit(subreddit, Sort.HOT, null, null, null, null, host)
         return SubredditScraper(ioDispatcher).scrap(response.bodyAsText())
     }
 
@@ -50,6 +51,7 @@ class ScrapRedditApi(
         sort: Sort?,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): Listing {
         // TODO
@@ -82,7 +84,7 @@ class ScrapRedditApi(
     }
 
     override suspend fun getUserInfo(user: String, host: String?): Child {
-        val response = getRawUserPosts(user, Sort.HOT, null, null, host)
+        val response = getRawUserPosts(user, Sort.HOT, null, null, null, host)
         return UserScaper(ioDispatcher).scrap(response.bodyAsText())
     }
 
@@ -91,9 +93,10 @@ class ScrapRedditApi(
         sort: Sort,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): Listing {
-        val response = getRawUserPosts(user, sort, timeSorting, after, host)
+        val response = getRawUserPosts(user, sort, timeSorting, after, limit, host)
         return PostScraper(ioDispatcher).scrap(response.bodyAsText())
     }
 
@@ -102,9 +105,10 @@ class ScrapRedditApi(
         sort: Sort,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): Listing {
-        val response = getRawUserComments(user, sort, timeSorting, after, host)
+        val response = getRawUserComments(user, sort, timeSorting, after, limit, host)
         return CommentScraper(ioDispatcher).scrap(response.bodyAsText())
     }
 
@@ -113,6 +117,7 @@ class ScrapRedditApi(
         sort: Sort?,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): Listing {
         // TODO
@@ -124,6 +129,7 @@ class ScrapRedditApi(
         sort: Sort?,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): Listing {
         // TODO
@@ -135,9 +141,10 @@ class ScrapRedditApi(
         sort: Sort?,
         timeSorting: TimeSorting?,
         after: String?,
+        limit: Int?,
         host: String?
     ): Listing {
-        val response = searchSubredditRaw(query, sort, timeSorting, after, host)
+        val response = searchSubredditRaw(query, sort, timeSorting, after, limit, host)
         return SubredditSearchScraper(ioDispatcher).scrap(response.bodyAsText())
     }
 }
