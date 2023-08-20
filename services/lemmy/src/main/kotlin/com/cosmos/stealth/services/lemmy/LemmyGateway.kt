@@ -121,7 +121,9 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
             val id = post.toInt()
 
             val postAsync = async { repository.getPost(request, id) }
-            val commentsAsync = async { repository.getComments(request, id, filtering.commentSortType, limit, null) }
+            val commentsAsync = async {
+                repository.getComments(request, id, filtering.commentSortType, limit, afterKey.int)
+            }
 
             val post = postAsync.await()
             val comments = commentsAsync.await()

@@ -13,6 +13,7 @@ import com.cosmos.stealth.server.util.extension.getPath
 import com.cosmos.stealth.server.util.extension.getQuery
 import com.cosmos.stealth.server.util.extension.info
 import com.cosmos.stealth.server.util.extension.respondWithResource
+import com.cosmos.stealth.services.base.util.extension.toAfterKey
 import io.ktor.server.application.call
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -32,13 +33,15 @@ fun Route.postRouting() {
         val order = Order.decode(call.getQuery("order")) ?: Default.ORDER
         val time = Time.decode(call.getQuery("time")) ?: Default.TIME
         val limit = call.getQuery("limit")?.toIntOrNull() ?: Default.POST_LIMIT
+        val after = call.getQuery("after")?.toAfterKey()
 
         val postRequest = PostRequest(
             call.info,
             post,
             Service(serviceName, instance),
             Filtering(sort, order, time),
-            limit
+            limit,
+            after
         )
 
         val postResource = postService.getPost(postRequest)
