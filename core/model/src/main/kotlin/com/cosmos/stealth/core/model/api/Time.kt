@@ -5,28 +5,31 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 /**
- * Sort
+ * Time filter
  *
- * Values: trending,date,score,comments,relevance
+ * Values: hour,day,week,month,year,all
  */
 @Suppress("EnumNaming")
 @JsonClass(generateAdapter = false)
-enum class Sort(val value: String) {
+enum class Time(val value: String) {
 
-    @Json(name = "trending")
-    trending("trending"),
+    @Json(name = "hour")
+    hour("hour"),
 
-    @Json(name = "date")
-    date("date"),
+    @Json(name = "day")
+    day("day"),
 
-    @Json(name = "score")
-    score("score"),
+    @Json(name = "week")
+    week("week"),
 
-    @Json(name = "comments")
-    comments("comments"),
+    @Json(name = "month")
+    month("month"),
 
-    @Json(name = "relevance")
-    relevance("relevance");
+    @Json(name = "year")
+    year("year"),
+
+    @Json(name = "all")
+    all("all");
 
     override fun toString(): String = value
 
@@ -34,12 +37,12 @@ enum class Sort(val value: String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: Any?): String? = if (data is Sort) "$data" else null
+        fun encode(data: Any?): String? = if (data is Time) "$data" else null
 
         /**
-         * Returns a valid [Sort] for [data], null otherwise.
+         * Returns a valid [Time] for [data], null otherwise.
          */
-        fun decode(data: Any?): Sort? = data?.let {
+        fun decode(data: Any?): Time? = data?.let {
             val normalizedData = "$it".lowercase()
             values().firstOrNull { value ->
                 it == value || normalizedData == "$value".lowercase()
@@ -47,4 +50,3 @@ enum class Sort(val value: String) {
         }
     }
 }
-

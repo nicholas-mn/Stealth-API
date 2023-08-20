@@ -4,6 +4,7 @@ import com.cosmos.stealth.core.network.util.UrlSubstitutor
 import com.cosmos.stealth.core.network.util.extension.forward
 import com.cosmos.stealth.core.network.util.getEndpoint
 import com.cosmos.stealth.core.network.util.getQueryParameter
+import com.cosmos.stealth.services.lemmy.data.model.CommentSortType
 import com.cosmos.stealth.services.lemmy.data.model.GetCommentsResponse
 import com.cosmos.stealth.services.lemmy.data.model.GetCommunityResponse
 import com.cosmos.stealth.services.lemmy.data.model.GetPersonDetailsResponse
@@ -102,7 +103,7 @@ class HttpLemmyApi(
         instance: String,
         postId: Int?,
         parentId: Int?,
-        sort: SortType?,
+        sort: CommentSortType?,
         page: Int?,
         limit: Int?,
         host: String?
@@ -122,7 +123,6 @@ class HttpLemmyApi(
 
             // TODO: Remove hardcoded parameters
             parameter("max_depth", LemmyApi.MAX_DEPTH)
-            parameter("limit", LemmyApi.LIMIT)
         }.body()
     }
 

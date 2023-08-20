@@ -4,6 +4,7 @@ import com.cosmos.stealth.core.network.data.annotation.GET
 import com.cosmos.stealth.core.network.data.annotation.Header
 import com.cosmos.stealth.core.network.data.annotation.Query
 import com.cosmos.stealth.core.network.data.annotation.Url
+import com.cosmos.stealth.services.lemmy.data.model.CommentSortType
 import com.cosmos.stealth.services.lemmy.data.model.GetCommentsResponse
 import com.cosmos.stealth.services.lemmy.data.model.GetCommunityResponse
 import com.cosmos.stealth.services.lemmy.data.model.GetPersonDetailsResponse
@@ -55,7 +56,7 @@ interface LemmyApi {
         @Url instance: String,
         @Query("post_id") postId: Int?,
         @Query("parent_id") parentId: Int?,
-        @Query("sort") sort: SortType?,
+        @Query("sort") sort: CommentSortType?,
         @Query("page") page: Int?,
         @Query("limit") limit: Int? = null,
         @Header("Forwarded") host: String? = null
@@ -75,6 +76,5 @@ interface LemmyApi {
 
     companion object {
         const val MAX_DEPTH = 6
-        const val LIMIT = 100
     }
 }

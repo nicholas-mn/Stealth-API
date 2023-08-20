@@ -1,32 +1,22 @@
 package com.cosmos.stealth.core.model.api
 
-
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 /**
- * Sort
+ * Sort order
  *
- * Values: trending,date,score,comments,relevance
+ * Values: asc,desc
  */
 @Suppress("EnumNaming")
 @JsonClass(generateAdapter = false)
-enum class Sort(val value: String) {
+enum class Order(val value: String) {
 
-    @Json(name = "trending")
-    trending("trending"),
+    @Json(name = "asc")
+    asc("asc"),
 
-    @Json(name = "date")
-    date("date"),
-
-    @Json(name = "score")
-    score("score"),
-
-    @Json(name = "comments")
-    comments("comments"),
-
-    @Json(name = "relevance")
-    relevance("relevance");
+    @Json(name = "desc")
+    desc("desc");
 
     override fun toString(): String = value
 
@@ -34,12 +24,12 @@ enum class Sort(val value: String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: Any?): String? = if (data is Sort) "$data" else null
+        fun encode(data: Any?): String? = if (data is Order) "$data" else null
 
         /**
-         * Returns a valid [Sort] for [data], null otherwise.
+         * Returns a valid [Order] for [data], null otherwise.
          */
-        fun decode(data: Any?): Sort? = data?.let {
+        fun decode(data: Any?): Order? = data?.let {
             val normalizedData = "$it".lowercase()
             values().firstOrNull { value ->
                 it == value || normalizedData == "$value".lowercase()
@@ -47,4 +37,3 @@ enum class Sort(val value: String) {
         }
     }
 }
-

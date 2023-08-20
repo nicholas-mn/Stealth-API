@@ -1,6 +1,5 @@
 package com.cosmos.stealth.services.reddit.data.repository
 
-import com.cosmos.stealth.core.common.util.extension.interlace
 import com.cosmos.stealth.core.model.api.After
 import com.cosmos.stealth.core.model.api.Appendable
 import com.cosmos.stealth.core.model.api.Commentable
@@ -22,6 +21,7 @@ import com.cosmos.stealth.core.network.util.Resource
 import com.cosmos.stealth.core.network.util.extension.map
 import com.cosmos.stealth.services.base.util.extension.isSuccess
 import com.cosmos.stealth.services.base.util.extension.orInternalError
+import com.cosmos.stealth.services.base.util.extension.sortPosts
 import com.cosmos.stealth.services.base.util.extension.toAfter
 import com.cosmos.stealth.services.base.util.extension.toAfterKey
 import com.cosmos.stealth.services.base.util.extension.toStatus
@@ -38,6 +38,7 @@ import com.cosmos.stealth.services.reddit.data.model.MoreChildren
 import com.cosmos.stealth.services.reddit.data.model.PostChild
 import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.Sorting
+import com.cosmos.stealth.services.reddit.util.extension.toFiltering
 import com.cosmos.stealth.services.reddit.util.joinSubredditList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
@@ -118,7 +119,7 @@ abstract class Repository(
         }
 
         // Step 5: Flatten (and sort) the responses in order to have a single list of posts
-        val data = withContext(defaultDispatcher) { feedables.sort(sorting) }
+        val data = withContext(defaultDispatcher) { feedables.sortPosts(sorting.toFiltering()) }
 
         // Step 6: Retrieve the `after` key for each response and join them to a single string
         val afterKeys = afters
@@ -379,18 +380,6 @@ abstract class Repository(
         }
 
         restored
-    }
-
-    private fun List<List<Feedable>>.sort(sorting: Sorting): List<Feedable> {
-        return when (sorting.generalSorting) {
-            // If sorting is set to NEW, simply flatten the lists and sort the posts by date
-            Sort.NEW -> this.flatten().sortedByDescending { (it as Postable).created }
-            // If sorting is set to TOP, simply flatten the lists and sort the posts by score
-            Sort.TOP -> this.flatten().sortedByDescending { (it as Postable).upvotes }
-            // For all the other sorting methods, interlace the lists to have a consistent result
-            // [['a', 'b', 'c'], ['e', 'f', 'g'], ['h', 'i']] ==> ['a', 'e', 'h', 'b', 'f', 'i', 'c', 'g']
-            else -> this.interlace()
-        }
     }
 
     companion object {

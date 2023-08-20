@@ -2,7 +2,6 @@ package com.cosmos.stealth.core.model.data
 
 import com.cosmos.stealth.core.model.api.AfterKey
 import com.cosmos.stealth.core.model.api.Service
-import com.cosmos.stealth.core.model.api.Sort
 
 data class SingleFeedRequest(
     val info: RequestInfo,
@@ -11,7 +10,7 @@ data class SingleFeedRequest(
 
     val service: Service,
 
-    val sort: Sort = Default.SORT,
+    val filtering: Filtering,
 
     val limit: Int = Default.LIMIT,
 

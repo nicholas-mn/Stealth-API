@@ -26,11 +26,12 @@ import com.cosmos.stealth.services.lemmy.data.mapper.CommentMapper
 import com.cosmos.stealth.services.lemmy.data.mapper.CommunityMapper
 import com.cosmos.stealth.services.lemmy.data.mapper.PostMapper
 import com.cosmos.stealth.services.lemmy.data.mapper.UserMapper
+import com.cosmos.stealth.services.lemmy.data.model.CommentSortType
 import com.cosmos.stealth.services.lemmy.data.model.SearchType
 import com.cosmos.stealth.services.lemmy.data.model.SortType
 import com.cosmos.stealth.services.lemmy.data.remote.api.LemmyApi
 import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIER
-import com.cosmos.stealth.services.lemmy.util.extension.toSort
+import com.cosmos.stealth.services.lemmy.util.extension.toFiltering
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -109,7 +110,7 @@ class LemmyRepository(
             }
         }
 
-        val data = withContext(defaultDispatcher) { feedables.sortPosts(sort.toSort()) }
+        val data = withContext(defaultDispatcher) { feedables.sortPosts(sort.toFiltering()) }
 
         val afterData = page.nextKey(request.service, data.size)?.run { listOf(this) }
         val status = Status(request.service, HttpURLConnection.HTTP_OK)
@@ -189,7 +190,7 @@ class LemmyRepository(
         }
     }
 
-    suspend fun getComments(request: Request, postId: Int, sort: SortType, limit: Int, page: Int?): Feed {
+    suspend fun getComments(request: Request, postId: Int, sort: CommentSortType, limit: Int, page: Int?): Feed {
         val response = safeApiCall {
             lemmyApi.getComments(request.service.instance.orEmpty(), postId, null, sort, page, limit, request.info.host)
         }

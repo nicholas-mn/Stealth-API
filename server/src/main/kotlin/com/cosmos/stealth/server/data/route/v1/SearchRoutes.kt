@@ -1,10 +1,13 @@
 package com.cosmos.stealth.server.data.route.v1
 
+import com.cosmos.stealth.core.model.api.Order
 import com.cosmos.stealth.core.model.api.SearchType
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
 import com.cosmos.stealth.core.model.api.Sort
+import com.cosmos.stealth.core.model.api.Time
 import com.cosmos.stealth.core.model.data.Default
+import com.cosmos.stealth.core.model.data.Filtering
 import com.cosmos.stealth.core.model.data.SearchRequest
 import com.cosmos.stealth.server.data.service.SearchService
 import com.cosmos.stealth.server.util.extension.getPath
@@ -28,6 +31,8 @@ fun Route.searchRouting() {
 
         val instance = call.getQuery("instance")
         val sort = Sort.decode(call.getQuery("sort")) ?: Default.SORT
+        val order = Order.decode(call.getQuery("order")) ?: Default.ORDER
+        val time = Time.decode(call.getQuery("time")) ?: Default.TIME
         val community = call.getQuery("community")
         val user = call.getQuery("user")
         val limit = call.getQuery("limit")?.toIntOrNull() ?: Default.LIMIT
@@ -39,9 +44,9 @@ fun Route.searchRouting() {
             query,
             Service(serviceName, instance),
             type,
+            Filtering(sort, order, time),
             community,
             user,
-            sort,
             limit,
             after
         )

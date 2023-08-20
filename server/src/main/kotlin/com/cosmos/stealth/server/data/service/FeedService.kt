@@ -7,6 +7,7 @@ import com.cosmos.stealth.core.model.api.FeedRequest
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.Status
 import com.cosmos.stealth.core.model.data.Default
+import com.cosmos.stealth.core.model.data.Filtering
 import com.cosmos.stealth.core.model.data.RequestInfo
 import com.cosmos.stealth.core.model.data.SingleFeedRequest
 import com.cosmos.stealth.server.data.manager.GatewayManager
@@ -35,7 +36,11 @@ class FeedService(private val gatewayManager: GatewayManager) {
                     requestInfo,
                     requestEntry.key.communities,
                     service,
-                    feedRequest.sort ?: Default.SORT,
+                    Filtering(
+                        feedRequest.sort ?: Default.SORT,
+                        feedRequest.order ?: Default.ORDER,
+                        feedRequest.time ?: Default.TIME
+                    ),
                     splitLimit,
                     requestEntry.value?.key
                 )
