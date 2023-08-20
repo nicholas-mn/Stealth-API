@@ -1,6 +1,7 @@
 package com.cosmos.stealth.services.lemmy.data.repository
 
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
+import com.cosmos.stealth.core.common.util.MessageHandler
 import com.cosmos.stealth.core.model.api.After
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.CommunityResults
@@ -40,6 +41,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 import java.net.HttpURLConnection
+import java.util.Locale
 import kotlin.math.ceil
 import kotlin.math.min
 
@@ -113,7 +115,14 @@ class LemmyRepository(
         val data = withContext(defaultDispatcher) { feedables.sortPosts(sort.toFiltering()) }
 
         val afterData = page.nextKey(request.service, data.size)?.run { listOf(this) }
-        val status = Status(request.service, HttpURLConnection.HTTP_OK)
+        val status = when {
+            communities.size > MAX_COMMUNITIES -> {
+                val message = MessageHandler.getString(Locale.ENGLISH, "lemmy.warning.max_communities", MAX_COMMUNITIES)
+                Status(request.service, HttpURLConnection.HTTP_PARTIAL, message)
+            }
+
+            else -> Status(request.service, HttpURLConnection.HTTP_OK)
+        }
 
         Feed(data, afterData, listOf(status))
     }
