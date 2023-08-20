@@ -1,5 +1,6 @@
 package com.cosmos.stealth.services.lemmy
 
+import com.cosmos.stealth.core.common.util.MessageHandler
 import com.cosmos.stealth.core.model.api.Community
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.Feed
@@ -40,6 +41,7 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import org.koin.core.annotation.Single
+import java.util.Locale
 
 @Single
 class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
@@ -52,7 +54,8 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
             val request = getRequest(service, info)
 
             if (request == null) {
-                val status = Status(service, HttpStatusCode.BadRequest.value, MISSING_INSTANCE_ERROR)
+                val message = MessageHandler.getString(Locale.ENGLISH, "base.error.missing_instance")
+                val status = Status(service, HttpStatusCode.BadRequest.value, message)
                 return Feed(listOf(), null, listOf(status))
             }
 
@@ -62,8 +65,7 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
 
     override suspend fun getCommunity(communityRequest: CommunityRequest): Resource<Community> = supervisorScope {
         with (communityRequest) {
-            val request = getRequest(service, info)
-                ?: return@supervisorScope Resource.Error(HttpStatusCode.BadRequest.value, MISSING_INSTANCE_ERROR)
+            val request = getRequest(service, info) ?: return@supervisorScope missingInstance()
 
             val feedAsync = async { repository.getPosts(request, community, filtering.sortType, limit, afterKey.int) }
             val communityInfoAsync = async { repository.getCommunity(request, community) }
@@ -82,8 +84,7 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
 
     override suspend fun getCommunityInfo(communityInfoRequest: CommunityInfoRequest): Resource<CommunityInfo> {
         return with(communityInfoRequest) {
-            val request = getRequest(service, info)
-                ?: return Resource.Error(HttpStatusCode.BadRequest.value, MISSING_INSTANCE_ERROR)
+            val request = getRequest(service, info) ?: return missingInstance()
 
             repository.getCommunity(request, community)
         }
@@ -91,8 +92,7 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
 
     override suspend fun getUser(userRequest: UserRequest): Resource<User> {
         return with(userRequest) {
-            val request = getRequest(service, info)
-                ?: return Resource.Error(HttpStatusCode.BadRequest.value, MISSING_INSTANCE_ERROR)
+            val request = getRequest(service, info) ?: return missingInstance()
 
             when (type) {
                 FeedableType.post -> repository.getUserPosts(request, user, filtering.sortType, limit, afterKey.int)
@@ -106,8 +106,7 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
 
     override suspend fun getUserInfo(userInfoRequest: UserInfoRequest): Resource<UserInfo> {
         return with(userInfoRequest) {
-            val request = getRequest(service, info)
-                ?: return Resource.Error(HttpStatusCode.BadRequest.value, MISSING_INSTANCE_ERROR)
+            val request = getRequest(service, info) ?: return missingInstance()
 
             repository.getUser(request, user)
         }
@@ -115,8 +114,7 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
 
     override suspend fun getPost(postRequest: PostRequest): Resource<Post> = supervisorScope {
         with(postRequest) {
-            val request = getRequest(service, info)
-                ?: return@supervisorScope Resource.Error(HttpStatusCode.BadRequest.value, MISSING_INSTANCE_ERROR)
+            val request = getRequest(service, info) ?: return@supervisorScope missingInstance()
 
             val id = post.toInt()
 
@@ -147,8 +145,7 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
 
     override suspend fun getSearchResults(searchRequest: SearchRequest): Resource<SearchResults> {
         return with(searchRequest) {
-            val request = getRequest(service, info)
-                ?: return Resource.Error(HttpStatusCode.BadRequest.value, MISSING_INSTANCE_ERROR)
+            val request = getRequest(service, info) ?: return missingInstance()
 
             when (type) {
                 SearchType.feedable -> {
@@ -168,7 +165,8 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
         return service.instance.takeUnless { it.isNullOrBlank() }?.run { Request(service, info) }
     }
 
-    companion object {
-        private const val MISSING_INSTANCE_ERROR = "Instance must be provided"
+    private fun <T> missingInstance(): Resource<T> {
+        val message = MessageHandler.getString(Locale.ENGLISH, "base.error.missing_instance")
+        return Resource.Error(HttpStatusCode.BadRequest.value, message)
     }
 }

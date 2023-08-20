@@ -1,21 +1,25 @@
 package com.cosmos.stealth.server.data.route.v1
 
 import com.cosmos.stealth.core.model.api.FeedableType
-import com.cosmos.stealth.core.model.api.Order
 import com.cosmos.stealth.core.model.api.Service
-import com.cosmos.stealth.core.model.api.ServiceName
-import com.cosmos.stealth.core.model.api.Sort
-import com.cosmos.stealth.core.model.api.Time
 import com.cosmos.stealth.core.model.data.Default
 import com.cosmos.stealth.core.model.data.Filtering
+import com.cosmos.stealth.core.model.data.Path
+import com.cosmos.stealth.core.model.data.Query
 import com.cosmos.stealth.core.model.data.UserInfoRequest
 import com.cosmos.stealth.core.model.data.UserRequest
 import com.cosmos.stealth.server.data.service.UserService
-import com.cosmos.stealth.server.util.extension.getPath
 import com.cosmos.stealth.server.util.extension.getQuery
 import com.cosmos.stealth.server.util.extension.info
 import com.cosmos.stealth.server.util.extension.respondWithResource
-import com.cosmos.stealth.services.base.util.extension.toAfterKey
+import com.cosmos.stealth.server.util.getAfter
+import com.cosmos.stealth.server.util.getInstance
+import com.cosmos.stealth.server.util.getLimit
+import com.cosmos.stealth.server.util.getOrder
+import com.cosmos.stealth.server.util.getService
+import com.cosmos.stealth.server.util.getSort
+import com.cosmos.stealth.server.util.getTime
+import com.cosmos.stealth.server.util.getUser
 import io.ktor.server.application.call
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -27,19 +31,19 @@ fun Route.userRouting() {
 
     route("/user") {
 
-        get("/{user}") {
-            val user = call.getPath("user") ?: error("User ID is required")
-            val service = call.getQuery("service") ?: error("Service is required")
+        get("/{${Path.USER}}") {
+            val user = call.getUser()
 
-            val serviceName = ServiceName.decode(service) ?: error("Unknown service $service")
+            val serviceName = call.getService()
 
-            val instance = call.getQuery("instance")
-            val sort = Sort.decode(call.getQuery("sort")) ?: Default.SORT
-            val order = Order.decode(call.getQuery("order")) ?: Default.ORDER
-            val time = Time.decode(call.getQuery("time")) ?: Default.TIME
-            val limit = call.getQuery("limit")?.toIntOrNull() ?: Default.LIMIT
-            val after = call.getQuery("after")?.toAfterKey()
-            val type = FeedableType.decode(call.getQuery("type")) ?: Default.USER_FEEDABLE_TYPE
+            val instance = call.getInstance()
+            val sort = call.getSort()
+            val order = call.getOrder()
+            val time = call.getTime()
+            val limit = call.getLimit()
+            val after = call.getAfter()
+
+            val type = FeedableType.decode(call.getQuery(Query.TYPE)) ?: Default.USER_FEEDABLE_TYPE
 
             val userRequest = UserRequest(
                 call.info,
@@ -56,13 +60,12 @@ fun Route.userRouting() {
             call.respondWithResource(userResource)
         }
 
-        get("/{user}/info") {
-            val user = call.getPath("user") ?: error("User id is required")
-            val service = call.getQuery("service") ?: error("Service is required")
+        get("/{${Path.USER}}/info") {
+            val user = call.getUser()
 
-            val serviceName = ServiceName.decode(service) ?: error("Unknown service $service")
+            val serviceName = call.getService()
 
-            val instance = call.getQuery("instance")
+            val instance = call.getInstance()
 
             val userInfoRequest = UserInfoRequest(call.info, user, Service(serviceName, instance))
 

@@ -1,20 +1,21 @@
 package com.cosmos.stealth.server.data.route.v1
 
-import com.cosmos.stealth.core.model.api.Order
 import com.cosmos.stealth.core.model.api.Service
-import com.cosmos.stealth.core.model.api.ServiceName
-import com.cosmos.stealth.core.model.api.Sort
-import com.cosmos.stealth.core.model.api.Time
 import com.cosmos.stealth.core.model.data.CommunityInfoRequest
 import com.cosmos.stealth.core.model.data.CommunityRequest
-import com.cosmos.stealth.core.model.data.Default
 import com.cosmos.stealth.core.model.data.Filtering
+import com.cosmos.stealth.core.model.data.Path
 import com.cosmos.stealth.server.data.service.CommunityService
-import com.cosmos.stealth.server.util.extension.getPath
-import com.cosmos.stealth.server.util.extension.getQuery
 import com.cosmos.stealth.server.util.extension.info
 import com.cosmos.stealth.server.util.extension.respondWithResource
-import com.cosmos.stealth.services.base.util.extension.toAfterKey
+import com.cosmos.stealth.server.util.getAfter
+import com.cosmos.stealth.server.util.getCommunity
+import com.cosmos.stealth.server.util.getInstance
+import com.cosmos.stealth.server.util.getLimit
+import com.cosmos.stealth.server.util.getOrder
+import com.cosmos.stealth.server.util.getService
+import com.cosmos.stealth.server.util.getSort
+import com.cosmos.stealth.server.util.getTime
 import io.ktor.server.application.call
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -26,18 +27,17 @@ fun Route.communityRouting() {
 
     route("/community") {
 
-        get("/{community}") {
-            val community = call.getPath("community") ?: error("Community name is required")
-            val service = call.getQuery("service") ?: error("Service is required")
+        get("/{${Path.COMMUNITY}}") {
+            val community = call.getCommunity()
 
-            val serviceName = ServiceName.decode(service) ?: error("Unknown service $service")
+            val serviceName = call.getService()
 
-            val instance = call.getQuery("instance")
-            val sort = Sort.decode(call.getQuery("sort")) ?: Default.SORT
-            val order = Order.decode(call.getQuery("order")) ?: Default.ORDER
-            val time = Time.decode(call.getQuery("time")) ?: Default.TIME
-            val limit = call.getQuery("limit")?.toIntOrNull() ?: Default.LIMIT
-            val after = call.getQuery("after")?.toAfterKey()
+            val instance = call.getInstance()
+            val sort = call.getSort()
+            val order = call.getOrder()
+            val time = call.getTime()
+            val limit = call.getLimit()
+            val after = call.getAfter()
 
             val communityRequest = CommunityRequest(
                 call.info,
@@ -53,13 +53,10 @@ fun Route.communityRouting() {
             call.respondWithResource(communityResource)
         }
 
-        get("/{community}/info") {
-            val community = call.getPath("community") ?: error("Community name is required")
-            val service = call.getQuery("service") ?: error("Service is required")
-
-            val serviceName = ServiceName.decode(service) ?: error("Unknown service $service")
-
-            val instance = call.getQuery("instance")
+        get("/{${Path.COMMUNITY}}/info") {
+            val community = call.getCommunity()
+            val serviceName = call.getService()
+            val instance = call.getInstance()
 
             val communityInfoRequest = CommunityInfoRequest(call.info, community, Service(serviceName, instance))
 
