@@ -121,7 +121,11 @@ abstract class Gateway(
         return with(postRequest) {
             val request = Request(service, info)
 
-            repository.getPost(request, post, limit, filtering.toRedditSort(true).generalSorting)
+            // Remove the t3_ prefix before requesting a post. Stealth API uses the prefixed ID for posts, but the
+            // Reddit API needs the unprefixed one.
+            val unprefixedPost = post.removePrefix(POST_PREFIX)
+
+            repository.getPost(request, unprefixedPost, limit, filtering.toRedditSort(true).generalSorting)
         }
     }
 
@@ -195,5 +199,9 @@ abstract class Gateway(
                 }
             }
         }
+    }
+
+    companion object {
+        private const val POST_PREFIX = "t3_"
     }
 }
