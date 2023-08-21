@@ -20,6 +20,7 @@ import com.cosmos.stealth.services.reddit.data.repository.Repository
 import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi
 import com.cosmos.stealth.services.teddit.di.TedditModule.Qualifier.TEDDIT_QUALIFIER
 import kotlinx.coroutines.CoroutineDispatcher
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 
@@ -200,9 +201,13 @@ class TedditRepository(
         }
     }
 
-    private fun Request.getInstance(): String = service.instance ?: TedditApi.BASE_URL
+    private fun Request.getInstance(): String = service.instance ?: BASE_URL.host
 
     private fun Request.getRequest(): Request {
-        return this.copy(service = service.copy(instance = service.instance ?: TedditApi.BASE_URL))
+        return this.copy(service = service.copy(instance = service.instance ?: BASE_URL.host))
+    }
+
+    companion object {
+        private val BASE_URL = TedditApi.BASE_URL.toHttpUrl()
     }
 }

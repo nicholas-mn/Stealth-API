@@ -11,6 +11,7 @@ import com.cosmos.stealth.core.model.api.Time
 import com.cosmos.stealth.core.model.data.Default
 import com.cosmos.stealth.core.model.data.Path
 import com.cosmos.stealth.core.model.data.Query
+import com.cosmos.stealth.core.network.util.LinkValidator
 import com.cosmos.stealth.server.util.extension.getPath
 import com.cosmos.stealth.server.util.extension.getQuery
 import com.cosmos.stealth.services.base.util.extension.toAfterKey
@@ -40,7 +41,7 @@ fun ApplicationCall.getService(): ServiceName {
 }
 
 fun ApplicationCall.getInstance(): String? {
-    return getQuery(Query.INSTANCE)
+    return getQuery(Query.INSTANCE)?.run { LinkValidator(this).validUrl?.host }
 }
 
 fun ApplicationCall.getSort(default: Sort = Default.SORT): Sort {

@@ -35,6 +35,8 @@ dependencies {
     implementation("io.insert-koin:koin-annotations:${Dependencies.Versions.koinKsp}")
     ksp("io.insert-koin:koin-ksp-compiler:${Dependencies.Versions.koinKsp}")
 
+    implementation("com.squareup.okhttp3:okhttp:${Dependencies.Versions.okHttp}")
+
     implementation("ch.qos.logback:logback-classic:${Dependencies.Versions.logback}")
 
     testImplementation("io.ktor:ktor-server-tests-jvm:${Dependencies.Versions.ktor}")

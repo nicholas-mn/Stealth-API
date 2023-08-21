@@ -10,6 +10,7 @@ import com.cosmos.stealth.core.model.data.Default
 import com.cosmos.stealth.core.model.data.Filtering
 import com.cosmos.stealth.core.model.data.RequestInfo
 import com.cosmos.stealth.core.model.data.SingleFeedRequest
+import com.cosmos.stealth.core.network.util.LinkValidator
 import com.cosmos.stealth.server.data.manager.GatewayManager
 import com.cosmos.stealth.services.base.util.extension.orInternalError
 import kotlinx.coroutines.async
@@ -32,10 +33,12 @@ class FeedService(private val gatewayManager: GatewayManager) {
             async {
                 val service = requestEntry.key.service
 
+                val instance = LinkValidator(service.instance).validUrl?.host
+
                 val singleFeedRequest = SingleFeedRequest(
                     requestInfo,
                     requestEntry.key.communities,
-                    service,
+                    service.copy(instance = instance),
                     Filtering(
                         feedRequest.sort ?: Default.SORT,
                         feedRequest.order ?: Default.ORDER,
