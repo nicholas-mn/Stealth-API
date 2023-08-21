@@ -17,6 +17,7 @@ import com.cosmos.stealth.services.reddit.data.model.CommentData
 import com.cosmos.stealth.services.reddit.data.model.MoreChild
 import com.cosmos.stealth.services.reddit.data.model.MoreData
 import com.cosmos.stealth.services.reddit.data.model.PostData
+import com.cosmos.stealth.services.reddit.util.extension.getRefLink
 import com.cosmos.stealth.services.reddit.util.extension.toReaction
 import com.cosmos.stealth.services.reddit.util.toBadge
 import kotlinx.coroutines.CoroutineDispatcher
@@ -65,7 +66,7 @@ class CommentMapper(
                 bodyHtml,
                 author,
                 score,
-                permalink,
+                permalink.getRefLink(context?.instance.orEmpty()),
                 created.toMillis(),
                 depth ?: 0,
                 null,

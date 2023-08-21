@@ -25,6 +25,7 @@ import com.cosmos.stealth.services.base.util.extension.orNull
 import com.cosmos.stealth.services.reddit.data.model.PostChild
 import com.cosmos.stealth.services.reddit.data.model.PostData
 import com.cosmos.stealth.services.reddit.data.model.RedditVideoPreview
+import com.cosmos.stealth.services.reddit.util.extension.getRefLink
 import com.cosmos.stealth.services.reddit.util.extension.toMedia
 import com.cosmos.stealth.services.reddit.util.extension.toPosterType
 import com.cosmos.stealth.services.reddit.util.extension.toReaction
@@ -59,7 +60,7 @@ class PostMapper(
                 score,
                 commentsNumber,
                 url,
-                permalink,
+                permalink.getRefLink(context?.instance.orEmpty()),
                 created.toMillis(),
                 selfTextHtml,
                 null,

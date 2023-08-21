@@ -9,3 +9,7 @@ fun String?.toPosterType(): PosterType {
         else -> PosterType.regular
     }
 }
+
+fun String.getRefLink(instance: String): String {
+    return "https://$instance$this"
+}
