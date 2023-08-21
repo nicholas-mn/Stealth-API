@@ -70,7 +70,7 @@ class CommentData(
     @Json(name = "distinguished")
     val distinguished: String?,
 
-    @Json(name = "subreddit_name_prefixed")
+    @Json(name = "subreddit")
     val subreddit: String,
 
     @Json(name = "link_title")
