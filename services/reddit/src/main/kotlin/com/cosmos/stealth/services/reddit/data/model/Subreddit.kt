@@ -51,5 +51,11 @@ data class Subreddit(
     val url: String,
 
     @Json(name = "public_description")
-    val publicDescription: String
+    val publicDescription: String,
+
+    @Json(name = "icon_size")
+    val iconSize: List<Int>? = null,
+
+    @Json(name = "banner_size")
+    val bannerSize: List<Int>? = null
 )

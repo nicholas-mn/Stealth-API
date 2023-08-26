@@ -36,5 +36,8 @@ data class AboutUserData(
     val snoovatarImg: String?,
 
     @Json(name = "comment_karma")
-    val commentKarma: Int = -1
+    val commentKarma: Int = -1,
+
+    @Json(name = "snoovatar_size")
+    val snoovatarSize: List<Int>? = null
 )
