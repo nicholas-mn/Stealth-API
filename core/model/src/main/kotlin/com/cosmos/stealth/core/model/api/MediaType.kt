@@ -40,7 +40,7 @@ enum class MediaType {
             IMGUR_LINK,
             IMAGE -> PostType.image
 
-            else -> PostType.text
+            else -> PostType.link
         }
     }
 }
