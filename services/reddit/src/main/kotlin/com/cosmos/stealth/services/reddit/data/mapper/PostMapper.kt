@@ -65,7 +65,6 @@ class PostMapper(
                 permalink.getRefLink(context?.instance.orEmpty()),
                 created.toMillis(),
                 selfTextHtml,
-                null,
                 ratio,
                 domain,
                 null,

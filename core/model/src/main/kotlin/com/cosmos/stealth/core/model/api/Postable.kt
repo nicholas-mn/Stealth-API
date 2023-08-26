@@ -12,14 +12,13 @@ import com.squareup.moshi.JsonClass
  * @param community 
  * @param title 
  * @param author 
- * @param upvotes 
+ * @param score
  * @param commentCount 
  * @param url 
  * @param refLink 
  * @param created 
  * @param body 
- * @param downvotes 
- * @param ratio 
+ * @param ratio
  * @param domain 
  * @param edited 
  * @param oc 
@@ -55,8 +54,8 @@ data class Postable (
     @Json(name = "author")
     val author: String,
 
-    @Json(name = "upvotes")
-    val upvotes: Int,
+    @Json(name = "score")
+    val score: Int,
 
     @Json(name = "commentCount")
     val commentCount: Int,
@@ -72,9 +71,6 @@ data class Postable (
 
     @Json(name = "body")
     val body: String? = null,
-
-    @Json(name = "downvotes")
-    val downvotes: Int? = null,
 
     @Json(name = "ratio")
     val ratio: Double? = null,

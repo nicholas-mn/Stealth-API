@@ -20,9 +20,9 @@ fun List<List<Feedable>>.sortPosts(filtering: Filtering): List<Feedable> {
         // If sorting is set to score, simply flatten the lists and sort the posts by score
         Sort.score -> {
             if (filtering.order == Order.desc) {
-                this.flatten().sortedByDescending { (it as Postable).upvotes }
+                this.flatten().sortedByDescending { (it as Postable).score }
             } else {
-                this.flatten().sortedBy { (it as Postable).upvotes }
+                this.flatten().sortedBy { (it as Postable).score }
             }
         }
         // For all the other sorting methods, interlace the lists to have a consistent result

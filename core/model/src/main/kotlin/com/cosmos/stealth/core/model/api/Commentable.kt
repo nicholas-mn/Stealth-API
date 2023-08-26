@@ -12,12 +12,11 @@ import com.squareup.moshi.JsonClass
  * @param community 
  * @param body 
  * @param author 
- * @param upvotes 
+ * @param score
  * @param refLink 
  * @param created 
  * @param depth 
- * @param downvotes 
- * @param replies 
+ * @param replies
  * @param edited 
  * @param pinned 
  * @param controversial 
@@ -44,8 +43,8 @@ data class Commentable (
     @Json(name = "author")
     val author: String,
 
-    @Json(name = "upvotes")
-    val upvotes: Int,
+    @Json(name = "score")
+    val score: Int,
 
     @Json(name = "refLink")
     val refLink: String,
@@ -55,9 +54,6 @@ data class Commentable (
 
     @Json(name = "depth")
     val depth: Int? = null,
-
-    @Json(name = "downvotes")
-    val downvotes: Int? = null,
 
     @Json(name = "replies")
     val replies: MutableList<Feedable>? = null,
