@@ -13,6 +13,7 @@ import com.cosmos.stealth.core.network.util.extension.mime
 import com.cosmos.stealth.core.network.util.extension.toMedia
 import com.cosmos.stealth.services.reddit.data.model.AboutUserChild
 import com.cosmos.stealth.services.reddit.data.model.AboutUserData
+import com.cosmos.stealth.services.reddit.util.extension.getRefLink
 import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Named
@@ -39,7 +40,8 @@ class UserMapper(
                 null,
                 null,
                 null,
-                totalKarma
+                totalKarma,
+                subreddit?.url?.getRefLink(context?.instance.orEmpty())
             )
         }
     }

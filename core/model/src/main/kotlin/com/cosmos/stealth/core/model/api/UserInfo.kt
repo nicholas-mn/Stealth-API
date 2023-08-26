@@ -18,6 +18,8 @@ import com.squareup.moshi.JsonClass
  * @param nsfw
  * @param postCount
  * @param commentCount
+ * @param score
+ * @param refLink
  */
 @JsonClass(generateAdapter = true)
 data class UserInfo (
@@ -61,5 +63,8 @@ data class UserInfo (
     val commentCount: Int? = null,
 
     @Json(name = "score")
-    val score: Int? = null
+    val score: Int? = null,
+
+    @Json(name = "refLink")
+    val refLink: String? = null
 )
