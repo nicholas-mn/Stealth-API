@@ -4,7 +4,7 @@ enum class MediaType {
     NO_MEDIA,
 
     // Reddit
-    REDDIT_GALLERY, REDDIT_VIDEO, REDDIT_GIF,
+    REDDIT_GALLERY, REDDIT_VIDEO, REDDIT_GIF, REDDIT_IMAGE,
 
     // Imgur
     IMGUR_GALLERY, IMGUR_ALBUM, IMGUR_IMAGE, IMGUR_VIDEO, IMGUR_GIF, IMGUR_LINK,
@@ -34,6 +34,7 @@ enum class MediaType {
             VIDEO -> PostType.video
 
             REDDIT_GALLERY,
+            REDDIT_IMAGE,
             IMGUR_GALLERY,
             IMGUR_ALBUM,
             IMGUR_IMAGE,

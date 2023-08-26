@@ -119,7 +119,7 @@ class PostMapper(
 
             mediaPreview?.images?.getOrNull(0)?.variants?.mp4 != null -> MediaType.VIDEO
 
-            domain == "i.redd.it" -> MediaType.IMAGE
+            domain == "i.redd.it" -> MediaType.REDDIT_IMAGE
 
             else -> getLinkType(url)
         }
@@ -133,6 +133,8 @@ class PostMapper(
                     ?: media?.redditVideoPreview?.toMedia()
                     ?: mediaPreview?.videoPreview?.toMedia()
             }
+
+            MediaType.REDDIT_IMAGE -> Media(ContentType.Image.JPEG.mime, MediaSource(url))
 
             MediaType.VIDEO -> {
                 crossposts?.firstOrNull()?.getMedia(mediaType)
