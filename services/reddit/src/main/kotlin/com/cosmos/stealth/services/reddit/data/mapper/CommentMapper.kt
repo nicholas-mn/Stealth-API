@@ -68,7 +68,7 @@ class CommentMapper(
                 score,
                 permalink.getRefLink(context?.instance.orEmpty()),
                 created.toMillis(),
-                depth ?: 0,
+                depth,
                 null,
                 dataToEntities(replies?.data?.children, context, parentId),
                 edited.takeIf { it > -1 },

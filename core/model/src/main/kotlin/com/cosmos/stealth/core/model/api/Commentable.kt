@@ -54,7 +54,7 @@ data class Commentable (
     val created: Long,
 
     @Json(name = "depth")
-    val depth: Int,
+    val depth: Int? = null,
 
     @Json(name = "downvotes")
     val downvotes: Int? = null,
