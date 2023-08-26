@@ -31,7 +31,6 @@ import com.squareup.moshi.JsonClass
  * @param pinned 
  * @param reactions
  * @param media 
- * @param gallery 
  * @param postBadge
  * @param authorBadge
  * @param posterType 
@@ -114,10 +113,7 @@ data class Postable (
     val preview: Media? = null,
 
     @Json(name = "media")
-    val media: Media? = null,
-
-    @Json(name = "gallery")
-    val gallery: List<Media>? = null,
+    val media: List<Media>? = null,
 
     @Json(name = "postBadge")
     val postBadge: Badge? = null,

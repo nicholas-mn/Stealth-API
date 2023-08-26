@@ -3,6 +3,7 @@ package com.cosmos.stealth.services.lemmy.data.mapper
 import com.cosmos.stealth.core.common.data.mapper.Mapper
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.common.util.MarkdownParser
+import com.cosmos.stealth.core.common.util.extension.asList
 import com.cosmos.stealth.core.model.api.Feedable
 import com.cosmos.stealth.core.model.api.Media
 import com.cosmos.stealth.core.model.api.MediaSource
@@ -68,8 +69,7 @@ class PostMapper(
                 post.featuredLocal || post.featuredCommunity,
                 null,
                 post.thumbnailUrl?.toMedia(),
-                media,
-                null,
+                media?.asList(),
                 null,
                 null,
                 creator.toPosterType()

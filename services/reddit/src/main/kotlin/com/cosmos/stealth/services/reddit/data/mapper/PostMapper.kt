@@ -2,6 +2,7 @@ package com.cosmos.stealth.services.reddit.data.mapper
 
 import com.cosmos.stealth.core.common.data.mapper.Mapper
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
+import com.cosmos.stealth.core.common.util.extension.asList
 import com.cosmos.stealth.core.common.util.extension.toMillis
 import com.cosmos.stealth.core.data.repository.DashRepository
 import com.cosmos.stealth.core.model.api.Feedable
@@ -77,8 +78,7 @@ class PostMapper(
                 isStickied,
                 getReactions(),
                 preview,
-                media,
-                gallery,
+                gallery ?: media?.asList(),
                 toBadge(linkFlairRichText, flair),
                 toBadge(authorFlairRichText, authorFlair),
                 distinguished.toPosterType()
