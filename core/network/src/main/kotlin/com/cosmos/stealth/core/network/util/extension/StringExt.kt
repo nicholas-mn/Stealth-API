@@ -32,6 +32,9 @@ val String.mimeType: ContentType?
     get() = toHttpUrlOrNull()?.mimeType
 
 fun String.toMedia(): Media? {
-    val mime = mimeType?.mime ?: return null
+    return mimeType?.run { toMedia(this.mime) }
+}
+
+fun String.toMedia(mime: String): Media {
     return Media(mime, MediaSource(this))
 }

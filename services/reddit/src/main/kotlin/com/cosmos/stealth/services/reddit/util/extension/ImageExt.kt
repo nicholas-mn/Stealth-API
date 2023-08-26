@@ -18,5 +18,9 @@ fun Image.toMedia(): Media? {
         }
     } ?: return null
 
+    return toMedia(mime)
+}
+
+fun Image.toMedia(mime: String): Media {
     return Media(mime, imageSource.toMediaSource(), null, resolutions.map { it.toMediaSource() })
 }

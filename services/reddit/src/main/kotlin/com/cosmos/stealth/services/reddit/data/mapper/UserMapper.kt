@@ -10,10 +10,10 @@ import com.cosmos.stealth.core.model.api.ServiceName
 import com.cosmos.stealth.core.model.api.UserInfo
 import com.cosmos.stealth.core.model.api.UserType
 import com.cosmos.stealth.core.network.util.extension.mime
-import com.cosmos.stealth.core.network.util.extension.mimeType
 import com.cosmos.stealth.core.network.util.extension.toMedia
 import com.cosmos.stealth.services.reddit.data.model.AboutUserChild
 import com.cosmos.stealth.services.reddit.data.model.AboutUserData
+import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
@@ -47,11 +47,10 @@ class UserMapper(
     private fun AboutUserData.getIcon(): Media? {
         return when {
             iconImg != null -> {
-                val mime = iconImg.mimeType?.mime ?: return null
-                val snooMedia = snoovatarImg?.toMedia()
-                Media(mime, MediaSource(iconImg), null, null, snooMedia?.run { listOf(this) })
+                val snooMedia = snoovatarImg?.toMedia(ContentType.Image.PNG.mime)
+                Media(ContentType.Image.PNG.mime, MediaSource(iconImg), null, null, snooMedia?.run { listOf(this) })
             }
-            snoovatarImg != null -> snoovatarImg.toMedia()
+            snoovatarImg != null -> Media(ContentType.Image.PNG.mime, MediaSource(snoovatarImg))
             else -> null
         }
     }

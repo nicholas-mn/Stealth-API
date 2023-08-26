@@ -3,13 +3,16 @@ package com.cosmos.stealth.services.reddit.util.extension
 import com.cosmos.stealth.core.model.api.Media
 import com.cosmos.stealth.core.model.api.MediaSource
 import com.cosmos.stealth.core.network.util.extension.mime
-import com.cosmos.stealth.core.network.util.extension.mimeType
 import com.cosmos.stealth.services.reddit.data.model.GalleryItem
+import io.ktor.http.ContentType
 
 fun GalleryItem.toMedia(): Media? {
-    val mime = mimeType
-        ?: image?.url?.mimeType?.mime
-        ?: image?.mp4?.mimeType?.mime
+    val mime = when {
+        mimeType != null -> mimeType
+        image?.url != null -> ContentType.Image.JPEG.mime
+        image?.mp4 != null -> ContentType.Video.MP4.mime
+        else -> null
+    }
 
     val url = image?.url ?: image?.mp4
 

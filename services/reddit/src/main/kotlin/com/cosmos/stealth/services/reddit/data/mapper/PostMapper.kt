@@ -22,6 +22,8 @@ import com.cosmos.stealth.core.network.util.getImgurVideo
 import com.cosmos.stealth.core.network.util.getLinkType
 import com.cosmos.stealth.core.network.util.getUrlFromImgurId
 import com.cosmos.stealth.services.base.util.extension.orNull
+import com.cosmos.stealth.services.reddit.data.model.GalleryDataItem
+import com.cosmos.stealth.services.reddit.data.model.GalleryItem
 import com.cosmos.stealth.services.reddit.data.model.PostChild
 import com.cosmos.stealth.services.reddit.data.model.PostData
 import com.cosmos.stealth.services.reddit.data.model.RedditVideoPreview
@@ -30,7 +32,6 @@ import com.cosmos.stealth.services.reddit.util.extension.toMedia
 import com.cosmos.stealth.services.reddit.util.extension.toPosterType
 import com.cosmos.stealth.services.reddit.util.extension.toReaction
 import com.cosmos.stealth.services.reddit.util.toBadge
-import com.cosmos.stealth.services.reddit.util.toMedia
 import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Named
@@ -137,7 +138,7 @@ class PostMapper(
                 crossposts?.firstOrNull()?.getMedia(mediaType)
                     ?: media?.redditVideoPreview?.toMedia()
                     ?: mediaPreview?.videoPreview?.toMedia()
-                    ?: mediaPreview?.images?.getOrNull(0)?.variants?.mp4?.toMedia()
+                    ?: mediaPreview?.images?.getOrNull(0)?.variants?.mp4?.toMedia(ContentType.Video.MP4.mime)
             }
 
             MediaType.IMGUR_LINK -> {
@@ -195,5 +196,26 @@ class PostMapper(
         val mime = fallbackUrl.mimeType?.mime ?: return null
 
         return Media(mime, MediaSource(fallbackUrl, width, height), null, null)
+    }
+
+    private fun toMedia(galleryDataItem: GalleryDataItem, galleryItem: GalleryItem): Media? {
+        val image = galleryItem.image
+
+        val mime = when {
+            image?.url != null -> ContentType.Image.JPEG.mime
+            image?.mp4 != null -> ContentType.Video.MP4.mime
+            else -> null
+        }
+
+        val mediaUrl = image?.url ?: image?.mp4
+
+        if (mediaUrl == null || mime == null) return null
+
+        return Media(
+            mime,
+            MediaSource(mediaUrl, image?.width, image?.height),
+            galleryDataItem.mediaId,
+            caption = galleryDataItem.caption
+        )
     }
 }

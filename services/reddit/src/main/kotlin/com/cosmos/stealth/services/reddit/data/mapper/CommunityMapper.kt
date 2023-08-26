@@ -7,8 +7,10 @@ import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.CommunityType
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
+import com.cosmos.stealth.core.network.util.extension.mime
 import com.cosmos.stealth.core.network.util.extension.toMedia
 import com.cosmos.stealth.services.reddit.data.model.AboutChild
+import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
@@ -29,8 +31,8 @@ class CommunityMapper(
                 title,
                 publicDescriptionHtml,
                 descriptionHtml,
-                communityIcon.toMedia(),
-                headerImg?.toMedia(),
+                communityIcon.toMedia(ContentType.Image.PNG.mime),
+                headerImg?.toMedia(ContentType.Image.PNG.mime),
                 subscribers,
                 activeUserCount,
                 url,
