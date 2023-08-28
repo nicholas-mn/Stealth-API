@@ -12,6 +12,7 @@ import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIE
 import com.squareup.moshi.Moshi
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.BrowserUserAgent
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.OkHttpClient
@@ -65,6 +66,8 @@ class LemmyModule {
         @Named(LEMMY_QUALIFIER) moshiContentConverter: MoshiContentConverter
     ): HttpClient {
         return HttpClient(OkHttp) {
+            BrowserUserAgent()
+
             install(ContentNegotiation) {
                 moshi(moshiContentConverter)
             }

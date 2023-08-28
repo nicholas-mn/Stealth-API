@@ -5,6 +5,7 @@ import com.cosmos.stealth.core.common.util.TimeValue
 import com.cosmos.stealth.core.data.di.DataModule.Qualifier.DASH_QUALIFIER
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.BrowserUserAgent
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.ContentType
 import io.ktor.serialization.kotlinx.xml.DefaultXml
@@ -41,6 +42,8 @@ class DataModule {
     @Named(DASH_QUALIFIER)
     fun provideDashHttpClient(@Named(DASH_QUALIFIER) okHttpClient: OkHttpClient): HttpClient {
         return HttpClient(OkHttp) {
+            BrowserUserAgent()
+
             install(ContentNegotiation) {
                 xml(
                     format = DefaultXml.copy { defaultPolicy { ignoreUnknownChildren() } },

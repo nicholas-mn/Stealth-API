@@ -31,6 +31,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.BrowserUserAgent
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import kotlinx.coroutines.CoroutineDispatcher
@@ -115,6 +116,8 @@ class RedditModule {
                 url(RedditApi.BASE_URL)
             }
 
+            BrowserUserAgent()
+
             install(ContentNegotiation) {
                 moshi(moshiContentConverter)
             }
@@ -134,6 +137,8 @@ class RedditModule {
             defaultRequest {
                 url(RedditApi.BASE_URL_OLD)
             }
+
+            BrowserUserAgent()
 
             engine {
                 preconfigured = okHttpClient

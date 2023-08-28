@@ -11,6 +11,7 @@ import com.cosmos.stealth.services.teddit.data.remote.TargetRedditInterceptor
 import com.cosmos.stealth.services.teddit.di.TedditModule.Qualifier.TEDDIT_QUALIFIER
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.BrowserUserAgent
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import okhttp3.OkHttpClient
 import org.koin.core.annotation.ComponentScan
@@ -49,6 +50,8 @@ class TedditModule {
         @Named(REDDIT_QUALIFIER) moshiContentConverter: MoshiContentConverter
     ): HttpClient {
         return HttpClient(OkHttp) {
+            BrowserUserAgent()
+
             install(ContentNegotiation) {
                 moshi(moshiContentConverter)
             }
