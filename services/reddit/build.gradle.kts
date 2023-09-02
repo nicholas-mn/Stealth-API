@@ -1,6 +1,5 @@
 plugins {
     kotlin("jvm")
-    kotlin("kapt")
     id("com.google.devtools.ksp")
 }
 
@@ -25,7 +24,7 @@ dependencies {
 
     implementation("com.squareup.moshi:moshi:${Dependencies.Versions.moshi}")
     implementation("com.squareup.moshi:moshi-adapters:${Dependencies.Versions.moshi}")
-    kapt("com.squareup.moshi:moshi-kotlin-codegen:${Dependencies.Versions.moshi}")
+    ksp("com.squareup.moshi:moshi-kotlin-codegen:${Dependencies.Versions.moshi}")
 
     implementation("org.jsoup:jsoup:${Dependencies.Versions.jsoup}")
 }
