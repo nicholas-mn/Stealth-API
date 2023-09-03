@@ -22,6 +22,9 @@ import com.squareup.moshi.JsonClass
  * @param controversial 
  * @param reactions
  * @param authorBadge
+ * @param postAuthor
+ * @param postTitle
+ * @param postRefLink
  */
 @JsonClass(generateAdapter = true)
 data class Commentable (
@@ -75,4 +78,13 @@ data class Commentable (
 
     @Json(name = "submitter")
     val submitter: Boolean,
+
+    @Json(name = "postAuthor")
+    val postAuthor: String? = null,
+
+    @Json(name = "postTitle")
+    val postTitle: String? = null,
+
+    @Json(name = "postRefLink")
+    val postRefLink: String? = null
 ) : Feedable(FeedableType.comment)

@@ -193,7 +193,7 @@ abstract class Repository(
 
             val post = async { postMapper.dataToEntity(postChild, request.service) }
             val replies = async {
-                commentMapper.dataToEntities(it[1].data.children, request.service, postChild.data)
+                commentMapper.dataToEntities(it[1].data.children, request.service, postChild.data, null)
             }
 
             val status = response.toStatus(request.service)
@@ -217,7 +217,7 @@ abstract class Repository(
         apiCall: suspend () -> MoreChildren
     ): Resource<List<Feedable>> {
         return safeApiCall(apiCall) {
-            val items = commentMapper.dataToEntities(it.json.data.things, request.service, appendable.parentId)
+            val items = commentMapper.dataToEntities(it.json.data.things, request.service, null, appendable.parentId)
 
             val data = if (additionalContentFeedable != null) {
                 items.toMutableList().apply { add(additionalContentFeedable) }.toList()
@@ -280,7 +280,8 @@ abstract class Repository(
                 val items = commentMapper.dataToEntities(
                     response.data.data.children as List<CommentChild>,
                     request.service,
-                    parent = null
+                    parent = null,
+                    parentId = null
                 )
                 val afterData = response.data.data.after
                     ?.toAfter(request.service)

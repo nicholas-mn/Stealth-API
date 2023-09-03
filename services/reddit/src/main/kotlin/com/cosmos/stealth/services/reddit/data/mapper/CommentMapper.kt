@@ -24,6 +24,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 
@@ -39,25 +40,23 @@ class CommentMapper(
     suspend fun dataToEntities(
         data: List<Child>?,
         context: Service?,
-        parent: PostData?
-    ): MutableList<Feedable> = withContext(defaultDispatcher) {
-        dataToEntities(data, context, parent?.name)
-    }
-
-    suspend fun dataToEntities(
-        data: List<Child>?,
-        context: Service?,
+        parent: PostData?,
         parentId: String?
     ): MutableList<Feedable> = withContext(defaultDispatcher) {
-        data?.map { async { dataToEntity(it, context, parentId) } }?.awaitAll()?.toMutableList() ?: mutableListOf()
+        data?.map {
+            async { dataToEntity(it, context, parent, parentId) }
+        }?.awaitAll()?.toMutableList() ?: mutableListOf()
     }
 
     private suspend fun dataToEntity(
         data: CommentData,
         context: Service?,
+        parent: PostData?,
         parentId: String?
     ): Commentable = withContext(defaultDispatcher) {
         with(data) {
+            val postRefLink = linkPermalink?.toHttpUrlOrNull()?.encodedPath ?: parent?.permalink
+
             Commentable(
                 context ?: Service(ServiceName.reddit),
                 name,
@@ -69,13 +68,16 @@ class CommentMapper(
                 permalink.getRefLink(context?.instance.orEmpty()),
                 created.toMillis(),
                 depth,
-                dataToEntities(replies?.data?.children, context, parentId),
+                dataToEntities(replies?.data?.children, context, parent, parentId),
                 edited.takeIf { it > -1 },
                 stickied,
                 controversiality > 0,
                 getReactions(),
                 toBadge(authorFlairRichText, flair),
-                isSubmitter
+                isSubmitter,
+                linkAuthor ?: parent?.author,
+                linkTitle ?: parent?.title,
+                postRefLink?.getRefLink(context?.instance.orEmpty()),
             )
         }
     }
@@ -96,11 +98,12 @@ class CommentMapper(
     private suspend fun dataToEntity(
         data: Child,
         context: Service?,
-        parentId: String? = null
+        parent: PostData?,
+        parentId: String?
     ): Feedable {
         return when (data.kind) {
-            ChildType.t1 -> dataToEntity((data as CommentChild).data, context, parentId)
-            ChildType.more -> dataToEntity((data as MoreChild).data, context, parentId)
+            ChildType.t1 -> dataToEntity((data as CommentChild).data, context, parent, parentId)
+            ChildType.more -> dataToEntity((data as MoreChild).data, context, parent?.name ?: parentId)
             else -> error("Unknown kind ${data.kind}")
         }
     }

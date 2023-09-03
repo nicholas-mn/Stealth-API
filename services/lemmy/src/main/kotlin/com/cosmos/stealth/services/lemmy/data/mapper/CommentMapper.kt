@@ -41,7 +41,10 @@ class CommentMapper(
                 counts.downvotes > counts.upvotes,
                 null,
                 null,
-                creator.id == post.creatorId
+                creator.id == post.creatorId,
+                null,
+                post.name,
+                post.apId
             )
         }
     }

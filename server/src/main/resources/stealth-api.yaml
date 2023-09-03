@@ -787,6 +787,12 @@ components:
           $ref: "#/components/schemas/Badge"
         submitter:
           type: boolean
+        postAuthor:
+          type: string
+        postTitle:
+          type: string
+        postRefLink:
+          type: string
     
     Appendable:
       type: object
