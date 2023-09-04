@@ -667,6 +667,7 @@ components:
         - url
         - refLink
         - created
+        - posterType
       properties:
         type:
           $ref: "#/components/schemas/FeedableType"
@@ -746,6 +747,8 @@ components:
         - score
         - refLink
         - created
+        - submitter
+        - posterType
       properties:
         type:
           $ref: "#/components/schemas/FeedableType"
@@ -793,6 +796,8 @@ components:
           type: string
         postRefLink:
           type: string
+        posterType:
+          $ref: "#/components/schemas/PosterType"
     
     Appendable:
       type: object

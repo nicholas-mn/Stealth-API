@@ -55,6 +55,7 @@ class PostMapper(
                 post.url.orEmpty(),
                 post.apId,
                 post.published.toDateInMillis(),
+                creator.toPosterType(),
                 post.body?.run { markdownParser.parse(this) },
                 null, // TODO
                 httpUrl?.host,
@@ -70,8 +71,7 @@ class PostMapper(
                 post.thumbnailUrl?.toMedia(),
                 media?.asList(),
                 null,
-                null,
-                creator.toPosterType()
+                null
             )
         }
     }

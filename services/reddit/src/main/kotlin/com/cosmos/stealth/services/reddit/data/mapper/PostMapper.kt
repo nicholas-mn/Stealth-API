@@ -64,6 +64,7 @@ class PostMapper(
                 url,
                 permalink.getRefLink(context?.instance.orEmpty()),
                 created.toMillis(),
+                distinguished.toPosterType(),
                 selfTextHtml,
                 ratio,
                 domain,
@@ -79,8 +80,7 @@ class PostMapper(
                 preview,
                 gallery ?: media?.asList(),
                 toBadge(linkFlairRichText, flair),
-                toBadge(authorFlairRichText, authorFlair),
-                distinguished.toPosterType()
+                toBadge(authorFlairRichText, authorFlair)
             )
         }
     }

@@ -16,7 +16,8 @@ import com.squareup.moshi.JsonClass
  * @param commentCount 
  * @param url 
  * @param refLink 
- * @param created 
+ * @param created
+ * @param posterType
  * @param body 
  * @param ratio
  * @param domain 
@@ -32,7 +33,6 @@ import com.squareup.moshi.JsonClass
  * @param media 
  * @param postBadge
  * @param authorBadge
- * @param posterType 
  */
 @JsonClass(generateAdapter = true)
 data class Postable (
@@ -68,6 +68,9 @@ data class Postable (
 
     @Json(name = "created")
     val created: Long,
+
+    @Json(name = "posterType")
+    val posterType: PosterType = PosterType.regular,
 
     @Json(name = "body")
     val body: String? = null,
@@ -115,8 +118,5 @@ data class Postable (
     val postBadge: Badge? = null,
 
     @Json(name = "authorBadge")
-    val authorBadge: Badge? = null,
-
-    @Json(name = "posterType")
-    val posterType: PosterType? = PosterType.regular
+    val authorBadge: Badge? = null
 ) : Feedable(FeedableType.post)

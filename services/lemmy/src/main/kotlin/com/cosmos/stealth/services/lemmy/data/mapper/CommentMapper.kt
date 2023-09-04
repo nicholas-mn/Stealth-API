@@ -12,6 +12,7 @@ import com.cosmos.stealth.services.lemmy.data.model.Comment
 import com.cosmos.stealth.services.lemmy.data.model.CommentView
 import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIER
 import com.cosmos.stealth.services.lemmy.util.extension.toDateInMillis
+import com.cosmos.stealth.services.lemmy.util.extension.toPosterType
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
@@ -34,6 +35,8 @@ class CommentMapper(
                 counts.score,
                 comment.apId,
                 comment.published.toDateInMillis(),
+                creator.id == post.creatorId,
+                creator.toPosterType(),
                 comment.depth,
                 mutableListOf(),
                 comment.updated.toDateInMillis(),
@@ -41,7 +44,6 @@ class CommentMapper(
                 counts.downvotes > counts.upvotes,
                 null,
                 null,
-                creator.id == post.creatorId,
                 null,
                 post.name,
                 post.apId

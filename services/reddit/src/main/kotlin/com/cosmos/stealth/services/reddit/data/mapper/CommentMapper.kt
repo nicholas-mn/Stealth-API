@@ -18,6 +18,7 @@ import com.cosmos.stealth.services.reddit.data.model.MoreChild
 import com.cosmos.stealth.services.reddit.data.model.MoreData
 import com.cosmos.stealth.services.reddit.data.model.PostData
 import com.cosmos.stealth.services.reddit.util.extension.getRefLink
+import com.cosmos.stealth.services.reddit.util.extension.toPosterType
 import com.cosmos.stealth.services.reddit.util.extension.toReaction
 import com.cosmos.stealth.services.reddit.util.toBadge
 import kotlinx.coroutines.CoroutineDispatcher
@@ -67,6 +68,8 @@ class CommentMapper(
                 score,
                 permalink.getRefLink(context?.instance.orEmpty()),
                 created.toMillis(),
+                isSubmitter,
+                distinguished.toPosterType(),
                 depth,
                 dataToEntities(replies?.data?.children, context, parent, parentId),
                 edited.takeIf { it > -1 },
@@ -74,10 +77,9 @@ class CommentMapper(
                 controversiality > 0,
                 getReactions(),
                 toBadge(authorFlairRichText, flair),
-                isSubmitter,
                 linkAuthor ?: parent?.author,
                 linkTitle ?: parent?.title,
-                postRefLink?.getRefLink(context?.instance.orEmpty()),
+                postRefLink?.getRefLink(context?.instance.orEmpty())
             )
         }
     }

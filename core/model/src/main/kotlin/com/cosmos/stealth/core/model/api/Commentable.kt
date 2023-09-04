@@ -14,7 +14,9 @@ import com.squareup.moshi.JsonClass
  * @param author 
  * @param score
  * @param refLink 
- * @param created 
+ * @param created
+ * @param submitter
+ * @param posterType
  * @param depth 
  * @param replies
  * @param edited 
@@ -55,6 +57,12 @@ data class Commentable (
     @Json(name = "created")
     val created: Long,
 
+    @Json(name = "submitter")
+    val submitter: Boolean,
+
+    @Json(name = "posterType")
+    val posterType: PosterType = PosterType.regular,
+
     @Json(name = "depth")
     val depth: Int? = null,
 
@@ -75,9 +83,6 @@ data class Commentable (
 
     @Json(name = "authorBadge")
     val authorBadge: Badge? = null,
-
-    @Json(name = "submitter")
-    val submitter: Boolean,
 
     @Json(name = "postAuthor")
     val postAuthor: String? = null,
