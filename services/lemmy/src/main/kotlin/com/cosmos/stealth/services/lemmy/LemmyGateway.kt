@@ -139,7 +139,7 @@ class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
         return with (moreContentRequest) {
             val request = Request(appendable.service, info)
 
-            repository.getMoreComments(request, appendable.parentId.toInt())
+            repository.getMoreComments(request, appendable.parentId?.toInt())
         }
     }
 

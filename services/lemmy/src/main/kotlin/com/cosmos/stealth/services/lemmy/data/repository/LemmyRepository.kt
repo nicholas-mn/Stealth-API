@@ -218,7 +218,7 @@ class LemmyRepository(
         }
     }
 
-    suspend fun getMoreComments(request: Request, parentId: Int): Resource<List<Feedable>> {
+    suspend fun getMoreComments(request: Request, parentId: Int?): Resource<List<Feedable>> {
         val response = safeApiCall {
             lemmyApi.getComments(
                 request.service.instance.orEmpty(),

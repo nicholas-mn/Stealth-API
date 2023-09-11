@@ -808,7 +808,6 @@ components:
         - id
         - count
         - content
-        - parentId
         - depth
       properties:
         type:
@@ -825,6 +824,10 @@ components:
             type: string
         parentId:
           type: string
+          description: ID of the direct parent
+        parentLinkId:
+          type: string
+          description: ID of the item this object originates from
         depth:
           type: integer
     

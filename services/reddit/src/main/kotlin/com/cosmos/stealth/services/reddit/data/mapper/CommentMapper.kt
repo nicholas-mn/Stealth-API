@@ -91,6 +91,7 @@ class CommentMapper(
                 id,
                 count,
                 children,
+                this.parentId,
                 parentId.orEmpty(),
                 depth ?: 0
             )

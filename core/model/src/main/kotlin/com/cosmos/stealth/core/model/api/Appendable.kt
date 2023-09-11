@@ -10,8 +10,9 @@ import com.squareup.moshi.JsonClass
  * @param id 
  * @param count 
  * @param content 
- * @param parentId 
- * @param depth 
+ * @param parentId
+ * @param parentLinkId
+ * @param depth
  */
 @JsonClass(generateAdapter = true)
 data class Appendable (
@@ -28,7 +29,10 @@ data class Appendable (
     val content: List<String>,
 
     @Json(name = "parentId")
-    val parentId: String,
+    val parentId: String?,
+
+    @Json(name = "parentLinkId")
+    val parentLinkId: String?,
 
     @Json(name = "depth")
     val depth: Int

@@ -217,7 +217,12 @@ abstract class Repository(
         apiCall: suspend () -> MoreChildren
     ): Resource<List<Feedable>> {
         return safeApiCall(apiCall) {
-            val items = commentMapper.dataToEntities(it.json.data.things, request.service, null, appendable.parentId)
+            val items = commentMapper.dataToEntities(
+                it.json.data.things,
+                request.service,
+                null,
+                appendable.parentLinkId
+            )
 
             val data = if (additionalContentFeedable != null) {
                 items.toMutableList().apply { add(additionalContentFeedable) }.toList()

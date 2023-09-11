@@ -91,6 +91,7 @@ class CommentMapper(
                     childCount,
                     listOf(),
                     comment.id,
+                    comment.postId,
                     comment.depth ?: 0
                 )
                 comment.replies?.add(moreCommentFeedable)

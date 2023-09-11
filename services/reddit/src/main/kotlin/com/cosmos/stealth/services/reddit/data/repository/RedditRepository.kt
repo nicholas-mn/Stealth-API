@@ -128,7 +128,7 @@ class RedditRepository(
         val source = getSource(request.service.instance)
 
         return getMoreChildren(source.getRequest(request), appendable, additionalContentFeedable) {
-            source.getMoreChildren(children, appendable.parentId)
+            source.getMoreChildren(children, appendable.parentLinkId.orEmpty())
         }
     }
 
