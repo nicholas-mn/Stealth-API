@@ -72,7 +72,7 @@ class CommentMapper(
                 distinguished.toPosterType(),
                 depth,
                 dataToEntities(replies?.data?.children, context, parent, parentId),
-                edited.takeIf { it > -1 },
+                edited.takeIf { it > -1 }?.toMillis(),
                 stickied,
                 controversiality > 0,
                 getReactions(),
