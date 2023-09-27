@@ -34,7 +34,7 @@ class CommentMapper(
                 creator.name,
                 counts.score,
                 comment.apId,
-                comment.published.toDateInMillis(),
+                comment.published.toDateInMillis() ?: System.currentTimeMillis(),
                 creator.id == post.creatorId,
                 creator.toPosterType(),
                 comment.depth,

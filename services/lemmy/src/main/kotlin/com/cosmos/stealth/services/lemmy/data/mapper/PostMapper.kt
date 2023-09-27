@@ -54,7 +54,7 @@ class PostMapper(
                 counts.comments,
                 post.url.orEmpty(),
                 post.apId,
-                post.published.toDateInMillis(),
+                post.published.toDateInMillis() ?: System.currentTimeMillis(),
                 creator.toPosterType(),
                 post.body?.run { markdownParser.parse(this) },
                 null, // TODO

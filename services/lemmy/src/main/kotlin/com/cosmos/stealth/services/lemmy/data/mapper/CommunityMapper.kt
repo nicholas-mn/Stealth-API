@@ -28,7 +28,7 @@ class CommunityMapper(
                 context ?: Service(ServiceName.lemmy),
                 community.id.toString(),
                 community.name,
-                community.published.toDateInMillis(),
+                community.published.toDateInMillis() ?: System.currentTimeMillis(),
                 community.title,
                 null,
                 community.description?.run { markdownParser.parse(this) },

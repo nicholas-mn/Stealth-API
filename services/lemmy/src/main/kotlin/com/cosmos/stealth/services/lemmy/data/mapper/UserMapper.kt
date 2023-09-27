@@ -28,7 +28,7 @@ class UserMapper(
                 context ?: Service(ServiceName.lemmy),
                 person.id.toString(),
                 person.name,
-                person.published.toDateInMillis(),
+                person.published.toDateInMillis() ?: System.currentTimeMillis(),
                 person.avatar?.toMedia(),
                 person.banner?.toMedia(),
                 person.bio?.run { markdownParser.parse(this) },
