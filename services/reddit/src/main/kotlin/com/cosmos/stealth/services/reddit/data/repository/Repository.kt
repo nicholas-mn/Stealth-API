@@ -64,10 +64,12 @@ abstract class Repository(
         limit: Int,
         after: String?
     ): Feed {
-        return if (subreddit.size > REDDIT_SUBREDDIT_LIMIT) {
-            getMultiSubreddit(request, subreddit, sorting, limit, after)
-        } else {
-            getSubreddit(request, joinSubredditList(subreddit), sorting, limit, after)
+        return when {
+            subreddit.isEmpty() -> getSubreddit(request, DEFAULT_SUBREDDIT, sorting, limit, after)
+            subreddit.size <= REDDIT_SUBREDDIT_LIMIT -> {
+                getSubreddit(request, joinSubredditList(subreddit), sorting, limit, after)
+            }
+            else -> getMultiSubreddit(request, subreddit, sorting, limit, after)
         }
     }
 
@@ -389,6 +391,8 @@ abstract class Repository(
     }
 
     companion object {
+        private const val DEFAULT_SUBREDDIT = "popular"
+
         private const val REDDIT_SUBREDDIT_LIMIT = 100
         private const val KEY_DELIMITER = ","
     }

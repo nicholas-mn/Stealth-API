@@ -57,14 +57,14 @@ class LemmyRepository(
 ) : NetworkRepository() {
 
     suspend fun getPosts(request: Request, communities: List<String>, sort: SortType, limit: Int, page: Int?): Feed {
-        return if (communities.size == 1) {
-            getPosts(request, communities[0], sort, limit, page)
-        } else {
-            getMultiCommunities(request, communities, sort, limit, page)
+        return when {
+            communities.isEmpty() -> getPosts(request, null, sort, limit, page)
+            communities.size == 1 -> getPosts(request, communities[0], sort, limit, page)
+            else -> getMultiCommunities(request, communities, sort, limit, page)
         }
     }
 
-    suspend fun getPosts(request: Request, communityName: String, sort: SortType, limit: Int, page: Int?): Feed {
+    suspend fun getPosts(request: Request, communityName: String?, sort: SortType, limit: Int, page: Int?): Feed {
         val response = safeApiCall {
             lemmyApi.getPosts(request.service.instance.orEmpty(), communityName, sort, page, limit, request.info.host)
         }

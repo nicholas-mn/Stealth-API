@@ -37,7 +37,7 @@ class FeedService(private val gatewayManager: GatewayManager) {
 
                 val singleFeedRequest = SingleFeedRequest(
                     requestInfo,
-                    requestEntry.key.communities,
+                    requestEntry.key.communities ?: emptyList(),
                     service.copy(instance = instance),
                     Filtering(
                         feedRequest.sort ?: Default.SORT,
@@ -50,7 +50,7 @@ class FeedService(private val gatewayManager: GatewayManager) {
 
                 val response = gatewayManager.getServiceGateway(service).getFeed(singleFeedRequest)
 
-                Pair(requestEntry.key.service, response)
+                requestEntry.key.service to response
             }
         }.awaitAll()
 

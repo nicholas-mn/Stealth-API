@@ -31,7 +31,7 @@ class HttpLemmyApi(
     @Suppress("MagicNumber")
     override suspend fun getPosts(
         instance: String,
-        communityName: String,
+        communityName: String?,
         sort: SortType?,
         page: Int?,
         limit: Int?,

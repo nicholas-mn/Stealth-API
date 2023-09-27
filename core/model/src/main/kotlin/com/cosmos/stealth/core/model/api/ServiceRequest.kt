@@ -15,5 +15,5 @@ data class ServiceRequest (
     val service: Service,
 
     @Json(name = "communities")
-    val communities: List<String>
+    val communities: List<String>?
 )

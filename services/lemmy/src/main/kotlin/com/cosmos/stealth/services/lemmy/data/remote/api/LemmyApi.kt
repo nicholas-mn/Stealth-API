@@ -20,7 +20,7 @@ interface LemmyApi {
     @GET("/api/v3/post/list")
     suspend fun getPosts(
         @Url instance: String,
-        @Query("community_name") communityName: String,
+        @Query("community_name") communityName: String?,
         @Query("sort") sort: SortType?,
         @Query("page") page: Int?,
         @Query("limit") limit: Int? = null,
