@@ -1,9 +1,11 @@
 package com.cosmos.stealth.core.common.util.extension
 
-fun <T> Iterable<Iterable<T>>.interlace(): List<T> {
+fun <T> Collection<Collection<T>>.interlace(): List<T> {
+    if (isEmpty()) return emptyList()
+
     val result = ArrayList<T>()
 
-    val max = this.maxOf { it.count() }
+    val max = this.maxOf { it.size }
 
     for (i in 0..max) {
         this
