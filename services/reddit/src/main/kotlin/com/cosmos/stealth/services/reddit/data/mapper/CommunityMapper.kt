@@ -31,13 +31,13 @@ class CommunityMapper(
                 title,
                 publicDescriptionHtml,
                 descriptionHtml,
-                communityIcon.toMedia(ContentType.Image.PNG.mime),
-                headerImg?.toMedia(ContentType.Image.PNG.mime),
+                iconImg?.takeIf { it.isNotBlank() }?.toMedia(ContentType.Image.PNG.mime),
+                headerImg?.takeIf { it.isNotBlank() }?.toMedia(ContentType.Image.PNG.mime),
                 subscribers,
                 activeUserCount,
                 url,
                 over18,
-                primaryColor
+                primaryColor?.ifBlank { null }
             )
         }
     }
