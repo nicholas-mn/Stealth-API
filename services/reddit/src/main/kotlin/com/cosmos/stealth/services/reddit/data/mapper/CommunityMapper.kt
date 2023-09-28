@@ -10,6 +10,7 @@ import com.cosmos.stealth.core.model.api.ServiceName
 import com.cosmos.stealth.core.network.util.extension.mime
 import com.cosmos.stealth.core.network.util.extension.toMedia
 import com.cosmos.stealth.services.reddit.data.model.AboutChild
+import com.cosmos.stealth.services.reddit.util.extension.getRefLink
 import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Named
@@ -35,7 +36,7 @@ class CommunityMapper(
                 headerImg?.takeIf { it.isNotBlank() }?.toMedia(ContentType.Image.PNG.mime),
                 subscribers,
                 activeUserCount,
-                url,
+                url.getRefLink(context?.instance.orEmpty()),
                 over18,
                 primaryColor?.ifBlank { null }
             )
