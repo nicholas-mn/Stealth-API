@@ -183,7 +183,7 @@ class PostMapper(
             ?: thumbnail?.toMedia()
     }
 
-    private suspend fun RedditVideoPreview.toMedia(): Media? {
+    private suspend fun RedditVideoPreview.toMedia(): Media {
         val url = fallbackUrl.substringBeforeLast('/')
 
         val dashMedia = dashUrl
@@ -193,10 +193,8 @@ class PostMapper(
         return dashMedia ?: toFallbackMedia()
     }
 
-    private fun RedditVideoPreview.toFallbackMedia(): Media? {
-        val mime = fallbackUrl.mimeType?.mime ?: return null
-
-        return Media(mime, MediaSource(fallbackUrl, width, height), null, null)
+    private fun RedditVideoPreview.toFallbackMedia(): Media {
+        return Media(ContentType.Video.MP4.mime, MediaSource(fallbackUrl, width, height), null, null)
     }
 
     private fun toMedia(galleryDataItem: GalleryDataItem, galleryItem: GalleryItem): Media? {
