@@ -68,7 +68,7 @@ class PostMapper(
                 post.locked,
                 post.featuredLocal || post.featuredCommunity,
                 null,
-                post.thumbnailUrl?.toMedia(),
+                post.thumbnailUrl?.toMedia() ?: media,
                 media?.asList(),
                 null,
                 null
