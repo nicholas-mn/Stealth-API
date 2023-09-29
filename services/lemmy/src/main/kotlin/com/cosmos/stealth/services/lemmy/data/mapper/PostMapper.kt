@@ -17,6 +17,7 @@ import com.cosmos.stealth.core.network.util.extension.mimeType
 import com.cosmos.stealth.core.network.util.extension.toMedia
 import com.cosmos.stealth.services.lemmy.data.model.PostView
 import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIER
+import com.cosmos.stealth.services.lemmy.util.extension.getAuthorName
 import com.cosmos.stealth.services.lemmy.util.extension.toDateInMillis
 import com.cosmos.stealth.services.lemmy.util.extension.toPosterType
 import io.ktor.http.ContentType
@@ -49,7 +50,7 @@ class PostMapper(
                 postType,
                 community.name,
                 post.name,
-                creator.name,
+                creator.getAuthorName(context?.instance),
                 counts.score,
                 counts.comments,
                 post.url.orEmpty(),

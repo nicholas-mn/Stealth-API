@@ -11,6 +11,7 @@ import com.cosmos.stealth.core.model.api.ServiceName
 import com.cosmos.stealth.services.lemmy.data.model.Comment
 import com.cosmos.stealth.services.lemmy.data.model.CommentView
 import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIER
+import com.cosmos.stealth.services.lemmy.util.extension.getAuthorName
 import com.cosmos.stealth.services.lemmy.util.extension.toDateInMillis
 import com.cosmos.stealth.services.lemmy.util.extension.toPosterType
 import kotlinx.coroutines.CoroutineDispatcher
@@ -31,7 +32,7 @@ class CommentMapper(
                 post.id.toString(),
                 community.name,
                 markdownParser.parse(comment.content),
-                creator.name,
+                creator.getAuthorName(context?.instance),
                 counts.score,
                 comment.apId,
                 comment.published.toDateInMillis() ?: System.currentTimeMillis(),
