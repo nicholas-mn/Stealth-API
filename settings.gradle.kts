@@ -1,7 +1,7 @@
 pluginManagement {
-    val kotlin = "1.8.22"
-    val ktor = "2.3.1"
-    val ksp = "1.8.22-1.0.11"
+    val kotlin = "1.9.10"
+    val ktor = "2.3.4"
+    val ksp = "1.9.10-1.0.13"
 
     plugins {
         kotlin("jvm") version kotlin apply false
