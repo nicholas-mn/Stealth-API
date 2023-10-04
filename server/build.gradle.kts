@@ -54,6 +54,8 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:${Dependencies.Versions.ktor}")
     implementation("io.ktor:ktor-server-forwarded-header:${Dependencies.Versions.ktor}")
     implementation("io.ktor:ktor-server-status-pages:${Dependencies.Versions.ktor}")
+    implementation("io.ktor:ktor-server-swagger:${Dependencies.Versions.ktor}")
+    implementation("io.ktor:ktor-server-html-builder:${Dependencies.Versions.ktor}")
 
     implementation("io.insert-koin:koin-ktor:${Dependencies.Versions.koin}")
     implementation("io.insert-koin:koin-annotations:${Dependencies.Versions.koinKsp}")
