@@ -53,7 +53,7 @@ class PostMapper(
                 creator.getAuthorName(context?.instance),
                 counts.score,
                 counts.comments,
-                post.url.orEmpty(),
+                post.url?.takeIf { it.isNotBlank() } ?: post.apId,
                 post.apId,
                 post.published.toDateInMillis() ?: System.currentTimeMillis(),
                 creator.toPosterType(),
