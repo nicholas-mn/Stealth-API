@@ -10,6 +10,7 @@ import com.cosmos.stealth.core.model.api.ServiceName
 import com.cosmos.stealth.core.network.util.extension.toMedia
 import com.cosmos.stealth.services.lemmy.data.model.CommunityView
 import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIER
+import com.cosmos.stealth.services.lemmy.util.extension.getCommunityName
 import com.cosmos.stealth.services.lemmy.util.extension.toDateInMillis
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Named
@@ -27,7 +28,7 @@ class CommunityMapper(
                 CommunityType.community,
                 context ?: Service(ServiceName.lemmy),
                 community.id.toString(),
-                community.name,
+                community.getCommunityName(context?.instance),
                 community.published.toDateInMillis() ?: System.currentTimeMillis(),
                 community.title,
                 null,
