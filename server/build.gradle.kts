@@ -4,6 +4,8 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+val development: String by project
+
 sourceSets.main {
     java.srcDirs("build/generated/ksp/main/kotlin")
 }
@@ -11,8 +13,30 @@ sourceSets.main {
 application {
     mainClass.set("com.cosmos.stealth.server.ApplicationKt")
 
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$development")
+}
+
+ktor {
+    val archiveName = "${rootProject.name}-${Config.version}"
+
+    fatJar {
+        archiveFileName.set("$archiveName.jar")
+    }
+
+    docker {
+        jreVersion.set(JavaVersion.VERSION_17)
+        localImageName.set(rootProject.name)
+        imageTag.set(Config.version)
+    }
+
+    jib {
+        outputPaths {
+            tar = "build/$archiveName.tar"
+            digest = "build/$archiveName.digest"
+            imageJson = "build/$archiveName.json"
+            imageId = "build/$archiveName.id"
+        }
+    }
 }
 
 dependencies {
@@ -38,6 +62,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:${Dependencies.Versions.okHttp}")
 
     implementation("ch.qos.logback:logback-classic:${Dependencies.Versions.logback}")
+    implementation("org.codehaus.janino:janino:3.1.10")
 
     testImplementation("io.ktor:ktor-server-tests-jvm:${Dependencies.Versions.ktor}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Dependencies.Versions.kotlin}")
