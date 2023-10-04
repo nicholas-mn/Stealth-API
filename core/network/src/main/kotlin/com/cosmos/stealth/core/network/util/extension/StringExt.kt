@@ -3,13 +3,11 @@ package com.cosmos.stealth.core.network.util.extension
 import com.cosmos.stealth.core.model.api.Media
 import com.cosmos.stealth.core.model.api.MediaSource
 import com.cosmos.stealth.core.network.data.model.HostFormat
-import io.ktor.http.BadContentTypeFormatException
 import io.ktor.http.ContentType
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
-import java.net.URLConnection
 import java.net.UnknownHostException
 
 @Suppress("SwallowedException")
@@ -31,8 +29,10 @@ val String.hostFormat: HostFormat
 val String.mimeType: ContentType?
     get() = toHttpUrlOrNull()?.mimeType
 
-fun String.toMedia(): Media? {
-    return mimeType?.run { toMedia(this.mime) }
+fun String.toMedia(fallbackType: ContentType? = null): Media? {
+    return mimeType
+        ?.run { if (this == ContentType.Any) fallbackType else this }
+        ?.run { toMedia(this.mime) }
 }
 
 fun String.toMedia(mime: String): Media {

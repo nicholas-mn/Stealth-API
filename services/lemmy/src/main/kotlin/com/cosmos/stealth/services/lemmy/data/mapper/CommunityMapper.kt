@@ -12,6 +12,7 @@ import com.cosmos.stealth.services.lemmy.data.model.CommunityView
 import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIER
 import com.cosmos.stealth.services.lemmy.util.extension.getCommunityName
 import com.cosmos.stealth.services.lemmy.util.extension.toDateInMillis
+import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
@@ -33,8 +34,8 @@ class CommunityMapper(
                 community.title,
                 null,
                 community.description?.run { markdownParser.parse(this) },
-                community.icon?.toMedia(),
-                community.banner?.toMedia(),
+                community.icon?.toMedia(ContentType.Image.Any),
+                community.banner?.toMedia(ContentType.Image.Any),
                 counts.subscribers,
                 counts.usersActiveDay,
                 community.actorId,
