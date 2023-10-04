@@ -10,6 +10,7 @@ import com.cosmos.stealth.core.model.api.UserType
 import com.cosmos.stealth.core.network.util.extension.toMedia
 import com.cosmos.stealth.services.lemmy.data.model.PersonView
 import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIER
+import com.cosmos.stealth.services.lemmy.util.extension.getAuthorName
 import com.cosmos.stealth.services.lemmy.util.extension.toDateInMillis
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Named
@@ -27,7 +28,7 @@ class UserMapper(
                 UserType.user,
                 context ?: Service(ServiceName.lemmy),
                 person.id.toString(),
-                person.name,
+                person.getAuthorName(context?.instance),
                 person.published.toDateInMillis() ?: System.currentTimeMillis(),
                 person.avatar?.toMedia(),
                 person.banner?.toMedia(),
