@@ -9,13 +9,43 @@ import com.cosmos.stealth.services.reddit.data.model.Listing
 import com.cosmos.stealth.services.reddit.data.model.MoreChildren
 import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.TimeSorting
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi.Endpoint.GET_MORE_CHILDREN
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi.Endpoint.GET_POST
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi.Endpoint.GET_SEARCH_LINK
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi.Endpoint.GET_SEARCH_SR
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi.Endpoint.GET_SEARCH_SUBREDDIT
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi.Endpoint.GET_SEARCH_USER
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi.Endpoint.GET_SUBREDDIT
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi.Endpoint.GET_SUBREDDIT_ABOUT
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi.Endpoint.GET_USER_ABOUT
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi.Endpoint.GET_USER_COMMENTS
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi.Endpoint.GET_USER_SUBMITTED
 
 @Suppress("TooManyFunctions", "LongParameterList")
-interface RedditApi {
+internal interface RedditApi {
+
+    object Endpoint {
+        const val GET_SUBREDDIT = "/r/{subreddit}/{sort}"
+        const val GET_SUBREDDIT_ABOUT = "/r/{subreddit}/about"
+
+        const val GET_SEARCH_SUBREDDIT = "/r/{subreddit}/search?restrict_sr=1&include_over_18=1"
+
+        const val GET_POST = "{permalink}"
+
+        const val GET_MORE_CHILDREN = "/api/morechildren?api_type=json"
+
+        const val GET_USER_ABOUT = "/user/{user}/about"
+        const val GET_USER_SUBMITTED = "/user/{user}/submitted/"
+        const val GET_USER_COMMENTS = "/user/{user}/comments/"
+
+        const val GET_SEARCH_LINK = "/search?type=link&include_over_18=1"
+        const val GET_SEARCH_USER = "/search?type=user&include_over_18=1"
+        const val GET_SEARCH_SR = "/search?type=sr&include_over_18=1"
+    }
 
     //region Subreddit
 
-    @GET("/r/{subreddit}/{sort}")
+    @GET(GET_SUBREDDIT)
     suspend fun getSubreddit(
         @Path("subreddit") subreddit: String,
         @Path("sort") sort: Sort,
@@ -26,10 +56,10 @@ interface RedditApi {
         @Header("Forwarded") host: String? = null
     ): Listing
 
-    @GET("/r/{subreddit}/about")
+    @GET(GET_SUBREDDIT_ABOUT)
     suspend fun getSubredditInfo(@Path("subreddit") subreddit: String, @Header("Forwarded") host: String? = null): Child
 
-    @GET("/r/{subreddit}/search?restrict_sr=1&include_over_18=1")
+    @GET(GET_SEARCH_SUBREDDIT)
     suspend fun searchInSubreddit(
         @Path("subreddit") subreddit: String,
         @Query("q") query: String,
@@ -42,7 +72,7 @@ interface RedditApi {
 
     //endregion
 
-    @GET("{permalink}")
+    @GET(GET_POST)
     suspend fun getPost(
         @Path("permalink", encoded = true) permalink: String,
         @Query("limit") limit: Int? = null,
@@ -50,7 +80,7 @@ interface RedditApi {
         @Header("Forwarded") host: String? = null
     ): List<Listing>
 
-    @GET("/api/morechildren?api_type=json")
+    @GET(GET_MORE_CHILDREN)
     suspend fun getMoreChildren(
         @Query("children") children: String,
         @Query("link_id") linkId: String,
@@ -59,10 +89,10 @@ interface RedditApi {
 
     //region User
 
-    @GET("/user/{user}/about")
+    @GET(GET_USER_ABOUT)
     suspend fun getUserInfo(@Path("user") user: String, @Header("Forwarded") host: String? = null): Child
 
-    @GET("/user/{user}/submitted/")
+    @GET(GET_USER_SUBMITTED)
     suspend fun getUserPosts(
         @Path("user") user: String,
         @Query("sort") sort: Sort,
@@ -72,7 +102,7 @@ interface RedditApi {
         @Header("Forwarded") host: String? = null
     ): Listing
 
-    @GET("/user/{user}/comments/")
+    @GET(GET_USER_COMMENTS)
     suspend fun getUserComments(
         @Path("user") user: String,
         @Query("sort") sort: Sort,
@@ -86,7 +116,7 @@ interface RedditApi {
 
     //region Search
 
-    @GET("/search?type=link&include_over_18=1")
+    @GET(GET_SEARCH_LINK)
     suspend fun searchPost(
         @Query("q") query: String,
         @Query("sort") sort: Sort?,
@@ -96,7 +126,7 @@ interface RedditApi {
         @Header("Forwarded") host: String? = null
     ): Listing
 
-    @GET("/search?type=user&include_over_18=1")
+    @GET(GET_SEARCH_USER)
     suspend fun searchUser(
         @Query("q") query: String,
         @Query("sort") sort: Sort?,
@@ -106,7 +136,7 @@ interface RedditApi {
         @Header("Forwarded") host: String? = null
     ): Listing
 
-    @GET("/search?type=sr&include_over_18=1")
+    @GET(GET_SEARCH_SR)
     suspend fun searchSubreddit(
         @Query("q") query: String,
         @Query("sort") sort: Sort?,

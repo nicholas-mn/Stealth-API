@@ -29,7 +29,7 @@ import org.koin.core.annotation.Single
 
 @Suppress("TooManyFunctions", "LongParameterList")
 @Single
-class RedditRepository(
+internal class RedditRepository(
     @Named(REDDIT_QUALIFIER) private val dataRedditApi: RedditApi,
     @Named(REDDIT_SCRAP_QUALIFIER) private val scrapRedditApi: RedditApi,
     postMapper: PostMapper,

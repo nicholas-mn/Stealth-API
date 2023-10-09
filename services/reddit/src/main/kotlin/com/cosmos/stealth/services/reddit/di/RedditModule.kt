@@ -151,7 +151,7 @@ class RedditModule {
 
     @Single
     @Named(REDDIT_QUALIFIER)
-    fun provideDataRedditApi(
+    internal fun provideDataRedditApi(
         @Named(REDDIT_QUALIFIER) httpClient: HttpClient,
         urlSubstitutor: UrlSubstitutor
     ): RedditApi {
@@ -160,7 +160,7 @@ class RedditModule {
 
     @Single
     @Named(REDDIT_SCRAP_QUALIFIER)
-    fun provideScrapRedditApi(
+    internal fun provideScrapRedditApi(
         @Named(REDDIT_SCRAP_QUALIFIER) httpClient: HttpClient,
         urlSubstitutor: UrlSubstitutor,
         @Named(IO_DISPATCHER_QUALIFIER) ioDispatcher: CoroutineDispatcher

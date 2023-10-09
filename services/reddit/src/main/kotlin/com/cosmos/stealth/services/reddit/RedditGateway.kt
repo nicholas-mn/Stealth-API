@@ -5,7 +5,7 @@ import com.cosmos.stealth.services.reddit.data.repository.RedditRepository
 import org.koin.core.annotation.Single
 
 @Single
-class RedditGateway(redditRepository: RedditRepository) : Gateway(redditRepository) {
+class RedditGateway internal constructor(redditRepository: RedditRepository) : Gateway(redditRepository) {
 
     override val name: ServiceName
         get() = ServiceName.reddit
