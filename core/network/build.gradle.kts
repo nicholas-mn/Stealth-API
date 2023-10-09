@@ -11,8 +11,6 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:model"))
 
-    implementation("org.jetbrains.kotlin:kotlin-reflect:${Dependencies.Versions.kotlin}")
-
     implementation("io.ktor:ktor-client-content-negotiation:${Dependencies.Versions.ktor}")
 
     implementation("io.insert-koin:koin-ktor:${Dependencies.Versions.koin}")
