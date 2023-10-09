@@ -2,14 +2,18 @@ package com.cosmos.stealth.services.teddit.data.remote.api
 
 import com.cosmos.stealth.core.network.util.UrlSubstitutor
 import com.cosmos.stealth.core.network.util.extension.forward
-import com.cosmos.stealth.core.network.util.getEndpoint
-import com.cosmos.stealth.core.network.util.getPathParameter
-import com.cosmos.stealth.core.network.util.getQueryParameter
 import com.cosmos.stealth.services.reddit.data.model.Child
 import com.cosmos.stealth.services.reddit.data.model.Listing
 import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.TimeSorting
 import com.cosmos.stealth.services.teddit.data.model.TedditUser
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_POST
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_SEARCH_SR
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_SEARCH_SUBREDDIT
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_SUBREDDIT
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_SUBREDDIT_ABOUT
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_USER_COMMENTS
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_USER_SUBMITTED
 import com.cosmos.stealth.services.teddit.di.TedditModule.Qualifier.TEDDIT_QUALIFIER
 import io.ktor.client.HttpClient
 import io.ktor.client.call.NoTransformationFoundException
@@ -36,34 +40,29 @@ class DataTedditApi(
         after: String?,
         host: String?
     ): Listing {
-        val endpoint = TedditApi::getSubreddit.getEndpoint()
+        val subredditParam = "subreddit" to subreddit
+        val sortParam = "sort" to sort.type
 
-        val subredditParam = TedditApi::getSubreddit.getPathParameter(0) to subreddit
-        val sortParam = TedditApi::getSubreddit.getPathParameter(1) to sort.type
-
-        val url = urlSubstitutor.buildUrl(instance, endpoint, subredditParam, sortParam)
+        val url = urlSubstitutor.buildUrl(instance, GET_SUBREDDIT, subredditParam, sortParam)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(TedditApi::getSubreddit.getQueryParameter(0), timeSorting?.type)
-            parameter(TedditApi::getSubreddit.getQueryParameter(1), after)
+            parameter("t", timeSorting?.type)
+            parameter("after", after)
         }.body()
     }
 
     override suspend fun getSubredditInfo(instance: String, subreddit: String, host: String?): Child {
-        val endpoint = TedditApi::getSubredditInfo.getEndpoint()
+        val subredditParam = "subreddit" to subreddit
 
-        val subredditParam = TedditApi::getSubredditInfo.getPathParameter(0) to subreddit
-
-        val url = urlSubstitutor.buildUrl(instance, endpoint, subredditParam)
+        val url = urlSubstitutor.buildUrl(instance, GET_SUBREDDIT_ABOUT, subredditParam)
 
         return client.get(url) {
             forward(host, host == null)
         }.body()
     }
 
-    @Suppress("MagicNumber")
     override suspend fun searchInSubreddit(
         instance: String,
         subreddit: String,
@@ -73,19 +72,17 @@ class DataTedditApi(
         after: String?,
         host: String?
     ): Listing {
-        val endpoint = TedditApi::searchInSubreddit.getEndpoint()
+        val subredditParam = "subreddit" to subreddit
 
-        val subredditParam = TedditApi::searchInSubreddit.getPathParameter(0) to subreddit
-
-        val url = urlSubstitutor.buildUrl(instance, endpoint, subredditParam)
+        val url = urlSubstitutor.buildUrl(instance, GET_SEARCH_SUBREDDIT, subredditParam)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(TedditApi::searchInSubreddit.getQueryParameter(0), query)
-            parameter(TedditApi::searchInSubreddit.getQueryParameter(1), sort?.type)
-            parameter(TedditApi::searchInSubreddit.getQueryParameter(2), timeSorting?.type)
-            parameter(TedditApi::searchInSubreddit.getQueryParameter(3), after)
+            parameter("q", query)
+            parameter("sort", sort?.type)
+            parameter("t", timeSorting?.type)
+            parameter("after", after)
         }.body()
     }
 
@@ -97,18 +94,16 @@ class DataTedditApi(
         sort: Sort,
         host: String?
     ): List<Listing> {
-        val endpoint = TedditApi::getPost.getEndpoint()
+        val permalinkParam = "permalink" to permalink
 
-        val permalinkParam = TedditApi::getPost.getPathParameter(0) to permalink
-
-        val url = urlSubstitutor.buildUrl(instance, endpoint, permalinkParam)
+        val url = urlSubstitutor.buildUrl(instance, GET_POST, permalinkParam)
 
         suspend fun apiCall(url: String): HttpResponse {
             return client.get(url) {
                 forward(host, host == null)
 
-                parameter(TedditApi::getPost.getQueryParameter(0), limit)
-                parameter(TedditApi::getPost.getQueryParameter(1), sort.type)
+                parameter("limit", limit)
+                parameter("sort", sort.type)
             }
         }
 
@@ -138,18 +133,16 @@ class DataTedditApi(
         after: String?,
         host: String?
     ): TedditUser {
-        val endpoint = TedditApi::getUserPosts.getEndpoint()
+        val userParam = "user" to user
 
-        val userParam = TedditApi::getUserPosts.getPathParameter(0) to user
-
-        val url = urlSubstitutor.buildUrl(instance, endpoint, userParam)
+        val url = urlSubstitutor.buildUrl(instance, GET_USER_SUBMITTED, userParam)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(TedditApi::getUserPosts.getQueryParameter(0), sort.type)
-            parameter(TedditApi::getUserPosts.getQueryParameter(1), timeSorting?.type)
-            parameter(TedditApi::getUserPosts.getQueryParameter(2), after)
+            parameter("sort", sort.type)
+            parameter("t", timeSorting?.type)
+            parameter("after", after)
         }.body()
     }
 
@@ -161,22 +154,19 @@ class DataTedditApi(
         after: String?,
         host: String?
     ): TedditUser {
-        val endpoint = TedditApi::getUserComments.getEndpoint()
+        val userParam = "user" to user
 
-        val userParam = TedditApi::getUserComments.getPathParameter(0) to user
-
-        val url = urlSubstitutor.buildUrl(instance, endpoint, userParam)
+        val url = urlSubstitutor.buildUrl(instance, GET_USER_COMMENTS, userParam)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(TedditApi::getUserComments.getQueryParameter(0), sort.type)
-            parameter(TedditApi::getUserComments.getQueryParameter(1), timeSorting?.type)
-            parameter(TedditApi::getUserComments.getQueryParameter(2), after)
+            parameter("sort", sort.type)
+            parameter("t", timeSorting?.type)
+            parameter("after", after)
         }.body()
     }
 
-    @Suppress("MagicNumber")
     override suspend fun searchSubreddit(
         instance: String,
         query: String,
@@ -185,17 +175,15 @@ class DataTedditApi(
         after: String?,
         host: String?
     ): Listing {
-        val endpoint = TedditApi::searchSubreddit.getEndpoint()
-
-        val url = urlSubstitutor.buildUrl(instance, endpoint)
+        val url = urlSubstitutor.buildUrl(instance, GET_SEARCH_SR)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(TedditApi::searchSubreddit.getQueryParameter(0), query)
-            parameter(TedditApi::searchSubreddit.getQueryParameter(1), sort?.type)
-            parameter(TedditApi::searchSubreddit.getQueryParameter(2), timeSorting?.type)
-            parameter(TedditApi::searchSubreddit.getQueryParameter(3), after)
+            parameter("q", query)
+            parameter("sort", sort?.type)
+            parameter("t", timeSorting?.type)
+            parameter("after", after)
         }.body()
     }
 }

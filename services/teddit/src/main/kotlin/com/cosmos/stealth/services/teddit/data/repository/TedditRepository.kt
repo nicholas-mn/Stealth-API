@@ -26,7 +26,7 @@ import org.koin.core.annotation.Single
 
 @Suppress("TooManyFunctions")
 @Single
-class TedditRepository(
+internal class TedditRepository(
     @Named(TEDDIT_QUALIFIER) private val tedditApi: TedditApi,
     postMapper: PostMapper,
     communityMapper: CommunityMapper,

@@ -10,13 +10,34 @@ import com.cosmos.stealth.services.reddit.data.model.Listing
 import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.TimeSorting
 import com.cosmos.stealth.services.teddit.data.model.TedditUser
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_POST
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_SEARCH_SR
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_SEARCH_SUBREDDIT
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_SUBREDDIT
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_SUBREDDIT_ABOUT
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_USER_COMMENTS
+import com.cosmos.stealth.services.teddit.data.remote.api.TedditApi.Endpoint.GET_USER_SUBMITTED
 
 @Suppress("LongParameterList")
-interface TedditApi {
+internal interface TedditApi {
+
+    object Endpoint {
+        const val GET_SUBREDDIT = "/r/{subreddit}/{sort}?api"
+        const val GET_SUBREDDIT_ABOUT = "/r/{subreddit}/about?api"
+
+        const val GET_SEARCH_SUBREDDIT = "/r/{subreddit}/search?api&restrict_sr=on&nsfw=on"
+
+        const val GET_POST = "/{permalink}?api"
+
+        const val GET_USER_SUBMITTED = "/u/{user}/submitted?api"
+        const val GET_USER_COMMENTS = "/u/{user}/comments?api"
+
+        const val GET_SEARCH_SR = "/subreddits/search?api&nsfw=on"
+    }
 
     //region Subreddit
 
-    @GET("/r/{subreddit}/{sort}?api")
+    @GET(GET_SUBREDDIT)
     suspend fun getSubreddit(
         @Url instance: String,
         @Path("subreddit") subreddit: String,
@@ -26,14 +47,14 @@ interface TedditApi {
         @Header("Forwarded") host: String? = null
     ): Listing
 
-    @GET("/r/{subreddit}/about?api")
+    @GET(GET_SUBREDDIT_ABOUT)
     suspend fun getSubredditInfo(
         @Url instance: String,
         @Path("subreddit") subreddit: String,
         @Header("Forwarded") host: String? = null
     ): Child
 
-    @GET("/r/{subreddit}/search?api&restrict_sr=on&nsfw=on")
+    @GET(GET_SEARCH_SUBREDDIT)
     suspend fun searchInSubreddit(
         @Url instance: String,
         @Path("subreddit") subreddit: String,
@@ -46,7 +67,7 @@ interface TedditApi {
 
     //endregion
 
-    @GET("/{permalink}?api")
+    @GET(GET_POST)
     suspend fun getPost(
         @Url instance: String,
         @Path("permalink", encoded = true) permalink: String,
@@ -57,7 +78,7 @@ interface TedditApi {
 
     //region User
 
-    @GET("/u/{user}/submitted?api")
+    @GET(GET_USER_SUBMITTED)
     suspend fun getUserPosts(
         @Url instance: String,
         @Path("user") user: String,
@@ -67,7 +88,7 @@ interface TedditApi {
         @Header("Forwarded") host: String? = null
     ): TedditUser
 
-    @GET("/u/{user}/comments?api")
+    @GET(GET_USER_COMMENTS)
     suspend fun getUserComments(
         @Url instance: String,
         @Path("user") user: String,
@@ -81,7 +102,7 @@ interface TedditApi {
 
     //region Search
 
-    @GET("/subreddits/search?api&nsfw=on")
+    @GET(GET_SEARCH_SR)
     suspend fun searchSubreddit(
         @Url instance: String,
         @Query("q") query: String,
