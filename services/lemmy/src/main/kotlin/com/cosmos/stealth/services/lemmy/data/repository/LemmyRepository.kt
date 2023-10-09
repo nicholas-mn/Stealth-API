@@ -47,7 +47,7 @@ import kotlin.math.min
 
 @Suppress("LongParameterList", "TooManyFunctions")
 @Single
-class LemmyRepository(
+internal class LemmyRepository(
     @Named(LEMMY_QUALIFIER) private val lemmyApi: LemmyApi,
     private val postMapper: PostMapper,
     private val communityMapper: CommunityMapper,

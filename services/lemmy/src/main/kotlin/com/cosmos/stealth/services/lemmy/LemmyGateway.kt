@@ -44,7 +44,7 @@ import org.koin.core.annotation.Single
 import java.util.Locale
 
 @Single
-class LemmyGateway(private val repository: LemmyRepository) : ServiceGateway {
+class LemmyGateway internal constructor(private val repository: LemmyRepository) : ServiceGateway {
 
     override val name: ServiceName
         get() = ServiceName.lemmy

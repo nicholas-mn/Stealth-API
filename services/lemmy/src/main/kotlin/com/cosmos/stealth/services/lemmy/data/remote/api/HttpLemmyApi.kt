@@ -2,8 +2,6 @@ package com.cosmos.stealth.services.lemmy.data.remote.api
 
 import com.cosmos.stealth.core.network.util.UrlSubstitutor
 import com.cosmos.stealth.core.network.util.extension.forward
-import com.cosmos.stealth.core.network.util.getEndpoint
-import com.cosmos.stealth.core.network.util.getQueryParameter
 import com.cosmos.stealth.services.lemmy.data.model.CommentSortType
 import com.cosmos.stealth.services.lemmy.data.model.GetCommentsResponse
 import com.cosmos.stealth.services.lemmy.data.model.GetCommunityResponse
@@ -13,6 +11,12 @@ import com.cosmos.stealth.services.lemmy.data.model.GetPostsResponse
 import com.cosmos.stealth.services.lemmy.data.model.SearchResponse
 import com.cosmos.stealth.services.lemmy.data.model.SearchType
 import com.cosmos.stealth.services.lemmy.data.model.SortType
+import com.cosmos.stealth.services.lemmy.data.remote.api.LemmyApi.Endpoint.GET_COMMENT_LIST_V3
+import com.cosmos.stealth.services.lemmy.data.remote.api.LemmyApi.Endpoint.GET_COMMUNITY_V3
+import com.cosmos.stealth.services.lemmy.data.remote.api.LemmyApi.Endpoint.GET_POST_LIST_V3
+import com.cosmos.stealth.services.lemmy.data.remote.api.LemmyApi.Endpoint.GET_POST_V3
+import com.cosmos.stealth.services.lemmy.data.remote.api.LemmyApi.Endpoint.GET_SEARCH_V3
+import com.cosmos.stealth.services.lemmy.data.remote.api.LemmyApi.Endpoint.GET_USER_V3
 import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIER
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -28,7 +32,6 @@ class HttpLemmyApi(
     private val urlSubstitutor: UrlSubstitutor
 ) : LemmyApi {
 
-    @Suppress("MagicNumber")
     override suspend fun getPosts(
         instance: String,
         communityName: String?,
@@ -37,45 +40,38 @@ class HttpLemmyApi(
         limit: Int?,
         host: String?
     ): GetPostsResponse {
-        val endpoint = LemmyApi::getPosts.getEndpoint()
-
-        val url = urlSubstitutor.buildUrl(instance, endpoint)
+        val url = urlSubstitutor.buildUrl(instance, GET_POST_LIST_V3)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(LemmyApi::getPosts.getQueryParameter(0), communityName)
-            parameter(LemmyApi::getPosts.getQueryParameter(1), sort?.value)
-            parameter(LemmyApi::getPosts.getQueryParameter(2), page)
-            parameter(LemmyApi::getPosts.getQueryParameter(3), limit)
+            parameter("community_name", communityName)
+            parameter("sort", sort?.value)
+            parameter("page", page)
+            parameter("limit", limit)
         }.body()
     }
 
     override suspend fun getCommunity(instance: String, name: String, host: String?): GetCommunityResponse {
-        val endpoint = LemmyApi::getCommunity.getEndpoint()
-
-        val url = urlSubstitutor.buildUrl(instance, endpoint)
+        val url = urlSubstitutor.buildUrl(instance, GET_COMMUNITY_V3)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(LemmyApi::getCommunity.getQueryParameter(0), name)
+            parameter("name", name)
         }.body()
     }
 
     override suspend fun getPost(instance: String, id: Int, host: String?): GetPostResponse {
-        val endpoint = LemmyApi::getPost.getEndpoint()
-
-        val url = urlSubstitutor.buildUrl(instance, endpoint)
+        val url = urlSubstitutor.buildUrl(instance, GET_POST_V3)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(LemmyApi::getPost.getQueryParameter(0), id)
+            parameter("id", id)
         }.body()
     }
 
-    @Suppress("MagicNumber")
     override suspend fun getUser(
         instance: String,
         username: String,
@@ -84,21 +80,18 @@ class HttpLemmyApi(
         limit: Int?,
         host: String?
     ): GetPersonDetailsResponse {
-        val endpoint = LemmyApi::getUser.getEndpoint()
-
-        val url = urlSubstitutor.buildUrl(instance, endpoint)
+        val url = urlSubstitutor.buildUrl(instance, GET_USER_V3)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(LemmyApi::getUser.getQueryParameter(0), username)
-            parameter(LemmyApi::getUser.getQueryParameter(1), sort?.value)
-            parameter(LemmyApi::getUser.getQueryParameter(2), page)
-            parameter(LemmyApi::getUser.getQueryParameter(3), limit)
+            parameter("username", username)
+            parameter("sort", sort?.value)
+            parameter("page", page)
+            parameter("limit", limit)
         }.body()
     }
 
-    @Suppress("MagicNumber")
     override suspend fun getComments(
         instance: String,
         postId: Int?,
@@ -108,25 +101,22 @@ class HttpLemmyApi(
         limit: Int?,
         host: String?
     ): GetCommentsResponse {
-        val endpoint = LemmyApi::getComments.getEndpoint()
-
-        val url = urlSubstitutor.buildUrl(instance, endpoint)
+        val url = urlSubstitutor.buildUrl(instance, GET_COMMENT_LIST_V3)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(LemmyApi::getComments.getQueryParameter(0), postId)
-            parameter(LemmyApi::getComments.getQueryParameter(1), parentId)
-            parameter(LemmyApi::getComments.getQueryParameter(2), sort?.value)
-            parameter(LemmyApi::getComments.getQueryParameter(3), page)
-            parameter(LemmyApi::getComments.getQueryParameter(4), limit)
+            parameter("post_id", postId)
+            parameter("parent_id", parentId)
+            parameter("sort", sort?.value)
+            parameter("page", page)
+            parameter("limit", limit)
 
             // TODO: Remove hardcoded parameters
             parameter("max_depth", LemmyApi.MAX_DEPTH)
         }.body()
     }
 
-    @Suppress("MagicNumber")
     override suspend fun search(
         instance: String,
         query: String,
@@ -137,19 +127,17 @@ class HttpLemmyApi(
         limit: Int?,
         host: String?
     ): SearchResponse {
-        val endpoint = LemmyApi::search.getEndpoint()
-
-        val url = urlSubstitutor.buildUrl(instance, endpoint)
+        val url = urlSubstitutor.buildUrl(instance, GET_SEARCH_V3)
 
         return client.get(url) {
             forward(host, host == null)
 
-            parameter(LemmyApi::search.getQueryParameter(0), query)
-            parameter(LemmyApi::search.getQueryParameter(1), type.value)
-            parameter(LemmyApi::search.getQueryParameter(2), communityName)
-            parameter(LemmyApi::search.getQueryParameter(3), sort?.value)
-            parameter(LemmyApi::search.getQueryParameter(4), page)
-            parameter(LemmyApi::search.getQueryParameter(5), limit)
+            parameter("q", query)
+            parameter("type_", type.value)
+            parameter("community_name", communityName)
+            parameter("sort", sort?.value)
+            parameter("page", page)
+            parameter("limit", limit)
         }.body()
     }
 }

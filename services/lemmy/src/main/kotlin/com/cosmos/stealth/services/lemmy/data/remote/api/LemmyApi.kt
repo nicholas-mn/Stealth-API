@@ -13,11 +13,30 @@ import com.cosmos.stealth.services.lemmy.data.model.GetPostsResponse
 import com.cosmos.stealth.services.lemmy.data.model.SearchResponse
 import com.cosmos.stealth.services.lemmy.data.model.SearchType
 import com.cosmos.stealth.services.lemmy.data.model.SortType
+import com.cosmos.stealth.services.lemmy.data.remote.api.LemmyApi.Endpoint.GET_COMMENT_LIST_V3
+import com.cosmos.stealth.services.lemmy.data.remote.api.LemmyApi.Endpoint.GET_COMMUNITY_V3
+import com.cosmos.stealth.services.lemmy.data.remote.api.LemmyApi.Endpoint.GET_POST_LIST_V3
+import com.cosmos.stealth.services.lemmy.data.remote.api.LemmyApi.Endpoint.GET_POST_V3
+import com.cosmos.stealth.services.lemmy.data.remote.api.LemmyApi.Endpoint.GET_USER_V3
 
 @Suppress("LongParameterList")
-interface LemmyApi {
+internal interface LemmyApi {
 
-    @GET("/api/v3/post/list")
+    object Endpoint {
+        const val GET_POST_LIST_V3 = "/api/v3/post/list"
+
+        const val GET_COMMUNITY_V3 = "/api/v3/community"
+
+        const val GET_POST_V3 = "/api/v3/post"
+
+        const val GET_USER_V3 = "/api/v3/user"
+
+        const val GET_COMMENT_LIST_V3 = "/api/v3/comment/list"
+
+        const val GET_SEARCH_V3 = "/api/v3/search"
+    }
+
+    @GET(GET_POST_LIST_V3)
     suspend fun getPosts(
         @Url instance: String,
         @Query("community_name") communityName: String?,
@@ -27,21 +46,21 @@ interface LemmyApi {
         @Header("Forwarded") host: String? = null
     ): GetPostsResponse
 
-    @GET("/api/v3/community")
+    @GET(GET_COMMUNITY_V3)
     suspend fun getCommunity(
         @Url instance: String,
         @Query("name") name: String,
         @Header("Forwarded") host: String? = null
     ): GetCommunityResponse
 
-    @GET("/api/v3/post")
+    @GET(GET_POST_V3)
     suspend fun getPost(
         @Url instance: String,
         @Query("id") id: Int,
         @Header("Forwarded") host: String? = null
     ): GetPostResponse
 
-    @GET("/api/v3/user")
+    @GET(GET_USER_V3)
     suspend fun getUser(
         @Url instance: String,
         @Query("username") username: String,
@@ -51,7 +70,7 @@ interface LemmyApi {
         @Header("Forwarded") host: String? = null
     ): GetPersonDetailsResponse
 
-    @GET("/api/v3/comment/list")
+    @GET(GET_COMMENT_LIST_V3)
     suspend fun getComments(
         @Url instance: String,
         @Query("post_id") postId: Int?,
@@ -62,7 +81,7 @@ interface LemmyApi {
         @Header("Forwarded") host: String? = null
     ): GetCommentsResponse
 
-    @GET("/api/v3/search")
+    @GET(Endpoint.GET_SEARCH_V3)
     suspend fun search(
         @Url instance: String,
         @Query("q") query: String,
