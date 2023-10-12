@@ -312,7 +312,7 @@ paths:
           $ref: "#/components/responses/Services"
 
 servers:
-  - url: stealth.cosmosapps.org
+  - url: https://stealth.cosmosapps.org
 
 components:
   parameters:
