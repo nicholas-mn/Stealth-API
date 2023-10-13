@@ -1,11 +1,13 @@
-openapi: 3.0.2
+openapi: 3.0.3
 
 info:
   description: "API for Stealth's content aggregation."
   version: 0.1.0
   title: Stealth API
-  #termsOfService: http://swagger.io/terms/
+  termsOfService: https://stealth.cosmosapps.org/en/privacy.html
   contact:
+    name: CosmosApps
+    url: https://gitlab.com/cosmosapps
     email: cosmos.dev@protonmail.com
   license:
     name: GNU General Public License v3.0 only
