@@ -177,6 +177,7 @@ abstract class RedditScraper<Result>(
             const val CROSSPOST_ROOT_TIME = "data-crosspost-root-time"
             const val SR_NAME = "data-sr_name"
             const val COUNT = "data-count"
+            const val KIND = "data-kind"
         }
         
         const val POST = "div[id~=thing_t3_\\w*]"

@@ -39,6 +39,7 @@ private fun getImgurLinkType(link: String, mime: ContentType?): MediaType {
     return when {
         link.contains("/a/") -> MediaType.IMGUR_ALBUM
         link.contains("/gallery/") -> MediaType.IMGUR_GALLERY
+        link.contains(".gifv") -> MediaType.IMGUR_GIF
         mime.isGif -> MediaType.IMGUR_GIF
         mime.isVideo -> MediaType.IMGUR_VIDEO
         mime.isImage -> MediaType.IMGUR_IMAGE

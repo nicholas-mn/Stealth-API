@@ -121,17 +121,24 @@ class PostScraper(
         // is_gallery
         val isRedditGallery = attr(Selector.Attr.IS_GALLERY).toBoolean()
 
-        val thumbnailClass = selectFirst("a.thumbnail")
         // is_video
-        val isVideo = thumbnailClass?.selectFirst("div.duration-overlay")?.let { true } ?: false
-        val thumbnail = thumbnailClass
+        val kind = attr(Selector.Attr.KIND)
+        val isVideo = kind == "video" || kind == "gif"
+
+        val thumbnail = selectFirst("a.thumbnail")
             ?.selectFirst(Scraper.Selector.Tag.IMG)
             ?.attr(Scraper.Selector.Attr.SRC)
             ?.toValidLink()
 
         val expando = selectFirst("div.expando")
-            ?.attr(Selector.Attr.CACHED_HTML)
-            ?.run { Jsoup.parse(this) }
+            ?.run {
+                when {
+                    hasAttr(Selector.Attr.CACHED_HTML) -> {
+                        Jsoup.parse(attr(Selector.Attr.CACHED_HTML)).firstElementChild()
+                    }
+                    else -> this
+                }
+            }
 
         val media = when {
             isVideo -> {
@@ -144,7 +151,7 @@ class PostScraper(
                         0,
                         0,
                         false,
-                        null
+                        "$url/DASHPlaylist.mpd"
                     )
                 )
             }
@@ -207,7 +214,7 @@ class PostScraper(
         return PostChild(postData)
     }
 
-    private fun Document.toMedia(): Media? {
+    private fun Element.toMedia(): Media? {
         val source = selectFirst("source") ?: return null
 
         return when (source.attr("type")) {
@@ -232,17 +239,17 @@ class PostScraper(
         }
     }
 
-    private fun Document.toGalleryData(): GalleryData {
+    private fun Element.toGalleryData(): GalleryData? {
         val items = select("div.gallery-tile")
             .map {
                 val id = it.attr(Selector.Attr.MEDIA_ID)
                 GalleryDataItem(null, id)
             }
 
-        return GalleryData(items)
+        return if (items.isNotEmpty()) GalleryData(items) else null
     }
 
-    private fun Document.toMediaMetadata(): MediaMetadata? {
+    private fun Element.toMediaMetadata(): MediaMetadata? {
         val items = select("div.gallery-preview")
             .map {
                 val id = it.attr(Scraper.Selector.Attr.ID).substringAfterLast("-")

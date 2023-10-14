@@ -14,6 +14,7 @@ import com.cosmos.stealth.core.model.api.Reactions
 import com.cosmos.stealth.core.model.api.Service
 import com.cosmos.stealth.core.model.api.ServiceName
 import com.cosmos.stealth.core.network.util.Resource
+import com.cosmos.stealth.core.network.util.extension.isGif
 import com.cosmos.stealth.core.network.util.extension.isImage
 import com.cosmos.stealth.core.network.util.extension.mime
 import com.cosmos.stealth.core.network.util.extension.mimeType
@@ -178,8 +179,8 @@ class PostMapper(
         return mediaPreview?.images?.getOrNull(0)?.toMedia()
             ?: gallery?.firstOrNull()
             ?: mediaMetadata?.items?.getOrNull(0)?.toMedia()
-            ?: media?.takeIf { it.mime.startsWith("image") }
-            ?: url.takeIf { it.mimeType.isImage }?.run { toMedia() }
+            ?: media?.takeIf { it.mime.startsWith("image") && !it.mime.endsWith("gif") }
+            ?: url.takeIf { it.mimeType.run { isImage && !isGif } }?.run { toMedia() }
             ?: thumbnail?.toMedia()
     }
 
