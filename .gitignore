@@ -34,3 +34,5 @@ out/
 
 ### VS Code ###
 .vscode/
+
+/services/reddit/src/main/resources/credentials.json

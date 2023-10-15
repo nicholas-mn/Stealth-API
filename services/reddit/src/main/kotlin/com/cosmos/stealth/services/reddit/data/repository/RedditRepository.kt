@@ -32,6 +32,7 @@ import org.koin.core.annotation.Single
 internal class RedditRepository(
     @Named(REDDIT_QUALIFIER) private val dataRedditApi: RedditApi,
     @Named(REDDIT_SCRAP_QUALIFIER) private val scrapRedditApi: RedditApi,
+    private val credentialsRepository: CredentialsRepository,
     postMapper: PostMapper,
     communityMapper: CommunityMapper,
     userMapper: UserMapper,
@@ -55,6 +56,7 @@ internal class RedditRepository(
                 sorting.timeSorting,
                 after,
                 limit,
+                bearer = credentialsRepository.accessToken,
                 host = request.info.host
             )
         }
@@ -66,7 +68,7 @@ internal class RedditRepository(
         val source = getSource(request.service.instance)
 
         return getSubredditInfo(source.getRequest(request)) {
-            source.getSubredditInfo(subreddit, request.info.host)
+            source.getSubredditInfo(subreddit, bearer = credentialsRepository.accessToken, host = request.info.host)
         }
     }
 
@@ -87,6 +89,7 @@ internal class RedditRepository(
                 sorting.generalSorting,
                 sorting.timeSorting,
                 after,
+                bearer = credentialsRepository.accessToken,
                 host = request.info.host
             )
         }
@@ -96,7 +99,7 @@ internal class RedditRepository(
         val source = getSource(request.service.instance)
 
         val response = safeApiCall {
-            source.getPost(permalink, limit, sort, request.info.host)
+            source.getPost(permalink, limit, sort, bearer = credentialsRepository.accessToken, host = request.info.host)
         }
 
         return getPost(response, source.getRequest(request))
@@ -128,13 +131,20 @@ internal class RedditRepository(
         val source = getSource(request.service.instance)
 
         return getMoreChildren(source.getRequest(request), appendable, additionalContentFeedable) {
-            source.getMoreChildren(children, appendable.parentLinkId.orEmpty())
+            source.getMoreChildren(
+                children,
+                appendable.parentLinkId.orEmpty(),
+                bearer = credentialsRepository.accessToken,
+                host = request.info.host
+            )
         }
     }
 
     override suspend fun getUserInfo(request: Request, user: String): Resource<UserInfo> {
         val source = getSource(request.service.instance)
-        return getUserInfo(source.getRequest(request)) { source.getUserInfo(user, request.info.host) }
+        return getUserInfo(source.getRequest(request)) {
+            source.getUserInfo(user, bearer = credentialsRepository.accessToken, host = request.info.host)
+        }
     }
 
     override suspend fun getUserPosts(
@@ -146,7 +156,14 @@ internal class RedditRepository(
     ): Feed {
         val source = getSource(request.service.instance)
         val response = safeApiCall {
-            source.getUserPosts(user, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
+            source.getUserPosts(
+                user,
+                sorting.generalSorting,
+                sorting.timeSorting,
+                after,
+                bearer = credentialsRepository.accessToken,
+                host = request.info.host
+            )
         }
 
         return getUserPosts(response, source.getRequest(request))
@@ -161,7 +178,14 @@ internal class RedditRepository(
     ): Feed {
         val source = getSource(request.service.instance)
         val response = safeApiCall {
-            source.getUserComments(user, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
+            source.getUserComments(
+                user,
+                sorting.generalSorting,
+                sorting.timeSorting,
+                after,
+                bearer = credentialsRepository.accessToken,
+                host = request.info.host
+            )
         }
 
         return getUserComments(response, source.getRequest(request))
@@ -176,7 +200,14 @@ internal class RedditRepository(
     ): Resource<SearchResults> {
         val source = getSource(request.service.instance)
         return searchPost(source.getRequest(request)) {
-            source.searchPost(query, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
+            source.searchPost(
+                query,
+                sorting.generalSorting,
+                sorting.timeSorting,
+                after,
+                bearer = credentialsRepository.accessToken,
+                host = request.info.host
+            )
         }
     }
 
@@ -189,7 +220,14 @@ internal class RedditRepository(
     ): Resource<SearchResults> {
         val source = getSource(request.service.instance)
         return searchUser(source.getRequest(request)) {
-            source.searchUser(query, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
+            source.searchUser(
+                query,
+                sorting.generalSorting,
+                sorting.timeSorting,
+                after,
+                bearer = credentialsRepository.accessToken,
+                host = request.info.host
+            )
         }
     }
 
@@ -202,7 +240,14 @@ internal class RedditRepository(
     ): Resource<SearchResults> {
         val source = getSource(request.service.instance)
         return searchSubreddit(source.getRequest(request)) {
-            source.searchSubreddit(query, sorting.generalSorting, sorting.timeSorting, after, host = request.info.host)
+            source.searchSubreddit(
+                query,
+                sorting.generalSorting,
+                sorting.timeSorting,
+                after,
+                bearer = credentialsRepository.accessToken,
+                host = request.info.host
+            )
         }
     }
 

@@ -7,6 +7,11 @@ sourceSets.main {
     java.srcDirs("build/generated/ksp/main/kotlin")
 }
 
+@Suppress("UnstableApiUsage")
+kotlin.compilerOptions {
+    freeCompilerArgs = listOf("-opt-in=kotlin.io.encoding.ExperimentalEncodingApi")
+}
+
 dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:data"))

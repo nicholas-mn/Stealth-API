@@ -6,11 +6,21 @@ import com.cosmos.stealth.services.reddit.data.model.Listing
 import com.cosmos.stealth.services.reddit.data.model.MoreChildren
 import com.cosmos.stealth.services.reddit.data.model.Sort
 import com.cosmos.stealth.services.reddit.data.model.TimeSorting
+import com.cosmos.stealth.services.reddit.data.model.Token
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi.Companion.BASE_URL
+import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi.Endpoint.POST_ACCESS_TOKEN
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.submitForm
+import io.ktor.client.request.header
+import io.ktor.http.HttpHeaders
+import io.ktor.http.Parameters
 
 @Suppress("TooManyFunctions")
 class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRedditApi(client, urlSubstitutor) {
+
+    override val baseUrl: String
+        get() = BASE_URL
 
     override suspend fun getSubreddit(
         subreddit: String,
@@ -19,13 +29,14 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         after: String?,
         limit: Int?,
         geoFilter: String?,
+        bearer: String?,
         host: String?
     ): Listing {
-        return getRawSubreddit(subreddit, sort, timeSorting, after, limit, geoFilter, host).body()
+        return getRawSubreddit(subreddit, sort, timeSorting, after, limit, geoFilter, bearer, host).body()
     }
 
-    override suspend fun getSubredditInfo(subreddit: String, host: String?): Child {
-        return getRawSubredditInfo(subreddit, host).body()
+    override suspend fun getSubredditInfo(subreddit: String, bearer: String?, host: String?): Child {
+        return getRawSubredditInfo(subreddit, bearer, host).body()
     }
 
     override suspend fun searchInSubreddit(
@@ -35,21 +46,33 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         timeSorting: TimeSorting?,
         after: String?,
         limit: Int?,
+        bearer: String?,
         host: String?
     ): Listing {
-        return searchInSubredditRaw(subreddit, query, sort, timeSorting, after, limit, host).body()
+        return searchInSubredditRaw(subreddit, query, sort, timeSorting, after, limit, bearer, host).body()
     }
 
-    override suspend fun getPost(permalink: String, limit: Int?, sort: Sort, host: String?): List<Listing> {
-        return getRawPost(permalink, limit, sort, host).body()
+    override suspend fun getPost(
+        permalink: String,
+        limit: Int?,
+        sort: Sort,
+        bearer: String?,
+        host: String?
+    ): List<Listing> {
+        return getRawPost(permalink, limit, sort, bearer, host).body()
     }
 
-    override suspend fun getMoreChildren(children: String, linkId: String, host: String?): MoreChildren {
-        return getRawMoreChildren(children, linkId, host).body()
+    override suspend fun getMoreChildren(
+        children: String,
+        linkId: String,
+        bearer: String?,
+        host: String?
+    ): MoreChildren {
+        return getRawMoreChildren(children, linkId, bearer, host).body()
     }
 
-    override suspend fun getUserInfo(user: String, host: String?): Child {
-        return getRawUserInfo(user, host).body()
+    override suspend fun getUserInfo(user: String, bearer: String?, host: String?): Child {
+        return getRawUserInfo(user, bearer, host).body()
     }
 
     override suspend fun getUserPosts(
@@ -58,9 +81,10 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         timeSorting: TimeSorting?,
         after: String?,
         limit: Int?,
+        bearer: String?,
         host: String?
     ): Listing {
-        return getRawUserPosts(user, sort, timeSorting, after, limit, host).body()
+        return getRawUserPosts(user, sort, timeSorting, after, limit, bearer, host).body()
     }
 
     override suspend fun getUserComments(
@@ -69,9 +93,10 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         timeSorting: TimeSorting?,
         after: String?,
         limit: Int?,
+        bearer: String?,
         host: String?
     ): Listing {
-        return getRawUserComments(user, sort, timeSorting, after, limit, host).body()
+        return getRawUserComments(user, sort, timeSorting, after, limit, bearer, host).body()
     }
 
     override suspend fun searchPost(
@@ -80,9 +105,10 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         timeSorting: TimeSorting?,
         after: String?,
         limit: Int?,
+        bearer: String?,
         host: String?
     ): Listing {
-        return searchPostRaw(query, sort, timeSorting, after, limit, host).body()
+        return searchPostRaw(query, sort, timeSorting, after, limit, bearer, host).body()
     }
 
     override suspend fun searchUser(
@@ -91,9 +117,10 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         timeSorting: TimeSorting?,
         after: String?,
         limit: Int?,
+        bearer: String?,
         host: String?
     ): Listing {
-        return searchUserRaw(query, sort, timeSorting, after, limit, host).body()
+        return searchUserRaw(query, sort, timeSorting, after, limit, bearer, host).body()
     }
 
     override suspend fun searchSubreddit(
@@ -102,8 +129,17 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         timeSorting: TimeSorting?,
         after: String?,
         limit: Int?,
+        bearer: String?,
         host: String?
     ): Listing {
-        return searchSubredditRaw(query, sort, timeSorting, after, limit, host).body()
+        return searchSubredditRaw(query, sort, timeSorting, after, limit, bearer, host).body()
+    }
+
+    override suspend fun getAccessToken(parameters: Parameters, bearer: String): Token {
+        val url = urlSubstitutor.buildUrl(BASE_URL, POST_ACCESS_TOKEN)
+
+        return client.submitForm(url, parameters) {
+            header(HttpHeaders.Authorization, "Basic $bearer")
+        }.body()
     }
 }

@@ -25,6 +25,7 @@ import com.cosmos.stealth.services.reddit.data.remote.RedditCookieJar
 import com.cosmos.stealth.services.reddit.data.remote.api.DataRedditApi
 import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi
 import com.cosmos.stealth.services.reddit.data.remote.api.ScrapRedditApi
+import com.cosmos.stealth.services.reddit.di.RedditModule.Qualifier.GENERIC_QUALIFIER
 import com.cosmos.stealth.services.reddit.di.RedditModule.Qualifier.REDDIT_QUALIFIER
 import com.cosmos.stealth.services.reddit.di.RedditModule.Qualifier.REDDIT_SCRAP_QUALIFIER
 import com.squareup.moshi.Moshi
@@ -33,7 +34,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.BrowserUserAgent
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
 import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.OkHttpClient
 import org.koin.core.annotation.ComponentScan
@@ -52,6 +52,7 @@ class RedditModule {
     object Qualifier {
         const val REDDIT_QUALIFIER = "reddit"
         const val REDDIT_SCRAP_QUALIFIER = "reddit_scrap"
+        const val GENERIC_QUALIFIER = "generic"
     }
 
     @Single
@@ -71,6 +72,12 @@ class RedditModule {
             .add(EditedAdapter())
             .add(NullToEmptyStringAdapter())
             .build()
+    }
+
+    @Single
+    @Named(GENERIC_QUALIFIER)
+    fun provideGenericMoshi(): Moshi {
+        return Moshi.Builder().build()
     }
 
     @Single
@@ -112,10 +119,6 @@ class RedditModule {
         @Named(REDDIT_QUALIFIER) moshiContentConverter: MoshiContentConverter
     ): HttpClient {
         return HttpClient(OkHttp) {
-            defaultRequest {
-                url(RedditApi.BASE_URL)
-            }
-
             BrowserUserAgent()
 
             install(ContentNegotiation) {
@@ -134,10 +137,6 @@ class RedditModule {
     @Named(REDDIT_SCRAP_QUALIFIER)
     fun provideRedditScrapHttpClient(@Named(REDDIT_SCRAP_QUALIFIER) okHttpClient: OkHttpClient): HttpClient {
         return HttpClient(OkHttp) {
-            defaultRequest {
-                url(RedditApi.BASE_URL_OLD)
-            }
-
             BrowserUserAgent()
 
             engine {
