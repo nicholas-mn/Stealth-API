@@ -16,4 +16,5 @@ fun HttpMessageBuilder.forward(remoteHost: String?, proxyMode: Boolean = false) 
 
     header(HttpHeaders.Forwarded, "for=$forValue")
     header(HttpHeaders.XForwardedFor, remoteHost)
+    header("X-Real-IP", remoteHost)
 }
