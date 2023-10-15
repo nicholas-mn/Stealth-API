@@ -123,7 +123,8 @@ class PostScraper(
 
         // is_video
         val kind = attr(Selector.Attr.KIND)
-        val isVideo = kind == "video" || kind == "gif"
+        val rootType = attr(Selector.Attr.TARGET_ROOT_TYPE)
+        val isVideo = kind == "video" || kind == "gif" || rootType == "video" || rootType == "gif"
 
         val thumbnail = selectFirst("a.thumbnail")
             ?.selectFirst(Scraper.Selector.Tag.IMG)

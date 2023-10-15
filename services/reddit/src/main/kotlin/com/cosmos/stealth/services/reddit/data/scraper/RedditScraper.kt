@@ -175,6 +175,7 @@ abstract class RedditScraper<Result>(
             const val CROSSPOST_ROOT_AUTHOR = "data-crosspost-root-author"
             const val CROSSPOST_ROOT_SUBREDDIT_PREFIXED = "data-crosspost-root-subreddit-prefixed"
             const val CROSSPOST_ROOT_TIME = "data-crosspost-root-time"
+            const val TARGET_ROOT_TYPE = "data-target-root-type"
             const val SR_NAME = "data-sr_name"
             const val COUNT = "data-count"
             const val KIND = "data-kind"
