@@ -12,6 +12,7 @@ import com.cosmos.stealth.services.reddit.data.model.TimeSorting
 import com.cosmos.stealth.services.reddit.data.model.Token
 import com.cosmos.stealth.services.reddit.data.scraper.CommentScraper
 import com.cosmos.stealth.services.reddit.data.scraper.PostScraper
+import com.cosmos.stealth.services.reddit.data.scraper.PostSearchScraper
 import com.cosmos.stealth.services.reddit.data.scraper.SubredditScraper
 import com.cosmos.stealth.services.reddit.data.scraper.SubredditSearchScraper
 import com.cosmos.stealth.services.reddit.data.scraper.UserScaper
@@ -61,8 +62,8 @@ class ScrapRedditApi(
         bearer: String?,
         host: String?
     ): Listing {
-        // TODO
-        return Listing("t3", ListingData(null, null, emptyList(), null, null))
+        val response = searchInSubredditRaw(subreddit, query, sort, timeSorting, after, limit, null, host)
+        return PostSearchScraper(ioDispatcher).scrap(response.bodyAsText())
     }
 
     override suspend fun getPost(
@@ -131,8 +132,8 @@ class ScrapRedditApi(
         bearer: String?,
         host: String?
     ): Listing {
-        // TODO
-        return Listing("t3", ListingData(null, null, emptyList(), null, null))
+        val response = searchPostRaw(query, sort, timeSorting, after, limit, null, host)
+        return PostSearchScraper(ioDispatcher).scrap(response.bodyAsText())
     }
 
     override suspend fun searchUser(
