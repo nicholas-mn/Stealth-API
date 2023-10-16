@@ -99,7 +99,10 @@ internal interface RedditApi {
         @Query("children") children: String,
         @Query("link_id") linkId: String,
         @Header("Authorization") bearer: String? = null,
-        @Header("Forwarded") host: String? = null
+        @Header("Forwarded") host: String? = null,
+        parentId: String? = null,
+        refLink: String? = null,
+        depth: Int? = null
     ): MoreChildren
 
     //region User

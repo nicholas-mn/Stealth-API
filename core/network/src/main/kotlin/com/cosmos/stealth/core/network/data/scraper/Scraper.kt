@@ -5,9 +5,7 @@ import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-abstract class Scraper<Result>(
-    private val ioDispatcher: CoroutineDispatcher
-) {
+abstract class Scraper<Result>(protected val ioDispatcher: CoroutineDispatcher) {
 
     protected var document: Document? = null
 

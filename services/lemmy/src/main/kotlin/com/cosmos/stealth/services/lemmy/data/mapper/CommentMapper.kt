@@ -93,6 +93,7 @@ class CommentMapper(
                     listOf(),
                     comment.id,
                     comment.postId,
+                    comment.postRefLink,
                     comment.depth ?: 0
                 )
                 comment.replies?.add(moreCommentFeedable)

@@ -9,6 +9,8 @@ import com.cosmos.stealth.services.reddit.data.model.ListingData
 import com.cosmos.stealth.services.reddit.data.model.MoreChild
 import com.cosmos.stealth.services.reddit.data.model.MoreData
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 
@@ -19,6 +21,16 @@ class CommentScraper(
     private var linkId: String = ""
 
     override suspend fun scrapDocument(document: Document): Listing {
+        return scrapDocument(document, 0)
+    }
+
+    suspend fun scrap(body: String, startDepth: Int): Listing = withContext(ioDispatcher) {
+        val document = Jsoup.parse(body)
+        this@CommentScraper.document = document
+        scrapDocument(document, startDepth)
+    }
+
+    private fun scrapDocument(document: Document, startDepth: Int): Listing {
         val post = document.selectFirst(Selector.POST)
             ?.attr(Selector.Attr.FULLNAME)
 
@@ -30,7 +42,7 @@ class CommentScraper(
             ?: document.selectFirst(Selector.SITETABLE_LINK)
 
         return siteTable
-            ?.run { getComments(0) }
+            ?.run { getComments(startDepth) }
             .run {
                 Listing(
                     KIND,

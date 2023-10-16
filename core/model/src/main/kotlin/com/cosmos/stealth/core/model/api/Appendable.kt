@@ -34,6 +34,9 @@ data class Appendable (
     @Json(name = "parentLinkId")
     val parentLinkId: String?,
 
+    @Json(name = "refLink")
+    val refLink: String?,
+
     @Json(name = "depth")
     val depth: Int
 ) : Feedable(FeedableType.more)

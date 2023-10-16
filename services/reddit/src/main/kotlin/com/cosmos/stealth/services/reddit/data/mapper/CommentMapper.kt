@@ -84,7 +84,7 @@ class CommentMapper(
         }
     }
 
-    private fun dataToEntity(data: MoreData, context: Service?, parentId: String?): Appendable {
+    private fun dataToEntity(data: MoreData, context: Service?, parent: PostData?, parentId: String?): Appendable {
         with(data) {
             return Appendable(
                 context ?: Service(ServiceName.reddit),
@@ -93,6 +93,7 @@ class CommentMapper(
                 children,
                 this.parentId,
                 parentId.orEmpty(),
+                parent?.permalink?.getRefLink(context?.instance.orEmpty()),
                 depth ?: 0
             )
         }
@@ -106,7 +107,7 @@ class CommentMapper(
     ): Feedable {
         return when (data.kind) {
             ChildType.t1 -> dataToEntity((data as CommentChild).data, context, parent, parentId)
-            ChildType.more -> dataToEntity((data as MoreChild).data, context, parent?.name ?: parentId)
+            ChildType.more -> dataToEntity((data as MoreChild).data, context, parent, parent?.name ?: parentId)
             else -> error("Unknown kind ${data.kind}")
         }
     }

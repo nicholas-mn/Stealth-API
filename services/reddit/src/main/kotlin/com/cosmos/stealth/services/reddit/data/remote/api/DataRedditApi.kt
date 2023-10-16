@@ -66,7 +66,10 @@ class DataRedditApi(client: HttpClient, urlSubstitutor: UrlSubstitutor) : BaseRe
         children: String,
         linkId: String,
         bearer: String?,
-        host: String?
+        host: String?,
+        parentId: String?,
+        refLink: String?,
+        depth: Int?
     ): MoreChildren {
         return getRawMoreChildren(children, linkId, bearer, host).body()
     }

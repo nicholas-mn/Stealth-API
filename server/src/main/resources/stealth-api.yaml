@@ -830,6 +830,9 @@ components:
         parentLinkId:
           type: string
           description: ID of the item this object originates from
+        refLink:
+          type: string
+          description: Reference link of the item this object originates from
         depth:
           type: integer
     

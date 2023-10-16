@@ -160,7 +160,10 @@ internal class RedditRepository(
                     children,
                     appendable.parentLinkId.orEmpty(),
                     bearer = credentialsRepository.accessToken,
-                    host = request.info.host
+                    host = request.info.host,
+                    appendable.parentId,
+                    appendable.refLink,
+                    appendable.depth
                 )
             }
         }
@@ -341,7 +344,7 @@ internal class RedditRepository(
     companion object {
         private const val LOAD_MORE_LIMIT = 100
 
-        private val BASE_URL = RedditApi.BASE_URL.toHttpUrl()
-        private val SCRAP_URL = RedditApi.BASE_URL_OLD.toHttpUrl()
+        internal val BASE_URL = RedditApi.BASE_URL.toHttpUrl()
+        internal val SCRAP_URL = RedditApi.BASE_URL_OLD.toHttpUrl()
     }
 }

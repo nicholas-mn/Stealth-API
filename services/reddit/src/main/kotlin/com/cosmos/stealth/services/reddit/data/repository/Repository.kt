@@ -232,7 +232,10 @@ abstract class Repository(
                 items
             }
 
-            restoreCommentHierarchy(data, appendable.depth)
+            when (request.service.instance) {
+                RedditRepository.SCRAP_URL.host -> data
+                else -> restoreCommentHierarchy(data, appendable.depth)
+            }
         }
     }
 
