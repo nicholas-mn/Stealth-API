@@ -48,27 +48,38 @@ internal class RedditRepository(
         after: String?
     ): Feed {
         val source = getSource(request.service.instance)
+        var finalSource = source
 
-        val response = safeApiCall {
-            source.getSubreddit(
-                subreddit,
-                sorting.generalSorting,
-                sorting.timeSorting,
-                after,
-                limit,
-                bearer = credentialsRepository.accessToken,
-                host = request.info.host
-            )
+        val response = getResponseWithFallback(source) { redditApi ->
+            finalSource = redditApi
+
+            safeApiCall {
+                redditApi.getSubreddit(
+                    subreddit,
+                    sorting.generalSorting,
+                    sorting.timeSorting,
+                    after,
+                    limit,
+                    bearer = credentialsRepository.accessToken,
+                    host = request.info.host
+                )
+            }
         }
 
-        return getSubreddit(response, source.getRequest(request))
+        return getSubreddit(response, finalSource.getRequest(request))
     }
 
     override suspend fun getSubredditInfo(request: Request, subreddit: String): Resource<CommunityInfo> {
         val source = getSource(request.service.instance)
 
-        return getSubredditInfo(source.getRequest(request)) {
-            source.getSubredditInfo(subreddit, bearer = credentialsRepository.accessToken, host = request.info.host)
+        return getResponseWithFallback(source) { redditApi ->
+            getSubredditInfo(redditApi.getRequest(request)) {
+                redditApi.getSubredditInfo(
+                    subreddit,
+                    bearer = credentialsRepository.accessToken,
+                    host = request.info.host
+                )
+            }
         }
     }
 
@@ -82,27 +93,40 @@ internal class RedditRepository(
     ): Resource<SearchResults> {
         val source = getSource(request.service.instance)
 
-        return searchInSubreddit(source.getRequest(request)) {
-            source.searchInSubreddit(
-                subreddit,
-                query,
-                sorting.generalSorting,
-                sorting.timeSorting,
-                after,
-                bearer = credentialsRepository.accessToken,
-                host = request.info.host
-            )
+        return getResponseWithFallback(source) { redditApi ->
+            searchInSubreddit(redditApi.getRequest(request)) {
+                redditApi.searchInSubreddit(
+                    subreddit,
+                    query,
+                    sorting.generalSorting,
+                    sorting.timeSorting,
+                    after,
+                    bearer = credentialsRepository.accessToken,
+                    host = request.info.host
+                )
+            }
         }
     }
 
     override suspend fun getPost(request: Request, permalink: String, limit: Int?, sort: Sort): Resource<Post> {
         val source = getSource(request.service.instance)
+        var finalSource = source
 
-        val response = safeApiCall {
-            source.getPost(permalink, limit, sort, bearer = credentialsRepository.accessToken, host = request.info.host)
+        val response = getResponseWithFallback(source) { redditApi ->
+            finalSource = redditApi
+
+            safeApiCall {
+                redditApi.getPost(
+                    permalink,
+                    limit,
+                    sort,
+                    bearer = credentialsRepository.accessToken,
+                    host = request.info.host
+                )
+            }
         }
 
-        return getPost(response, source.getRequest(request))
+        return getPost(response, finalSource.getRequest(request))
     }
 
     override suspend fun getMoreChildren(
@@ -130,20 +154,25 @@ internal class RedditRepository(
 
         val source = getSource(request.service.instance)
 
-        return getMoreChildren(source.getRequest(request), appendable, additionalContentFeedable) {
-            source.getMoreChildren(
-                children,
-                appendable.parentLinkId.orEmpty(),
-                bearer = credentialsRepository.accessToken,
-                host = request.info.host
-            )
+        return getResponseWithFallback(source) { redditApi ->
+            getMoreChildren(redditApi.getRequest(request), appendable, additionalContentFeedable) {
+                redditApi.getMoreChildren(
+                    children,
+                    appendable.parentLinkId.orEmpty(),
+                    bearer = credentialsRepository.accessToken,
+                    host = request.info.host
+                )
+            }
         }
     }
 
     override suspend fun getUserInfo(request: Request, user: String): Resource<UserInfo> {
         val source = getSource(request.service.instance)
-        return getUserInfo(source.getRequest(request)) {
-            source.getUserInfo(user, bearer = credentialsRepository.accessToken, host = request.info.host)
+
+        return getResponseWithFallback(source) { redditApi ->
+            getUserInfo(redditApi.getRequest(request)) {
+                redditApi.getUserInfo(user, bearer = credentialsRepository.accessToken, host = request.info.host)
+            }
         }
     }
 
@@ -155,18 +184,24 @@ internal class RedditRepository(
         after: String?
     ): Feed {
         val source = getSource(request.service.instance)
-        val response = safeApiCall {
-            source.getUserPosts(
-                user,
-                sorting.generalSorting,
-                sorting.timeSorting,
-                after,
-                bearer = credentialsRepository.accessToken,
-                host = request.info.host
-            )
+        var finalSource = source
+
+        val response = getResponseWithFallback(source) { redditApi ->
+            finalSource = redditApi
+
+            safeApiCall {
+                redditApi.getUserPosts(
+                    user,
+                    sorting.generalSorting,
+                    sorting.timeSorting,
+                    after,
+                    bearer = credentialsRepository.accessToken,
+                    host = request.info.host
+                )
+            }
         }
 
-        return getUserPosts(response, source.getRequest(request))
+        return getUserPosts(response, finalSource.getRequest(request))
     }
 
     override suspend fun getUserComments(
@@ -177,18 +212,24 @@ internal class RedditRepository(
         after: String?
     ): Feed {
         val source = getSource(request.service.instance)
-        val response = safeApiCall {
-            source.getUserComments(
-                user,
-                sorting.generalSorting,
-                sorting.timeSorting,
-                after,
-                bearer = credentialsRepository.accessToken,
-                host = request.info.host
-            )
+        var finalSource = source
+
+        val response = getResponseWithFallback(source) { redditApi ->
+            finalSource = redditApi
+
+            safeApiCall {
+                redditApi.getUserComments(
+                    user,
+                    sorting.generalSorting,
+                    sorting.timeSorting,
+                    after,
+                    bearer = credentialsRepository.accessToken,
+                    host = request.info.host
+                )
+            }
         }
 
-        return getUserComments(response, source.getRequest(request))
+        return getUserComments(response, finalSource.getRequest(request))
     }
 
     override suspend fun searchPost(
@@ -199,15 +240,18 @@ internal class RedditRepository(
         after: String?
     ): Resource<SearchResults> {
         val source = getSource(request.service.instance)
-        return searchPost(source.getRequest(request)) {
-            source.searchPost(
-                query,
-                sorting.generalSorting,
-                sorting.timeSorting,
-                after,
-                bearer = credentialsRepository.accessToken,
-                host = request.info.host
-            )
+
+        return getResponseWithFallback(source) { redditApi ->
+            searchPost(redditApi.getRequest(request)) {
+                redditApi.searchPost(
+                    query,
+                    sorting.generalSorting,
+                    sorting.timeSorting,
+                    after,
+                    bearer = credentialsRepository.accessToken,
+                    host = request.info.host
+                )
+            }
         }
     }
 
@@ -219,15 +263,18 @@ internal class RedditRepository(
         after: String?
     ): Resource<SearchResults> {
         val source = getSource(request.service.instance)
-        return searchUser(source.getRequest(request)) {
-            source.searchUser(
-                query,
-                sorting.generalSorting,
-                sorting.timeSorting,
-                after,
-                bearer = credentialsRepository.accessToken,
-                host = request.info.host
-            )
+
+        return getResponseWithFallback(source) { redditApi ->
+            searchUser(redditApi.getRequest(request)) {
+                redditApi.searchUser(
+                    query,
+                    sorting.generalSorting,
+                    sorting.timeSorting,
+                    after,
+                    bearer = credentialsRepository.accessToken,
+                    host = request.info.host
+                )
+            }
         }
     }
 
@@ -239,15 +286,18 @@ internal class RedditRepository(
         after: String?
     ): Resource<SearchResults> {
         val source = getSource(request.service.instance)
-        return searchSubreddit(source.getRequest(request)) {
-            source.searchSubreddit(
-                query,
-                sorting.generalSorting,
-                sorting.timeSorting,
-                after,
-                bearer = credentialsRepository.accessToken,
-                host = request.info.host
-            )
+
+        return getResponseWithFallback(source) { redditApi ->
+            searchSubreddit(redditApi.getRequest(request)) {
+                redditApi.searchSubreddit(
+                    query,
+                    sorting.generalSorting,
+                    sorting.timeSorting,
+                    after,
+                    bearer = credentialsRepository.accessToken,
+                    host = request.info.host
+                )
+            }
         }
     }
 
@@ -265,6 +315,26 @@ internal class RedditRepository(
             is DataRedditApi -> request.copy(service = request.service.copy(instance = BASE_URL.host))
             is ScrapRedditApi -> request.copy(service = request.service.copy(instance = SCRAP_URL.host))
             else -> request
+        }
+    }
+
+    /**
+     * Fetch data with OAuth/JSON API and fallback to the Scrap API in case of failure
+     */
+    private inline fun <T> getResponseWithFallback(
+        source: RedditApi,
+        apiCall: (RedditApi) -> Resource<T>
+    ): Resource<T> {
+        val response = apiCall(source)
+
+        // Original source was Scrap API; return the first response regardless of status
+        if (source is ScrapRedditApi) return response
+
+        return when (response) {
+            // Call was successful; return response
+            is Resource.Success -> response
+            // Something went wrong; retry with scraping
+            else -> apiCall(scrapRedditApi)
         }
     }
 
