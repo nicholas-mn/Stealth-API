@@ -57,7 +57,7 @@ class PostMapper(
                 post.apId,
                 post.published.toDateInMillis() ?: System.currentTimeMillis(),
                 creator.toPosterType(),
-                post.body?.run { markdownParser.parse(this) },
+                post.body?.takeIf { it.isNotEmpty() }?.run { markdownParser.parse(this) },
                 null, // TODO
                 httpUrl?.host,
                 post.updated.toDateInMillis(),
