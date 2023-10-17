@@ -1,5 +1,6 @@
 package com.cosmos.stealth.services.reddit.data.repository
 
+import com.cosmos.stealth.core.common.data.Config
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.IO_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.services.reddit.data.model.Credentials
 import com.cosmos.stealth.services.reddit.data.model.Token
@@ -29,7 +30,8 @@ import java.util.concurrent.TimeUnit
 internal class CredentialsRepository(
     @Named(REDDIT_QUALIFIER) private val dataRedditApi: RedditApi,
     @Named(GENERIC_QUALIFIER) private val moshi: Moshi,
-    @Named(IO_DISPATCHER_QUALIFIER) private val ioDispatcher: CoroutineDispatcher
+    @Named(IO_DISPATCHER_QUALIFIER) private val ioDispatcher: CoroutineDispatcher,
+    config: Config
 ) {
 
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + ioDispatcher)
@@ -41,7 +43,7 @@ internal class CredentialsRepository(
     val accessToken: String?
         get() = credentials.randomOrNull()?.token?.accessToken
 
-    init { init() }
+    init { if (config.reddit.useOauth) init() }
 
     private fun init() {
         val adapter = moshi.adapter<List<Credentials>>(
