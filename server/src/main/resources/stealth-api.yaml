@@ -13,6 +13,9 @@ info:
     name: GNU General Public License v3.0 only
     url: https://www.gnu.org/licenses/gpl-3.0.html
 
+servers:
+  - url: https://stealth.cosmosapps.org/api
+
 tags:
   - name: feed
     description: Building a feed
@@ -312,9 +315,6 @@ paths:
         200:
           description: Successful operation
           $ref: "#/components/responses/Services"
-
-servers:
-  - url: https://stealth.cosmosapps.org
 
 components:
   parameters:
