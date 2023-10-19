@@ -16,7 +16,7 @@
         <else>
             <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                    <fileNamePattern>${user.home}/logs/stealth-api/log_%d{yyyy_MM_dd}.log</fileNamePattern>
+                    <fileNamePattern>logs/stealth-api/log_%d{yyyy_MM_dd}.log</fileNamePattern>
 
                     <maxHistory>30</maxHistory>
                     <totalSizeCap>3GB</totalSizeCap>
