@@ -2,6 +2,7 @@ package com.cosmos.stealth.services.reddit.data.repository
 
 import com.cosmos.stealth.core.common.data.Config
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.IO_DISPATCHER_QUALIFIER
+import com.cosmos.stealth.core.common.util.extension.getLogger
 import com.cosmos.stealth.services.reddit.data.model.Credentials
 import com.cosmos.stealth.services.reddit.data.model.Token
 import com.cosmos.stealth.services.reddit.data.remote.api.RedditApi
@@ -34,6 +35,8 @@ internal class CredentialsRepository(
     config: Config
 ) {
 
+    private val logger = getLogger()
+
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
     private var credentials: List<Credentials> = emptyList()
@@ -47,7 +50,10 @@ internal class CredentialsRepository(
             else -> credentials.randomOrNull()?.token?.accessToken
         }
 
-    init { if (config.reddit.useOauth) init() }
+    init {
+        logger.info("Use OAuth: {}", config.reddit.useOauth)
+        if (config.reddit.useOauth) init()
+    }
 
     private fun init() {
         val adapter = moshi.adapter<List<Credentials>>(
@@ -62,6 +68,8 @@ internal class CredentialsRepository(
             } ?: emptyList()
         }
 
+        logger.info("Credentials count: {}", credentials.size)
+
         if (credentials.isNotEmpty()) {
             initTokens()
             registerRefreshJob()
@@ -75,7 +83,10 @@ internal class CredentialsRepository(
                     runCatching {
                         initToken(creds)
                     }.onSuccess { token ->
+                        logger.info("Token initialized with success")
                         creds.token = token
+                    }.onFailure {
+                        logger.info("Error while initializing token")
                     }
                 }
             }.awaitAll()
@@ -104,7 +115,10 @@ internal class CredentialsRepository(
                         runCatching {
                             refreshToken(creds)
                         }.onSuccess { token ->
+                            logger.info("Token refreshed with success")
                             creds.token = token
+                        }.onFailure {
+                            logger.info("Error while refreshing token")
                         }
                     }
                 }.awaitAll()
