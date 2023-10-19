@@ -41,7 +41,11 @@ internal class CredentialsRepository(
     private var refreshJob: Job? = null
 
     val accessToken: String?
-        get() = credentials.randomOrNull()?.token?.accessToken
+        get() = when {
+            credentials.isEmpty() -> null
+            credentials.size == 1 -> credentials[0].token?.accessToken
+            else -> credentials.randomOrNull()?.token?.accessToken
+        }
 
     init { if (config.reddit.useOauth) init() }
 
