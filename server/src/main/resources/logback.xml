@@ -14,17 +14,24 @@
             <logger name="io.netty" level="INFO"/>
         </then>
         <else>
-            <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <fileNamePattern>${user.home}/logs/stealth-api/log_%d{yyyy_MM_dd}.log</fileNamePattern>
+
+                    <maxHistory>30</maxHistory>
+                    <totalSizeCap>3GB</totalSizeCap>
+                </rollingPolicy>
+
                 <encoder>
                     <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
                 </encoder>
             </appender>
 
-            <root level="warn">
-                <appender-ref ref="STDOUT"/>
+            <root level="info">
+                <appender-ref ref="FILE"/>
             </root>
-            <logger name="org.eclipse.jetty" level="WARN"/>
-            <logger name="io.netty" level="WARN"/>
+            <logger name="org.eclipse.jetty" level="INFO"/>
+            <logger name="io.netty" level="INFO"/>
         </else>
     </if>
 </configuration>
