@@ -64,7 +64,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:${Dependencies.Versions.okHttp}")
 
     implementation("ch.qos.logback:logback-classic:${Dependencies.Versions.logback}")
-    implementation("org.codehaus.janino:janino:3.1.10")
+    implementation("org.codehaus.janino:janino:${Dependencies.Versions.janino}")
 
     testImplementation("io.ktor:ktor-server-tests-jvm:${Dependencies.Versions.ktor}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Dependencies.Versions.kotlin}")

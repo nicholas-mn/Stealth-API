@@ -11,6 +11,8 @@ object Dependencies {
 
         const val logback = "1.4.11"
 
+        const val janino = "3.1.10"
+
         const val moshi = "1.15.0"
         const val okio = "3.5.0"
         const val okHttp = "4.11.0"
