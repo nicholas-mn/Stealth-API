@@ -1,0 +1,1194 @@
+openapi: 3.0.3
+
+info:
+  description: "API for Stealth's content aggregation."
+  version: 0.1.0
+  title: Stealth API
+  termsOfService: https://stealth.cosmosapps.org/en/privacy.html
+  contact:
+    name: CosmosApps
+    url: https://gitlab.com/cosmosapps
+    email: cosmos.dev@protonmail.com
+  license:
+    name: GNU General Public License v3.0 only
+    url: https://www.gnu.org/licenses/gpl-3.0.html
+
+servers:
+  - url: https://stealth.cosmosapps.org/api
+
+tags:
+  - name: feed
+    description: Building a feed
+
+  - name: community
+    description: Access to a community
+  
+  - name: user
+    description: Access to a user
+  
+  - name: post
+    description: Access to a post
+  
+  - name: content
+    description: Access to more content
+  
+  - name: search
+    description: Search items
+
+  - name: services
+    description: Everything about supported services
+
+paths:
+  /v1/feed:
+    post:
+      tags:
+        - feed
+      summary: Builds an aggregated feed
+      operationId: postFeedV1
+      parameters:
+        - $ref: "#/components/parameters/ProxyMode"
+      requestBody:
+        $ref: "#/components/requestBodies/FeedRequest"
+      responses:
+        200:
+          description: Successful operation
+          $ref: "#/components/responses/Feed"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/InternalError"
+        501:
+          $ref: "#/components/responses/NotImplemented"
+        502:
+          $ref: "#/components/responses/BadGateway"
+  
+  /v1/community/{community}:
+    get:
+      tags:
+        - community
+      summary: Get feed from a community
+      operationId: getCommunityV1
+      parameters:
+        - $ref: "#/components/parameters/ProxyMode"
+        - name: community
+          in: path
+          description: Name of the community
+          schema:
+            type: string
+          required: true
+        - $ref: "#/components/parameters/Service"
+        - $ref: "#/components/parameters/Instance"
+        - $ref: "#/components/parameters/Sort"
+        - $ref: "#/components/parameters/Order"
+        - $ref: "#/components/parameters/Time"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/After"
+      responses:
+        200:
+          description: Successful operation
+          $ref: "#/components/responses/Community"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/InternalError"
+        501:
+          $ref: "#/components/responses/NotImplemented"
+        502:
+          $ref: "#/components/responses/BadGateway"
+  
+  /v1/community/{community}/info:
+    get:
+      tags:
+        - community
+      summary: Get info about a community
+      operationId: getCommunityInfoV1
+      parameters:
+        - $ref: "#/components/parameters/ProxyMode"
+        - name: community
+          in: path
+          description: Name of the community
+          schema:
+            type: string
+          required: true
+        - $ref: "#/components/parameters/Service"
+        - $ref: "#/components/parameters/Instance"
+      responses:
+        200:
+          description: Successful operation
+          $ref: "#/components/responses/CommunityInfo"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/InternalError"
+        501:
+          $ref: "#/components/responses/NotImplemented"
+        502:
+          $ref: "#/components/responses/BadGateway"
+  
+  /v1/user/{user}:
+    get:
+      tags:
+        - user
+      summary: Get feed from a user
+      operationId: getUserV1
+      parameters:
+        - $ref: "#/components/parameters/ProxyMode"
+        - name: user
+          in: path
+          description: Name of the user
+          schema:
+            type: string
+          required: true
+        - $ref: "#/components/parameters/Service"
+        - $ref: "#/components/parameters/Instance"
+        - $ref: "#/components/parameters/Sort"
+        - $ref: "#/components/parameters/Order"
+        - $ref: "#/components/parameters/Time"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/After"
+        - name: type
+          in: query
+          description: Feedable type
+          schema:
+            type: string
+            enum: [post, comment]
+            default: post
+      responses:
+        200:
+          description: Successful operation
+          $ref: "#/components/responses/User"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/InternalError"
+        501:
+          $ref: "#/components/responses/NotImplemented"
+        502:
+          $ref: "#/components/responses/BadGateway"
+    
+  /v1/user/{user}/info:
+    get:
+      tags:
+        - user
+      summary: Get info about a user
+      operationId: getUserInfoV1
+      parameters:
+        - $ref: "#/components/parameters/ProxyMode"
+        - name: user
+          in: path
+          description: Name of the user
+          schema:
+            type: string
+          required: true
+        - $ref: "#/components/parameters/Service"
+        - $ref: "#/components/parameters/Instance"
+      responses:
+        200:
+          description: Successful operation
+          $ref: "#/components/responses/UserInfo"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/InternalError"
+        501:
+          $ref: "#/components/responses/NotImplemented"
+        502:
+          $ref: "#/components/responses/BadGateway"
+
+  /v1/post/{post}:
+    get:
+      tags:
+        - post
+      summary: Get a post
+      operationId: getPostV1
+      parameters:
+        - $ref: "#/components/parameters/ProxyMode"
+        - name: post
+          in: path
+          description: ID of the post
+          schema:
+            type: string
+          required: true
+        - $ref: "#/components/parameters/Service"
+        - $ref: "#/components/parameters/Instance"
+        - $ref: "#/components/parameters/Sort"
+        - $ref: "#/components/parameters/Order"
+        - $ref: "#/components/parameters/After"
+        - name: limit
+          in: query
+          description: Limit parameter
+          schema:
+            type: integer
+            default: 200
+      responses:
+        200:
+          description: Successful operation
+          $ref: "#/components/responses/Post"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/InternalError"
+        501:
+          $ref: "#/components/responses/NotImplemented"
+        502:
+          $ref: "#/components/responses/BadGateway"
+  
+  /v1/more:
+    post:
+      tags:
+        - content
+      summary: Load additional content
+      operationId: postMoreV1
+      parameters:
+        - $ref: "#/components/parameters/ProxyMode"
+      requestBody:
+        $ref: "#/components/requestBodies/MoreRequest"
+      responses:
+        200:
+          description: Successful operation
+          $ref: "#/components/responses/More"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/InternalError"
+        501:
+          $ref: "#/components/responses/NotImplemented"
+        502:
+          $ref: "#/components/responses/BadGateway"
+
+  /v1/search:
+    get:
+      tags:
+        - search
+      summary: Search items
+      operationId: getSearchV1
+      parameters:
+        - $ref: "#/components/parameters/ProxyMode"
+        - name: q
+          in: query
+          description: Search query
+          schema:
+            type: string
+          required: true
+        - $ref: "#/components/parameters/Service"
+        - $ref: "#/components/parameters/Instance"
+        - name: type
+          in: query
+          description: Type to search for
+          schema:
+            $ref: "#/components/schemas/SearchType"
+        - name: community
+          in: query
+          description: Community name
+          schema:
+            type: string
+        - name: user
+          in: query
+          description: User name
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Sort"
+        - $ref: "#/components/parameters/Order"
+        - $ref: "#/components/parameters/Time"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/After"
+      responses:
+        200:
+          description: Successful operation
+          $ref: "#/components/responses/SearchResults"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        500:
+          $ref: "#/components/responses/InternalError"
+        501:
+          $ref: "#/components/responses/NotImplemented"
+        502:
+          $ref: "#/components/responses/BadGateway"
+  
+  /v1/services:
+    get:
+      tags:
+        - services
+      summary: Get the list of supported services
+      operationId: getServicesV1
+      responses:
+        200:
+          description: Successful operation
+          $ref: "#/components/responses/Services"
+
+components:
+  parameters:
+    # Headers
+    ProxyMode:
+      in: header
+      name: X-Proxy-Mode
+      description: Use the server as a proxy to make requests
+      schema:
+        type: boolean
+        default: false
+    
+    # Queries
+    Sort:
+      in: query
+      name: sort
+      description: Sort parameter
+      schema:
+        $ref: "#/components/schemas/Sort"
+    
+    Order:
+      in: query
+      name: order
+      description: Order parameter
+      schema:
+        $ref: "#/components/schemas/Order"
+    
+    Time:
+      in: query
+      name: time
+      description: Time parameter
+      schema:
+        $ref: "#/components/schemas/Time"
+    
+    Service:
+      in: query
+      name: service
+      description: Target service
+      schema:
+        $ref: "#/components/schemas/ServiceName"
+      required: true
+    
+    Instance:
+      in: query
+      name: instance
+      description: Target instance
+      schema:
+        $ref: "#/components/schemas/Instance"
+    
+    After:
+      in: query
+      name: after
+      description: Pagination key
+      schema:
+        $ref: "#/components/schemas/AfterKey"
+
+    Limit:
+      in: query
+      name: limit
+      description: Limit parameter
+      schema:
+        type: integer
+        default: 25
+    
+    Type:
+      in: query
+      name: type
+      description: Feedable type
+      schema:
+        $ref: "#/components/schemas/FeedableType"
+
+  responses:
+    Feed:
+      description: An aggregated feed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Feed"
+
+    Community:
+      description: Info and feed from a community
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Community"
+    
+    CommunityInfo:
+      description: Info about a community
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CommunityInfo"
+
+    User:
+      description: Info and feed from a user
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/User"
+    
+    UserInfo:
+      description: Info about a user
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserInfo"
+    
+    Post:
+      description: Post and comments
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Post"
+    
+    More:
+      description: additional content
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Feedable"
+
+    
+    SearchResults:
+      description: Search results
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SearchResults"
+    
+    Services:
+      description: Supported services
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/ServiceName"
+    
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    
+    InternalError:
+      description: Something went wrong
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    
+    NotImplemented:
+      description: Operation is not currently supported
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    
+    BadGateway:
+      description: Error while processing response from service
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  requestBodies:
+    FeedRequest:
+      description: Request for an aggregated feed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FeedRequest"
+      required: true
+    
+    MoreRequest:
+      description: Request for additional content
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Appendable"
+      required: true
+
+  schemas:
+    Feed:
+      type: object
+      description: An aggregated feed
+      required:
+        - items
+        - status
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Feedable"
+        after:
+          type: array
+          items:
+            $ref: "#/components/schemas/After"
+        status:
+          type: array
+          items:
+            $ref: "#/components/schemas/Status"
+    
+    Community:
+      type: object
+      description: Info and feed about a community
+      required:
+        - info
+        - feed
+      properties:
+        info:
+          $ref: "#/components/schemas/CommunityInfo"
+        feed:
+          $ref: "#/components/schemas/Feed"
+    
+    CommunityInfo:
+      type: object
+      description: Info about a community
+      required:
+        - type
+        - service
+        - id
+        - name
+        - created
+      properties:
+        type:
+          $ref: "#/components/schemas/CommunityType"
+        service:
+          $ref: "#/components/schemas/Service"
+        id:
+          type: string
+        name:
+          type: string
+        title:
+          type: string
+        shortDescription:
+          type: string
+        description:
+          type: string
+        icon:
+          $ref: "#/components/schemas/Media"
+        header:
+          $ref: "#/components/schemas/Media"
+        members:
+          type: integer
+        active:
+          type: integer
+        refLink:
+          type: string
+        created:
+          type: integer
+          format: int64
+        nsfw:
+          type: boolean
+        color:
+          type: string
+    
+    User:
+      type: object
+      description: Info and feed about a user
+      required:
+        - info
+        - feed
+      properties:
+        info:
+          $ref: "#/components/schemas/UserInfo"
+        feed:
+          $ref: "#/components/schemas/Feed"
+
+    UserInfo:
+      type: object
+      description: Info about a user
+      required:
+        - type
+        - service
+        - id
+        - name
+        - created
+      properties:
+        type:
+          $ref: "#/components/schemas/UserType"
+        service:
+          $ref: "#/components/schemas/Service"
+        id:
+          type: string
+        name:
+          type: string
+        icon:
+          $ref: "#/components/schemas/Media"
+        header:
+          $ref: "#/components/schemas/Media"
+        description:
+          type: string
+        created:
+          type: integer
+          format: int64
+        subscribers:
+          type: integer
+        subscribees:
+          type: integer
+        nsfw:
+          type: boolean
+        postCount:
+          type: integer
+        commentCount:
+          type: integer
+        score:
+          type: integer
+        refLink:
+          type: string
+
+    Post:
+      type: object
+      description: Post and replies
+      required:
+        - post
+        - replies
+      properties:
+        post:
+          $ref: "#/components/schemas/Feedable"
+        replies:
+          $ref: "#/components/schemas/Feed"
+    
+    Feedable:
+      oneOf:
+        - $ref: "#/components/schemas/Postable"
+        - $ref: "#/components/schemas/Commentable"
+        - $ref: "#/components/schemas/Appendable"
+      discriminator:
+        propertyName: type
+        mapping:
+          post: "#/components/schemas/Postable"
+          comment: "#/components/schemas/Commentable"
+          more: "#/components/schemas/Appendable"
+    
+    Postable:
+      type: object
+      description: Post
+      required:
+        - type
+        - service
+        - id
+        - contentType
+        - community
+        - title
+        - author
+        - score
+        - commentCount
+        - url
+        - refLink
+        - created
+        - posterType
+      properties:
+        type:
+          $ref: "#/components/schemas/FeedableType"
+        service:
+          $ref: "#/components/schemas/Service"
+        id:
+          type: string
+        postType:
+          $ref: "#/components/schemas/PostType"
+        community:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        author:
+          type: string
+        score:
+          type: integer
+        ratio:
+          type: number
+          format: double
+        commentCount:
+          type: integer
+        domain:
+          type: string
+        url:
+          type: string
+        refLink:
+          type: string
+        created:
+          type: integer
+          format: int64
+        edited:
+          type: integer
+          format: int64
+        oc:
+          type: boolean
+        self:
+          type: boolean
+        nsfw:
+          type: boolean
+        spoiler:
+          type: boolean
+        archived:
+          type: boolean
+        locked:
+          type: boolean
+        pinned:
+          type: boolean
+        reactions:
+          $ref: "#/components/schemas/Reactions"
+        preview:
+          $ref: "#/components/schemas/Media"
+        media:
+          type: array
+          items:
+            $ref: "#/components/schemas/Media"
+        postBadge:
+          $ref: "#/components/schemas/Badge"
+        authorBadge:
+          $ref: "#/components/schemas/Badge"
+        posterType:
+          $ref: "#/components/schemas/PosterType"
+    
+    Commentable:
+      type: object
+      description: Comment
+      required:
+        - type
+        - service
+        - id
+        - postId
+        - community
+        - body
+        - author
+        - score
+        - refLink
+        - created
+        - submitter
+        - posterType
+      properties:
+        type:
+          $ref: "#/components/schemas/FeedableType"
+        service:
+          $ref: "#/components/schemas/Service"
+        id:
+          type: string
+        postId:
+          type: string
+        community:
+          type: string
+        body:
+          type: string
+        author:
+          type: string
+        score:
+          type: integer
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Feedable"
+        refLink:
+          type: string
+        created:
+          type: integer
+          format: int64
+        edited:
+          type: integer
+          format: int64
+        pinned:
+          type: boolean
+        depth:
+          type: integer
+        controversial:
+          type: boolean
+        reactions:
+          $ref: "#/components/schemas/Reactions"
+        authorBadge:
+          $ref: "#/components/schemas/Badge"
+        submitter:
+          type: boolean
+        postAuthor:
+          type: string
+        postTitle:
+          type: string
+        postRefLink:
+          type: string
+        posterType:
+          $ref: "#/components/schemas/PosterType"
+    
+    Appendable:
+      type: object
+      description: Info to request additional, unloaded content
+      required:
+        - type
+        - service
+        - id
+        - count
+        - content
+        - depth
+      properties:
+        type:
+          $ref: "#/components/schemas/FeedableType"
+        service:
+          $ref: "#/components/schemas/Service"
+        id:
+          type: string
+        count:
+          type: integer
+        content:
+          type: array
+          items:
+            type: string
+        parentId:
+          type: string
+          description: ID of the direct parent
+        parentLinkId:
+          type: string
+          description: ID of the item this object originates from
+        refLink:
+          type: string
+          description: Reference link of the item this object originates from
+        depth:
+          type: integer
+    
+    SearchResults:
+      oneOf:
+        - $ref: "#/components/schemas/FeedableResults"
+        - $ref: "#/components/schemas/CommunityResults"
+        - $ref: "#/components/schemas/UserResults"
+      discriminator:
+        propertyName: type
+        mapping:
+          feedable: "#/components/schemas/FeedableResults"
+          community: "#/components/schemas/CommunityResults"
+          user: "#/components/schemas/UserResults"
+    
+    FeedableResults:
+      type: object
+      required:
+        - type
+        - results
+      properties:
+        type:
+          $ref: "#/components/schemas/SearchType"
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Feedable"
+        after:
+          $ref: "#/components/schemas/AfterKey"
+    
+    CommunityResults:
+      type: object
+      required:
+        - type
+        - results
+      properties:
+        type:
+          $ref: "#/components/schemas/SearchType"
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/CommunityInfo"
+        after:
+          $ref: "#/components/schemas/AfterKey"
+    
+    UserResults:
+      type: object
+      required:
+        - type
+        - results
+      properties:
+        type:
+          $ref: "#/components/schemas/SearchType"
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserInfo"
+        after:
+          $ref: "#/components/schemas/AfterKey"
+
+    Media:
+      type: object
+      description: Media description
+      required:
+        - mime
+        - source
+      properties:
+        id:
+          type: string
+        mime:
+          type: string
+          example: image/jpeg
+        source:
+          $ref: "#/components/schemas/MediaSource"
+        resolutions:
+          type: array
+          description: Other resolutions
+          items:
+            $ref: "#/components/schemas/MediaSource"
+        alternatives:
+          type: array
+          description: Alternative sources (e.g. with a different type)
+          items:
+            $ref: "#/components/schemas/Media"
+        caption:
+          type: string
+    
+    MediaSource:
+      type: object
+      description: Source for a Media object
+      required:
+        - url
+      properties:
+        width:
+          type: integer
+          example: 1920
+        height:
+          type: integer
+          example: 1080
+        url:
+          type: string
+          example: https://gitlab.com/cosmosapps/stealth/-/raw/master/stealth.png
+    
+    Reactions:
+      type: object
+      description: Reactions received
+      required:
+        - total
+        - reactions
+      properties:
+        total:
+          type: integer
+          example: 128
+        reactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reaction"
+    
+    Reaction:
+      type: object
+      description: Reaction description
+      required:
+        - count
+      properties:
+        count:
+          type: integer
+          example: 5
+        name:
+          type: string
+          example: Homer
+        description:
+          type: string
+          example: Alumnus who's gained the most weight
+        media:
+          $ref: "#/components/schemas/Media"
+    
+    Badge:
+      type: object
+      description: Badge description
+      required:
+        - data
+      properties:
+        background:
+          type: string
+          example: "#C0FFEE"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/BadgeData"
+
+    BadgeData:
+      type: object
+      description: Badge data
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum: [text, image]
+          example: text
+        text:
+          type: string
+          example: Everything's coming up Milhouse!
+        url:
+          type: string
+          example: https://gitlab.com/uploads/-/system/project/avatar/25469848/icon.png?width=64
+
+    FeedRequest:
+      type: object
+      description: Request for an aggregated feed
+      required:
+        - services
+      properties:
+        services:
+          type: array
+          items:
+            $ref: "#/components/schemas/ServiceRequest"
+        after:
+          type: array
+          items:
+            $ref: "#/components/schemas/After"
+        sort:
+          $ref: "#/components/schemas/Sort"
+        order:
+          $ref: "#/components/schemas/Order"
+        time:
+          $ref: "#/components/schemas/Time"
+        limit:
+          type: integer
+          default: 25
+
+    ServiceRequest:
+      type: object
+      description: Request for a feed from a specific service
+      required:
+        - service
+      properties:
+        service:
+          $ref: "#/components/schemas/Service"
+        communities:
+          type: array
+          items:
+            type: string
+            example: privacy
+
+    After:
+      type: object
+      description: Pagination key for a specific service
+      required:
+        - service
+        - key
+      properties:
+        service:
+          $ref: "#/components/schemas/Service"
+        key:
+          $ref: "#/components/schemas/AfterKey"
+
+    Status:
+      type: object
+      description: Status for a service request
+      required:
+        - service
+        - code
+      properties:
+        service:
+          $ref: "#/components/schemas/Service"
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Something might have happened.
+
+    Service:
+      type: object
+      description: Service description
+      required:
+        - name
+      properties:
+        name:
+          $ref: "#/components/schemas/ServiceName"
+        instance:
+          $ref: "#/components/schemas/Instance"
+    
+    Instance:
+      type: string
+      description: Target instance
+      format: hostname
+      example: teddit.net
+
+    AfterKey:
+      description: Pagination key
+      oneOf:
+        - type: string
+        - type: integer
+      example: b2dj4FWV
+    
+    Error:
+      type: object
+      description: Error description
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: Missing field
+
+    # Enums
+    ServiceName:
+      type: string
+      description: Supported services
+      enum:
+        - reddit
+        - teddit
+        - lemmy
+    
+    FeedableType:
+      type: string
+      description: Feedable type
+      enum:
+        - post
+        - comment
+        - more
+      default: post
+    
+    UserType:
+      type: string
+      description: User type
+      enum:
+        - user
+
+    CommunityType:
+      type: string
+      description: Community type
+      enum:
+        - community
+    
+    Sort:
+      type: string
+      description: Sort
+      enum:
+        - trending
+        - date
+        - score
+        - comments
+        - relevance
+      default: trending
+    
+    Order:
+      type: string
+      description: Sort order
+      enum:
+        - asc
+        - desc
+      default: desc
+    
+    Time:
+      type: string
+      description: Time filter
+      enum:
+        - hour
+        - day
+        - week
+        - month
+        - year
+        - all
+      default: day
+    
+    SearchType:
+      type: string
+      description: Search type
+      enum:
+        - community
+        - user
+        - feedable
+      default: feedable
+    
+    PosterType:
+      type: string
+      description: Type of poster
+      enum:
+        - regular
+        - moderator
+        - admin
+        - bot
+      default: regular
+    
+    PostType:
+      type: string
+      description: Type of post
+      enum:
+        - text
+        - image
+        - video
+        - link
