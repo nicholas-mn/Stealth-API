@@ -23,6 +23,7 @@ import com.cosmos.stealth.services.lemmy.util.extension.toPosterType
 import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import org.jsoup.parser.Parser
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 
@@ -49,7 +50,7 @@ class PostMapper(
                 post.id.toString(),
                 postType,
                 community.name,
-                post.name,
+                Parser.unescapeEntities(post.name, true),
                 creator.getAuthorName(context?.instance),
                 counts.score,
                 counts.comments,
