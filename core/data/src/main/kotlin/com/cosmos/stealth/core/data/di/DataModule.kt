@@ -3,6 +3,7 @@ package com.cosmos.stealth.core.data.di
 import com.cosmos.stealth.core.common.di.DispatchersModule
 import com.cosmos.stealth.core.common.util.TimeValue
 import com.cosmos.stealth.core.data.di.DataModule.Qualifier.DASH_QUALIFIER
+import com.cosmos.stealth.core.network.util.extension.cache
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.BrowserUserAgent
@@ -32,6 +33,7 @@ class DataModule {
     @Named(DASH_QUALIFIER)
     fun provideDashOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
+            .cache(DASH_QUALIFIER)
             .connectTimeout(TIMEOUT.value, TIMEOUT.unit)
             .readTimeout(TIMEOUT.value, TIMEOUT.unit)
             .writeTimeout(TIMEOUT.value, TIMEOUT.unit)
