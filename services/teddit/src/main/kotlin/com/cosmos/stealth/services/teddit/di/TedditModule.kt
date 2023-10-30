@@ -5,6 +5,7 @@ import com.cosmos.stealth.core.common.util.TimeValue
 import com.cosmos.stealth.core.network.data.converter.MoshiContentConverter
 import com.cosmos.stealth.core.network.data.converter.moshi
 import com.cosmos.stealth.core.network.di.NetworkModule
+import com.cosmos.stealth.core.network.util.extension.cache
 import com.cosmos.stealth.services.reddit.data.remote.RawJsonInterceptor
 import com.cosmos.stealth.services.reddit.di.RedditModule.Qualifier.REDDIT_QUALIFIER
 import com.cosmos.stealth.services.teddit.data.remote.TargetRedditInterceptor
@@ -37,6 +38,7 @@ class TedditModule {
         return OkHttpClient.Builder()
             .addInterceptor(RawJsonInterceptor())
             .addInterceptor(TargetRedditInterceptor())
+            .cache(TEDDIT_QUALIFIER)
             .connectTimeout(TIMEOUT.value, TIMEOUT.unit)
             .readTimeout(TIMEOUT.value, TIMEOUT.unit)
             .writeTimeout(TIMEOUT.value, TIMEOUT.unit)
