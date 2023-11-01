@@ -19,3 +19,5 @@ fun <T> Collection<Collection<T>>.interlace(): List<T> {
 fun <T> List<T>.nullIfEmpty(): List<T>? {
     return takeIf { it.isNotEmpty() }
 }
+
+inline fun <reified T : Any> List<*>.firstOrNullAs(): T? = firstOrNull() as? T?

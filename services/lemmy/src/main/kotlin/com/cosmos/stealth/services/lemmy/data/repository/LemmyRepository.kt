@@ -2,7 +2,9 @@ package com.cosmos.stealth.services.lemmy.data.repository
 
 import com.cosmos.stealth.core.common.di.DispatchersModule.Qualifier.DEFAULT_DISPATCHER_QUALIFIER
 import com.cosmos.stealth.core.common.util.MessageHandler
+import com.cosmos.stealth.core.common.util.extension.firstOrNullAs
 import com.cosmos.stealth.core.model.api.After
+import com.cosmos.stealth.core.model.api.Commentable
 import com.cosmos.stealth.core.model.api.CommunityInfo
 import com.cosmos.stealth.core.model.api.CommunityResults
 import com.cosmos.stealth.core.model.api.Feed
@@ -231,7 +233,11 @@ internal class LemmyRepository(
             )
         }
 
-        return response.map { commentMapper.dataToEntities(it.comments, request.service) }
+        return response.map {
+            // Return the replies of the first comment, as the response represents the parent of the Appendable
+            val comments = commentMapper.dataToEntities(it.comments, request.service)
+            comments.firstOrNullAs<Commentable>()?.replies?.toList() ?: emptyList()
+        }
     }
 
     suspend fun search(
