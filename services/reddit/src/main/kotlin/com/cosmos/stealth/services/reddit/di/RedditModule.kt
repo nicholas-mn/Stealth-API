@@ -8,6 +8,7 @@ import com.cosmos.stealth.core.network.data.converter.MoshiContentConverter
 import com.cosmos.stealth.core.network.data.converter.moshi
 import com.cosmos.stealth.core.network.di.NetworkModule
 import com.cosmos.stealth.core.network.util.UrlSubstitutor
+import com.cosmos.stealth.core.network.util.extension.cache
 import com.cosmos.stealth.services.reddit.data.adapter.EditedAdapter
 import com.cosmos.stealth.services.reddit.data.adapter.MediaMetadataAdapter
 import com.cosmos.stealth.services.reddit.data.adapter.NullToEmptyStringAdapter
@@ -95,6 +96,7 @@ class RedditModule {
         return OkHttpClient.Builder()
             .addInterceptor(RawJsonInterceptor())
             .addInterceptor(JsonInterceptor())
+            .cache(REDDIT_QUALIFIER)
             .connectTimeout(TIMEOUT.value, TIMEOUT.unit)
             .readTimeout(TIMEOUT.value, TIMEOUT.unit)
             .writeTimeout(TIMEOUT.value, TIMEOUT.unit)
@@ -105,6 +107,7 @@ class RedditModule {
     @Named(REDDIT_SCRAP_QUALIFIER)
     fun provideRedditScrapOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
+            .cache(REDDIT_SCRAP_QUALIFIER)
             .connectTimeout(TIMEOUT.value, TIMEOUT.unit)
             .readTimeout(TIMEOUT.value, TIMEOUT.unit)
             .writeTimeout(TIMEOUT.value, TIMEOUT.unit)

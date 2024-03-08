@@ -8,7 +8,7 @@ import com.cosmos.stealth.services.reddit.RedditGateway
 import com.cosmos.stealth.services.teddit.TedditGateway
 import org.koin.core.annotation.Single
 
-@Single
+@Single(createdAtStart = true)
 class GatewayManager(
     private val redditGateway: RedditGateway,
     private val tedditGateway: TedditGateway,

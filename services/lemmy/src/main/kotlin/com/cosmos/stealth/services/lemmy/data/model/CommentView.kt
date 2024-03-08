@@ -27,5 +27,11 @@ data class CommentView(
     val saved: Boolean,
 
     @Json(name = "creator_blocked")
-    val creatorBlocked: Boolean
+    val creatorBlocked: Boolean,
+
+    @Json(name = "creator_is_moderator")
+    val creatorIsModerator: Boolean?,
+
+    @Json(name = "creator_is_admin")
+    val creatorIsAdmin: Boolean?
 )

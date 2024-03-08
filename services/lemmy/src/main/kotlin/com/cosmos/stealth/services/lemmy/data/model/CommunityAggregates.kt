@@ -5,9 +5,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class CommunityAggregates(
-    @Json(name = "id")
-    val id: Int,
-
     @Json(name = "community_id")
     val communityId: Int,
 
@@ -33,8 +30,5 @@ data class CommunityAggregates(
     val usersActiveMonth: Int,
 
     @Json(name = "users_active_half_year")
-    val usersActiveHalfYear: Int,
-
-    @Json(name = "hot_rank")
-    val hotRank: Int
+    val usersActiveHalfYear: Int
 )

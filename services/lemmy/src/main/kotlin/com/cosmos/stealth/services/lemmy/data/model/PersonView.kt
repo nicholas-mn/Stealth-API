@@ -9,5 +9,8 @@ data class PersonView(
     val person: Person,
 
     @Json(name = "counts")
-    val counts: PersonAggregates
+    val counts: PersonAggregates,
+
+    @Json(name = "is_admin")
+    val isAdmin: Boolean?
 )

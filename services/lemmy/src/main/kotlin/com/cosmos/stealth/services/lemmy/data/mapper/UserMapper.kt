@@ -38,7 +38,7 @@ class UserMapper(
                 null,
                 counts.postCount,
                 counts.commentCount,
-                counts.postScore + counts.commentScore,
+                0, // TODO
                 person.actorId
             )
         }

@@ -18,11 +18,12 @@ import com.cosmos.stealth.core.network.util.extension.toMedia
 import com.cosmos.stealth.services.lemmy.data.model.PostView
 import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIER
 import com.cosmos.stealth.services.lemmy.util.extension.getAuthorName
+import com.cosmos.stealth.services.lemmy.util.extension.getPosterType
 import com.cosmos.stealth.services.lemmy.util.extension.toDateInMillis
-import com.cosmos.stealth.services.lemmy.util.extension.toPosterType
 import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import org.jsoup.parser.Parser
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 
@@ -49,14 +50,14 @@ class PostMapper(
                 post.id.toString(),
                 postType,
                 community.name,
-                post.name,
+                Parser.unescapeEntities(post.name, true),
                 creator.getAuthorName(context?.instance),
                 counts.score,
                 counts.comments,
                 post.url?.takeIf { it.isNotBlank() } ?: post.apId,
                 post.apId,
                 post.published.toDateInMillis() ?: System.currentTimeMillis(),
-                creator.toPosterType(),
+                getPosterType(creator),
                 post.body?.takeIf { it.isNotEmpty() }?.run { markdownParser.parse(this) },
                 null, // TODO
                 httpUrl?.host,
