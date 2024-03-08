@@ -15,5 +15,11 @@ data class PostView(
     val community: Community,
 
     @Json(name = "counts")
-    val counts: PostAggregates
+    val counts: PostAggregates,
+
+    @Json(name = "creator_is_moderator")
+    val creatorIsModerator: Boolean?,
+
+    @Json(name = "creator_is_admin")
+    val creatorIsAdmin: Boolean?
 )

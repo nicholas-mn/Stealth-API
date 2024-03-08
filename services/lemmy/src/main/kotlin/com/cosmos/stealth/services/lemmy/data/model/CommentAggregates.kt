@@ -5,9 +5,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class CommentAggregates(
-    @Json(name = "id")
-    val id: Int,
-
     @Json(name = "comment_id")
     val commentId: Int,
 
@@ -24,8 +21,5 @@ data class CommentAggregates(
     val published: String,
 
     @Json(name = "child_count")
-    val childCount: Int,
-
-    @Json(name = "hot_rank")
-    val hotRank: Int
+    val childCount: Int
 )

@@ -18,8 +18,8 @@ import com.cosmos.stealth.core.network.util.extension.toMedia
 import com.cosmos.stealth.services.lemmy.data.model.PostView
 import com.cosmos.stealth.services.lemmy.di.LemmyModule.Qualifier.LEMMY_QUALIFIER
 import com.cosmos.stealth.services.lemmy.util.extension.getAuthorName
+import com.cosmos.stealth.services.lemmy.util.extension.getPosterType
 import com.cosmos.stealth.services.lemmy.util.extension.toDateInMillis
-import com.cosmos.stealth.services.lemmy.util.extension.toPosterType
 import io.ktor.http.ContentType
 import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -57,7 +57,7 @@ class PostMapper(
                 post.url?.takeIf { it.isNotBlank() } ?: post.apId,
                 post.apId,
                 post.published.toDateInMillis() ?: System.currentTimeMillis(),
-                creator.toPosterType(),
+                getPosterType(creator),
                 post.body?.takeIf { it.isNotEmpty() }?.run { markdownParser.parse(this) },
                 null, // TODO
                 httpUrl?.host,

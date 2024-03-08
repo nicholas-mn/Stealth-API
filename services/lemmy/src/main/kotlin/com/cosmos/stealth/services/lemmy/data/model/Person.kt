@@ -47,8 +47,9 @@ data class Person(
     @Json(name = "matrix_user_id")
     val matrixUserId: String? = null,
 
+    @Deprecated("Old model")
     @Json(name = "admin")
-    val admin: Boolean,
+    val admin: Boolean?,
 
     @Json(name = "bot_account")
     val botAccount: Boolean,
