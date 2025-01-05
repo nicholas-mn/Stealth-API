@@ -24,7 +24,25 @@ More services will be supported in the future.
 
 ## Installation
 
-To do...
+To install and run the Stealth API using Docker, follow these steps:
+
+1. **Build the Docker Image**:
+   - Ensure you have Docker installed on your system.
+   - Clone the repository and navigate to the project directory.
+   - Build the Docker image using the following command:
+     ```bash
+     docker build -t stealth-api .
+     ```
+
+2. **Run the Docker Container**:
+   - Once the image is built, you can run the container with:
+     ```bash
+     docker run -p 8080:8080 stealth-api
+     ```
+
+This will start the Stealth API server, and it will be accessible at `http://localhost:8080`.
+
+The Dockerfile provided in the repository handles the setup and execution of the application within a containerized environment.
 
 ## Privacy Policy
 
