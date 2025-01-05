@@ -34,7 +34,13 @@ To install and run the Stealth API using Docker, follow these steps:
      docker build -t stealth-api .
      ```
 
-2. **Run the Docker Container**:
+2. **Pull the Docker Image**:
+   - You can pull the pre-built Docker image from the GitHub Container Registry using the following command:
+     ```bash
+     docker pull ghcr.io/nicholas-mn/stealth-api:latest
+     ```
+
+3. **Run the Docker Container**:
    - Once the image is built, you can run the container with:
      ```bash
      docker run -p 8080:8080 stealth-api
