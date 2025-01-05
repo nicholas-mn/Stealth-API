@@ -1,0 +1,6 @@
+services:
+  stealth-api:
+    image: ghcr.io/nicholas-mn/stealth-api:latest
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
